@@ -16,8 +16,9 @@ langchain-openai>=0.3.18
 langchain-cohere>=0.4.3
 langchain-text-splitters>=0.3.0
 
-# PDF processing (lightweight — no native deps needed)
+# PDF processing
 pypdf>=5.0.0
+pdfplumber>=0.11.0
 
 # Embeddings (lightweight)
 sentence-transformers>=4.0.0
