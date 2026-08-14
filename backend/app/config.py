@@ -12,7 +12,12 @@ from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
-    """Central configuration — reads from .env automatically."""
+    """
+    Application configuration loaded from environment variables and `.env`.
+    
+    Manages LLM providers (xAI, OpenRouter, OpenAI-compatible), Cohere reranking,
+    HuggingFace sentence-transformer embeddings, and persistent ChromaDB settings.
+    """
 
     # ── Paths ────────────────────────────────────────────────────────
     DATA_DIR: Path = Path(__file__).resolve().parent.parent.parent / "Data"
