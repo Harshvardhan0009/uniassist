@@ -1,8 +1,9 @@
 """
 Document Partitioning — Step 3 of the pipeline.
 
-Supports PDF, DOCX, TXT, and Markdown files.
-Each file/page becomes a LangChain Document with metadata (source, filename, page_number).
+Extracts text and structured tables from PDF, DOCX, TXT, and Markdown files.
+Uses `pdfplumber` for table-aware PDF parsing so tables are converted into
+clean Markdown tables, preserving row and column relationships.
 """
 
 import logging
@@ -15,22 +16,76 @@ logger = logging.getLogger(__name__)
 
 
 def partition_pdf(file_path: Path) -> list[Document]:
-    """Extract text from a PDF file, one Document per page."""
-    logger.info(f"Partitioning PDF: {file_path.name}")
-    loader = PyPDFLoader(str(file_path))
-    pages = loader.load()
+    """
+    Extract text and structured tables from a PDF file.
+    Converts tables into clean Markdown format.
+    """
+    logger.info(f"Partitioning PDF (table-aware): {file_path.name}")
+    documents = []
 
-    for page in pages:
-        page.metadata["filename"] = file_path.name
-        page.metadata["page_number"] = page.metadata.get("page", 0) + 1
-        page.metadata["category"] = "NarrativeText"
+    try:
+        import pdfplumber
 
-    logger.info(f"  → {len(pages)} pages extracted from {file_path.name}")
-    return pages
+        with pdfplumber.open(str(file_path)) as pdf:
+            for page_idx, page in enumerate(pdf.pages):
+                page_text = page.extract_text() or ""
+                tables = page.extract_tables()
+
+                content_parts = [page_text]
+
+                if tables:
+                    table_mds = []
+                    for table in tables:
+                        clean_rows = []
+                        for row in table:
+                            clean_cells = [
+                                cell.replace("\n", " ").strip() if cell else ""
+                                for cell in row
+                            ]
+                            if any(clean_cells) and len([c for c in clean_cells if c]) > 1:
+                                clean_rows.append(clean_cells)
+
+                        if clean_rows and len(clean_rows) >= 2:
+                            header = clean_rows[0]
+                            md_table = "| " + " | ".join(header) + " |\n"
+                            md_table += "| " + " | ".join(["---"] * len(header)) + " |\n"
+                            for r in clean_rows[1:]:
+                                r = r + [""] * (len(header) - len(r))
+                                md_table += "| " + " | ".join(r[: len(header)]) + " |\n"
+                            table_mds.append(md_table)
+
+                    if table_mds:
+                        content_parts.append("\n\n### Extracted Table Data:\n" + "\n\n".join(table_mds))
+
+                full_content = "\n\n".join(part for part in content_parts if part.strip())
+                if full_content.strip():
+                    doc = Document(
+                        page_content=full_content,
+                        metadata={
+                            "source": str(file_path),
+                            "filename": file_path.name,
+                            "page_number": page_idx + 1,
+                            "category": "TableAndText" if tables else "NarrativeText",
+                        },
+                    )
+                    documents.append(doc)
+
+        logger.info(f"  → {len(documents)} pages (with table preservation) from {file_path.name}")
+        return documents
+
+    except Exception as e:
+        logger.warning(f"pdfplumber extraction failed for {file_path.name}: {e}. Falling back to PyPDFLoader.")
+        loader = PyPDFLoader(str(file_path))
+        pages = loader.load()
+        for page in pages:
+            page.metadata["filename"] = file_path.name
+            page.metadata["page_number"] = page.metadata.get("page", 0) + 1
+            page.metadata["category"] = "NarrativeText"
+        return pages
 
 
 def partition_docx(file_path: Path) -> list[Document]:
-    """Extract text from a DOCX file."""
+    """Extract text and tables from a DOCX file."""
     logger.info(f"Partitioning DOCX: {file_path.name}")
     try:
         import docx
@@ -41,12 +96,15 @@ def partition_docx(file_path: Path) -> list[Document]:
             if para.text.strip():
                 full_text.append(para.text)
 
-        # Also extract table text
+        # Extract table data
         for table in doc.tables:
+            table_lines = []
             for row in table.rows:
-                row_text = " | ".join(cell.text.strip() for cell in row.cells if cell.text.strip())
+                row_text = " | ".join(cell.text.strip().replace("\n", " ") for cell in row.cells if cell.text.strip())
                 if row_text:
-                    full_text.append(row_text)
+                    table_lines.append(row_text)
+            if table_lines:
+                full_text.append("\n".join(table_lines))
 
         content = "\n\n".join(full_text)
         if not content.strip():
@@ -97,11 +155,7 @@ def partition_file(file_path: Path) -> list[Document]:
 
 
 def partition_directory(data_dir: Path) -> dict[str, list[Document]]:
-    """
-    Extract text from all supported files in a directory (recursive).
-
-    Supported: PDF, DOCX, TXT, MD.
-    """
+    """Extract text from all supported files in a directory (recursive)."""
     supported_extensions = {".pdf", ".docx", ".txt", ".md"}
     all_files = [
         f for f in sorted(data_dir.rglob("*"))
