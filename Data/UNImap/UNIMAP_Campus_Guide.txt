@@ -1,0 +1,70 @@
+# Lovely Professional University (LPU) - Campus Map, Blocks & Site Plan Guide
+
+## University Overview and Total Blocks
+The Lovely Professional University (LPU) campus has numbered blocks ranging from Block 01 up to Block 58, along with lettered sub-blocks, residential hostel blocks, administrative offices, auditoriums, sports facilities, and central services.
+
+### Complete List of University Blocks and Site Plan Legend:
+- Block 01: School of Fashion Design
+- Block 02A: Mini Auditorium, Baldev Raj Mittal Auditorium (Hostel/Safety & Security Presentations)
+- Block 02B: Campus Café
+- Block 03A: School of Paramedical Sciences, Department of Electrical Works, Director General Office
+- Block 03B: School of Pharmacy
+- Block 08A: School of Architecture & Design, Division of Construction, Division of Architecture & Design
+- Block 08B: School of Pharmacy
+- Block 08C: Uni Hospital, School of Fine Arts, School of Animation
+- Block 09: Girl's Hostel 1 (Playgrounds for Demo Matches for Girls & Yoga Session)
+- Block 10: Girl's Hostel 2 (Playgrounds for Demo Matches for Girls & Yoga Session)
+- Block 11: Girl's Hostel 3
+- Block 12: Girl's Hostel 4
+- Block 13: Division of Student Affairs (DSA visit, Club Registrations & Help Desk)
+- Block 14: School of Business (School of Business Administration, School of Management, School of Commerce and Economics)
+- Block 15A: UniCenter / Uni Mall
+- Block 15B: School of Hotel Management
+- Block 18: School of Arts and Languages, School of Physical Education, Department of Education
+- Block 19: Sh. Baldev Raj Mittal Main Stage (Adjoining Uni Mall - Food Carnival Arena, Shopper Street, Movie Showcase, Mega Events, Freshmen Got Talent)
+- Block 20: School of Law
+- Block 21A: Girl's Hostel 5
+- Block 21B: Girl's Hostel 6
+- Block 25: School of Agriculture
+- Block 26: School of Agriculture SEEE
+- Block 27: School of Physical Sciences PEP Faculty CSE
+- Block 28: School of Biotechnology, School of Physical Sciences
+- Block 29: Administrative Block (Office of the Pro-Chancellor, Division of Academic Affairs, Division of Procurement, Division of Residential Services, Division of Security & Safety, Division of Facilities, Lovely School of Open & Distance Learning). 
+  - Lower Ground Floor: Freshmen Registration / Freshmen Kit Distribution.
+  - Front Side: Adventure Sports, Fun Games, Help Desk.
+- Block 30: The Chancellory (Division of Human Resources, Division of Public Relations & Promotions, Division of Administrative Governance, Division of Infotech, Division of Quality Assurance, Department of Projects, Directorate of Open and Distance Learning)
+- Block 31: Division of Admissions, Museum of Academics
+- Block 32: Office of the Vice Chancellor (Division of Examination, Division of Research and Development, Division of Career Services, Division of International Affairs, Division of Finance, Department of IT Infrastructure)
+- Block 33: School of Computer Sciences and Engineering, School of Electrical and Electronics Engineering
+- Block 34: School of Computer Science & Engineering
+- Block 35: Shanti Devi Mittal Auditorium (Central Address and Cultural Showcase)
+- Block 36: School of Electronics & Electrical Engineering
+- Block 37: Central Library
+- Block 38: DRD School of Computer Application
+- Block 39: Sewerage Treatment Plant
+- Block 40: Central Store
+- Block 41A: Staff Apartments
+- Block 41B: Staff Apartments
+- Block 41C: Staff Apartments
+- Block 41D: Staff Apartments
+- Block 42: Swimming Pool
+- Block 45: Boys Hostel - 1
+- Block 47: Boys Hostel - 7
+- Block 48: Boys Hostel - 2
+- Block 49: Boys Hostel - 3
+- Block 50: Boys Hostel - 3A
+- Block 51A: Boys Hostel - 4 (Playgrounds for Demo Matches for Boys & Yoga Session)
+- Block 51B: Boys Hostel - 4
+- Block 52: Cricket Ground (Demo Matches for Boys)
+- Block 53: Boys Hostel - 5
+- Block 54: Boys Hostel - 6
+- Block 55: School of Mechanical Engineering (CSE, ECE, Physics)
+- Block 56: School of Civil Engineering
+- Block 57: School of Polytechnic
+- Block 58: Workshops
+
+### Gates, Walkways and Special Venues:
+- Main Gate 1A: Waiting Room (along G.T. Road towards Ludhiana and Jalandhar)
+- Main Gate 1B: Vehicular & Pedestrian Entry
+- Covered Walkways & Pedestrian Walkways connecting academic and residential blocks
+- Over Bridge and Vehicular Roads
