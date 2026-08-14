@@ -25,7 +25,7 @@ class Settings(BaseSettings):
     # If CHROMA_HOST is empty, runs in local file mode using CHROMA_PERSIST_DIR.
     # If CHROMA_HOST is set (e.g. 'my-chroma.onrender.com' or 'localhost'), connects via HttpClient.
     CHROMA_HOST: str = ""
-    CHROMA_PORT: int = 8000
+    CHROMA_PORT: int = 8001
     CHROMA_SSL: bool = False
     CHROMA_AUTH_TOKEN: str = ""
     CHROMA_COLLECTION: str = "university_docs"
