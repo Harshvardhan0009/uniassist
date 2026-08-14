@@ -1,13 +1,8 @@
 """
 Chunking — Step 4 of the pipeline.
 
-Splits page-level documents into smaller, semantically coherent chunks
-using LangChain's RecursiveCharacterTextSplitter. Each chunk retains
-the source file and page metadata from the original document.
-
-Since we're using PyPDFLoader (page-level extraction), we don't have
-element-level categories. Instead we split pages into overlapping chunks
-of ~1000 chars for good retrieval granularity.
+Splits page-level documents into coherent chunks while preserving table structures
+and context using LangChain's RecursiveCharacterTextSplitter.
 """
 
 import logging
@@ -18,8 +13,9 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 logger = logging.getLogger(__name__)
 
 # ── Splitter configuration ───────────────────────────────────────────
-CHUNK_SIZE = 1000        # chars per chunk
-CHUNK_OVERLAP = 200      # overlap to preserve context across boundaries
+# Larger chunk size so full tables (often 1000-2000 chars) remain together
+CHUNK_SIZE = 2500
+CHUNK_OVERLAP = 300
 
 splitter = RecursiveCharacterTextSplitter(
     chunk_size=CHUNK_SIZE,
@@ -32,34 +28,26 @@ splitter = RecursiveCharacterTextSplitter(
 
 def chunk_documents(documents: list[Document], source_file: str = "") -> list[Document]:
     """
-    Split page-level documents into smaller retrieval-friendly chunks.
-
-    Each chunk Document has:
-      - page_content: the chunk text
-      - metadata.source_file: original filename
-      - metadata.page_number: source page
-      - metadata.chunk_type: always 'text_only' (PyPDF doesn't detect tables/images)
-
-    Args:
-        documents: List of page-level Documents from partitioning.
-        source_file: Name of the source PDF.
-
-    Returns:
-        List of chunked Documents.
+    Split page-level documents into retrieval-friendly chunks.
+    Preserves table markdown and metadata.
     """
     if not documents:
         return []
 
-    # Split all pages into smaller chunks
-    chunks = splitter.split_documents(documents)
+    # If document already fits within chunk size, keep it whole
+    chunks = []
+    for doc in documents:
+        if len(doc.page_content) <= CHUNK_SIZE:
+            chunks.append(doc)
+        else:
+            sub_chunks = splitter.split_documents([doc])
+            chunks.extend(sub_chunks)
 
     # Enrich metadata
     for i, chunk in enumerate(chunks):
         chunk.metadata["source_file"] = source_file or chunk.metadata.get("filename", "unknown")
-        chunk.metadata["chunk_type"] = "text_only"
         chunk.metadata["chunk_index"] = i
-        # Preserve page info
-        if "page" in chunk.metadata:
+        if "page" in chunk.metadata and "page_number" not in chunk.metadata:
             chunk.metadata["page_number"] = chunk.metadata["page"] + 1
 
     logger.info(
@@ -69,7 +57,7 @@ def chunk_documents(documents: list[Document], source_file: str = "") -> list[Do
     return chunks
 
 
-# Alias for backward compatibility with pipeline.py
+# Alias for backward compatibility
 chunk_by_title = chunk_documents
 
 

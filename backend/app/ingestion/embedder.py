@@ -2,11 +2,15 @@
 Embedding & Vector Storage — Step 6 of the pipeline.
 
 Embeds summarized chunks using HuggingFace embeddings (all-MiniLM-L6-v2)
-via LangChain and stores them in a persistent ChromaDB collection.
+via LangChain and stores them in ChromaDB.
+
+Supports both:
+  1. Client-Server Mode: Shared remote ChromaDB over HTTP (Render / Railway / EC2)
+  2. Local File Mode: Embedded ChromaDB in `chroma_db/` directory
 """
 
 import logging
-
+import chromadb
 from langchain_chroma import Chroma
 from langchain_core.documents import Document
 from langchain_huggingface import HuggingFaceEmbeddings
@@ -35,22 +39,49 @@ def get_vector_store(
     embedding_function: HuggingFaceEmbeddings | None = None,
 ) -> Chroma:
     """
-    Get a persistent ChromaDB vector store instance.
+    Get a Chroma vector store instance (Client-Server or Local).
 
     Args:
         embedding_function: Optional — if not provided, creates one.
 
     Returns:
-        A LangChain Chroma vector store backed by persistent storage.
+        A LangChain Chroma vector store.
     """
     if embedding_function is None:
         embedding_function = get_embedding_function()
 
-    return Chroma(
-        collection_name=settings.CHROMA_COLLECTION,
-        embedding_function=embedding_function,
-        persist_directory=str(settings.CHROMA_PERSIST_DIR),
-    )
+    if settings.is_chroma_server:
+        logger.info(
+            f"Connecting to ChromaDB Server at "
+            f"{'https' if settings.CHROMA_SSL else 'http'}://{settings.CHROMA_HOST}:{settings.CHROMA_PORT} "
+            f"(collection: '{settings.CHROMA_COLLECTION}')"
+        )
+        headers = {}
+        if settings.CHROMA_AUTH_TOKEN:
+            headers["X-Chroma-Token"] = settings.CHROMA_AUTH_TOKEN
+
+        client = chromadb.HttpClient(
+            host=settings.CHROMA_HOST,
+            port=settings.CHROMA_PORT,
+            ssl=settings.CHROMA_SSL,
+            headers=headers if headers else None,
+        )
+
+        return Chroma(
+            client=client,
+            collection_name=settings.CHROMA_COLLECTION,
+            embedding_function=embedding_function,
+        )
+    else:
+        logger.info(
+            f"Using local ChromaDB at '{settings.CHROMA_PERSIST_DIR}' "
+            f"(collection: '{settings.CHROMA_COLLECTION}')"
+        )
+        return Chroma(
+            collection_name=settings.CHROMA_COLLECTION,
+            embedding_function=embedding_function,
+            persist_directory=str(settings.CHROMA_PERSIST_DIR),
+        )
 
 
 def embed_and_store(documents: list[Document]) -> int:
@@ -72,10 +103,9 @@ def embed_and_store(documents: list[Document]) -> int:
     vector_store = get_vector_store(embedding_fn)
 
     # ChromaDB metadata values must be str, int, float, or bool.
-    # Convert complex types (lists, dicts) to strings.
     sanitized_docs = _sanitize_metadata(documents)
 
-    # Add documents in batches to avoid memory spikes
+    # Add documents in batches
     batch_size = 50
     total_stored = 0
 

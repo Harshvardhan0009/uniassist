@@ -73,6 +73,8 @@ class HealthResponse(BaseModel):
     cohere_configured: bool
     embedding_model: str
     collection: str
+    chroma_mode: str
+    chroma_host: str | None = None
 
 
 # ── Endpoints ────────────────────────────────────────────────────────
@@ -87,6 +89,8 @@ async def health_check():
         cohere_configured=settings.has_cohere,
         embedding_model=settings.EMBEDDING_MODEL,
         collection=settings.CHROMA_COLLECTION,
+        chroma_mode="client_server" if settings.is_chroma_server else "local_persistent",
+        chroma_host=f"{'https' if settings.CHROMA_SSL else 'http'}://{settings.CHROMA_HOST}:{settings.CHROMA_PORT}" if settings.is_chroma_server else None,
     )
 
 

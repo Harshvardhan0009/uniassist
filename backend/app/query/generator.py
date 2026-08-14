@@ -2,10 +2,10 @@
 Answer Generator — Step 9 of the pipeline.
 
 Pulls raw content from reranked documents' metadata and passes it
-along with the user's query to Grok for final answer generation.
+along with the user's query to Grok/OpenRouter for final answer generation.
 
-If no GROK_API_KEY is set, generates a clean, structured response
-from the retrieved context (no raw dumps).
+Optimized for table comprehension, range matching (e.g. salary slabs, CGPA, stipends),
+and structured responses.
 """
 
 import logging
@@ -26,14 +26,16 @@ ANSWER_PROMPT = ChatPromptTemplate.from_messages(
         (
             "system",
             "You are UniAssist, an intelligent AI assistant for Lovely Professional University (LPU) students and staff. "
-            "Answer the user's question accurately and helpfully using ONLY the provided context from "
+            "Answer the user's question accurately, completely, and helpfully using ONLY the provided context from "
             "official university documents.\n\n"
-            "Formatting & Tone Guidelines:\n"
-            "- If the answer is present in the context, provide a clear, conversational, and well-structured response.\n"
-            "- Use bullet points, bold section headers, and clean line breaks for readability.\n"
-            "- If the answer is NOT in the context, honestly state that official documentation does not contain that info.\n"
-            "- Include specific citations indicating which document or section was referenced.\n"
-            "- Be direct, polite, concise, and helpful.",
+            "Critical Instructions for Tables, Numbers, and Ranges:\n"
+            "1. Pay close attention to table columns, headers, and rows.\n"
+            "2. When a user asks about a specific number, package, or stipend (e.g. '6 lakhs', '6 LPA', '15,000 stipend', '7.5 CGPA'):\n"
+            "   - Look for range slabs in tables such as 'Above 5 & up to 10 LPA' (which includes 6 lakhs), 'Above 3 & up to 5 LPA', etc.\n"
+            "   - Identify the exact category, eligible pathway courses, grade updation levels, and conditions mapped to that range.\n"
+            "3. Format table-derived answers in clean, readable bullet points or structured summaries.\n"
+            "4. If the answer is genuinely NOT in the context, state that clearly.\n"
+            "5. Cite the source document(s) used.",
         ),
         (
             "human",
@@ -76,14 +78,10 @@ def _format_context(documents: list[Document]) -> str:
 def _build_clean_answer(query: str, documents: list[Document]) -> str:
     """
     Build a clean, readable answer from retrieved documents WITHOUT an LLM.
-    
-    Instead of dumping raw text, this extracts key sentences that are most
-    relevant and presents them in a structured format.
     """
     if not documents:
         return "I couldn't find relevant information about that in the university documents."
 
-    # Gather content by source
     source_contents: dict[str, list[str]] = {}
     for doc in documents:
         source = doc.metadata.get("source_file", "Unknown").replace(".pdf", "")
@@ -92,49 +90,36 @@ def _build_clean_answer(query: str, documents: list[Document]) -> str:
             source_contents[source] = []
         source_contents[source].append(raw)
 
-    # Build a structured response
-    answer_parts = []
-    answer_parts.append(f"Based on the university documents, here's what I found:\n")
+    answer_parts = [f"Based on the university documents, here's what I found:\n"]
 
     for source, contents in source_contents.items():
         combined = "\n".join(contents)
-
-        # Clean up the text — remove excessive whitespace, page numbers, etc.
-        combined = re.sub(r'\n{3,}', '\n\n', combined)
-        combined = re.sub(r'^\s*\d+\s*$', '', combined, flags=re.MULTILINE)
+        combined = re.sub(r"\n{3,}", "\n\n", combined)
         combined = combined.strip()
 
-        # Extract meaningful sentences (skip very short lines)
         sentences = []
-        for line in combined.split('\n'):
+        for line in combined.split("\n"):
             line = line.strip()
-            if len(line) > 20:  # Skip very short fragments
+            if len(line) > 15:
                 sentences.append(line)
 
         if sentences:
-            # Take the most relevant portion (first ~800 chars)
-            text = '\n'.join(sentences)
-            if len(text) > 800:
-                # Try to cut at a sentence boundary
-                cutoff = text[:800].rfind('.')
-                if cutoff > 400:
-                    text = text[:cutoff + 1]
+            text = "\n".join(sentences)
+            if len(text) > 900:
+                cutoff = text[:900].rfind(".")
+                if cutoff > 500:
+                    text = text[: cutoff + 1]
                 else:
-                    text = text[:800] + "..."
+                    text = text[:900] + "..."
 
             answer_parts.append(f"**From {source}:**\n{text}\n")
-
-    answer_parts.append(
-        "\n---\n*Note: For a more detailed and conversational answer, "
-        "configure the GROK_API_KEY in the backend.*"
-    )
 
     return "\n".join(answer_parts)
 
 
 def generate_answer(query: str, documents: list[Document]) -> dict:
     """
-    Generate the final answer using Grok LLM.
+    Generate the final answer using Grok/OpenRouter LLM.
 
     Args:
         query: The user's question.
@@ -146,14 +131,10 @@ def generate_answer(query: str, documents: list[Document]) -> dict:
           - sources: list of source filenames
           - has_llm: whether LLM was used
     """
-    sources = list(
-        {doc.metadata.get("source_file", "Unknown") for doc in documents}
-    )
+    sources = list({doc.metadata.get("source_file", "Unknown") for doc in documents})
 
     if not settings.has_grok:
-        logger.warning(
-            "GROK_API_KEY not set — generating structured response from context."
-        )
+        logger.warning("GROK_API_KEY not set — generating structured response from context.")
         return {
             "answer": _build_clean_answer(query, documents),
             "sources": sources,
