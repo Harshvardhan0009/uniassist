@@ -47,7 +47,7 @@ class Settings(BaseSettings):
     RERANK_TOP_N: int = 5     # precise set after Cohere rerank
 
     model_config = {
-        "env_file": ".env",
+        "env_file": str(Path(__file__).resolve().parent.parent / ".env"),
         "env_file_encoding": "utf-8",
         "extra": "ignore",
     }

@@ -43,11 +43,12 @@ def retrieve(query: str, top_k: int | None = None) -> list[Document]:
         doc.metadata["relevance_score"] = round(score, 4)
         documents.append(doc)
 
-    logger.info(
-        f"  Retrieved {len(documents)} candidates "
-        f"(score range: {documents[0].metadata['relevance_score']:.3f} "
-        f"— {documents[-1].metadata['relevance_score']:.3f})"
-        if documents
-        else "  No candidates found."
-    )
+    if documents:
+        logger.info(
+            f"  Retrieved {len(documents)} candidates "
+            f"(score range: {documents[0].metadata['relevance_score']:.3f} "
+            f"— {documents[-1].metadata['relevance_score']:.3f})"
+        )
+    else:
+        logger.info("  No candidates found.")
     return documents
