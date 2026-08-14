@@ -10,7 +10,7 @@ and structured responses.
 
 import logging
 import re
-from ast import literal_eval
+import re
 
 from langchain_core.documents import Document
 from langchain_core.output_parsers import StrOutputParser
@@ -49,12 +49,14 @@ ANSWER_PROMPT = ChatPromptTemplate.from_messages(
 )
 
 
+import json
+
 def _extract_raw(doc: Document) -> str:
     """Get raw text content from a document, handling ChromaDB serialization."""
     raw = doc.metadata.get("raw_content", doc.page_content)
     if isinstance(raw, str) and raw.startswith("["):
         try:
-            raw = "\n".join(literal_eval(raw))
+            raw = "\n".join(json.loads(raw))
         except (ValueError, SyntaxError):
             pass
     return raw.strip()
@@ -131,7 +133,7 @@ def generate_answer(query: str, documents: list[Document]) -> dict:
           - sources: list of source filenames
           - has_llm: whether LLM was used
     """
-    sources = list({doc.metadata.get("source_file", "Unknown") for doc in documents})
+    sources = list(dict.fromkeys(doc.metadata.get("source_file", "Unknown") for doc in documents))
 
     if not settings.has_grok:
         logger.warning("GROK_API_KEY not set — generating structured response from context.")
@@ -154,14 +156,16 @@ def generate_answer(query: str, documents: list[Document]) -> dict:
 
     chain = ANSWER_PROMPT | llm | StrOutputParser()
 
+    has_llm = True
     try:
         answer = chain.invoke({"context": context, "query": query})
     except Exception as e:
         logger.error(f"Generation failed: {e}")
         answer = _build_clean_answer(query, documents)
+        has_llm = False
 
     return {
         "answer": answer,
         "sources": sources,
-        "has_llm": True,
+        "has_llm": has_llm,
     }

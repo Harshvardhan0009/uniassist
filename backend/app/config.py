@@ -25,7 +25,7 @@ class Settings(BaseSettings):
     # If CHROMA_HOST is empty, runs in local file mode using CHROMA_PERSIST_DIR.
     # If CHROMA_HOST is set (e.g. 'my-chroma.onrender.com' or 'localhost'), connects via HttpClient.
     CHROMA_HOST: str = ""
-    CHROMA_PORT: int = 8000
+    CHROMA_PORT: int = 8001
     CHROMA_SSL: bool = False
     CHROMA_AUTH_TOKEN: str = ""
     CHROMA_COLLECTION: str = "university_docs"
@@ -47,7 +47,7 @@ class Settings(BaseSettings):
     RERANK_TOP_N: int = 5     # precise set after Cohere rerank
 
     model_config = {
-        "env_file": ".env",
+        "env_file": str(Path(__file__).resolve().parent.parent / ".env"),
         "env_file_encoding": "utf-8",
         "extra": "ignore",
     }

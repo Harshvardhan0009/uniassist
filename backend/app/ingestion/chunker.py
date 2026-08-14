@@ -47,6 +47,7 @@ def chunk_documents(documents: list[Document], source_file: str = "") -> list[Do
     for i, chunk in enumerate(chunks):
         chunk.metadata["source_file"] = source_file or chunk.metadata.get("filename", "unknown")
         chunk.metadata["chunk_index"] = i
+        chunk.metadata["chunk_type"] = "text_only"
         if "page" in chunk.metadata and "page_number" not in chunk.metadata:
             chunk.metadata["page_number"] = chunk.metadata["page"] + 1
 
