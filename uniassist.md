@@ -1,8 +1,15 @@
-# University RAG System — Step-by-Step Build Plan
+# University RAG System — Step-by-Step Architecture
 
-A multi-modal Retrieval-Augmented Generation (RAG) system for answering university-related queries (admissions, courses, policies, faculty, schedules, etc.) from a corpus of PDF documents containing text, tables, and images.
+A multi-modal Retrieval-Augmented Generation (RAG) system for answering university-related queries (admissions, courses, policies, faculty, schedules, etc.) from a corpus of documents containing text, tables, and map legends.
 
-**Key choices:** BGE-M3 (free embedding model) · ChromaDB (vector store) · Cohere Rerank · Grok (free LLM) · Unstructured.io (PDF partitioning) · LangChain/LangGraph (orchestration)
+**Key Architecture Choices:** 
+- `all-MiniLM-L6-v2` / `BGE-M3` (lightweight embeddings)
+- `ChromaDB` (persistent vector store)
+- `Cohere Rerank v3.5` (cross-encoder reranking)
+- `OpenRouter / Grok / OpenAI` (LLM answer generation)
+- `PyPDF / python-docx / TextLoader` (zero-native-dependency partitioning)
+- `LangChain` (pipeline orchestration)
+- `Next.js 15 App Router` (ChatGPT-style conversational UI)
 
 ---
 
