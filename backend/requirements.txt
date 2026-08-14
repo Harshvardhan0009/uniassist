@@ -1,0 +1,29 @@
+# Core
+fastapi>=0.115.0
+uvicorn[standard]>=0.34.0
+pydantic-settings>=2.9.0
+python-dotenv>=1.1.0
+python-multipart>=0.0.20
+python-docx>=1.1.0
+
+# LangChain ecosystem
+langchain>=0.3.25
+langchain-core>=0.3.59
+langchain-community>=0.3.24
+langchain-huggingface>=0.2.0
+langchain-chroma>=0.2.4
+langchain-openai>=0.3.18
+langchain-cohere>=0.4.3
+langchain-text-splitters>=0.3.0
+
+# PDF processing (lightweight — no native deps needed)
+pypdf>=5.0.0
+
+# Embeddings (lightweight)
+sentence-transformers>=4.0.0
+
+# Vector store
+chromadb>=0.6.0
+
+# Utilities
+rich>=14.0.0
