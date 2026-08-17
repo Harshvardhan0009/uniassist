@@ -1,5 +1,5 @@
 /* ══════════════════════════════════════════════════════════════════
-   UniAssist — ChatGPT-style Layout
+   LpuAssist — ChatGPT-style Layout
    ══════════════════════════════════════════════════════════════════ */
 
 /* ── App Shell ────────────────────────────────────────────────────── */
@@ -83,6 +83,40 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  flex: 1;
+}
+
+.navItemActive {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.deleteBtn {
+  display: none;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: var(--radius-sm);
+  transition: color var(--transition-fast), background var(--transition-fast);
+  flex-shrink: 0;
+}
+
+.deleteBtn:hover {
+  color: var(--error);
+  background: rgba(255, 80, 80, 0.1);
+}
+
+.navItem:hover .deleteBtn {
+  display: flex;
+}
+
+.navEmpty {
+  padding: 12px;
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  font-style: italic;
 }
 
 .sidebarFooter {

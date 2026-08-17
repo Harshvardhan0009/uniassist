@@ -1,7 +1,7 @@
 import "./globals.css";
 
 export const metadata = {
-  title: "UniAssist — Your University AI Assistant",
+  title: "LpuAssist — Your University AI Assistant",
   description:
     "Ask questions about university policies, placement guidelines, dress code, library rules, and more. Powered by RAG technology.",
 };
