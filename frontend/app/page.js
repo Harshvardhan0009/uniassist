@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect, useCallback } from "react";
+import Image from "next/image";
 import styles from "./page.module.css";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:8000";
@@ -15,11 +16,55 @@ const SUGGESTIONS = [
 ];
 
 export default function Home() {
+  const [chatSessions, setChatSessions] = useState([]);
+  const [activeChatId, setActiveChatId] = useState(null);
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef(null);
   const textareaRef = useRef(null);
+
+  // Load chat sessions from localStorage on mount
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem("lpuassist_chats");
+      if (saved) {
+        setChatSessions(JSON.parse(saved));
+      }
+    } catch (e) {
+      console.error("Failed to load chat history:", e);
+    }
+  }, []);
+
+  // Save chat sessions to localStorage whenever they change
+  useEffect(() => {
+    try {
+      localStorage.setItem("lpuassist_chats", JSON.stringify(chatSessions));
+    } catch (e) {
+      console.error("Failed to save chat history:", e);
+    }
+  }, [chatSessions]);
+
+  // Persist active chat messages into sessions list
+  useEffect(() => {
+    if (activeChatId && messages.length > 0) {
+      setChatSessions((prev) => {
+        const idx = prev.findIndex((s) => s.id === activeChatId);
+        const updated = {
+          id: activeChatId,
+          title: messages[0]?.content?.slice(0, 40) || "New chat",
+          messages,
+          updatedAt: Date.now(),
+        };
+        if (idx >= 0) {
+          const copy = [...prev];
+          copy[idx] = updated;
+          return copy;
+        }
+        return [updated, ...prev];
+      });
+    }
+  }, [messages, activeChatId]);
 
   const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -38,6 +83,11 @@ export default function Home() {
   const sendMessage = async (text) => {
     const question = text || input.trim();
     if (!question || isLoading) return;
+
+    // Create a new session if none is active
+    if (!activeChatId) {
+      setActiveChatId(Date.now().toString());
+    }
 
     setMessages((prev) => [...prev, { role: "user", content: question, id: Date.now() }]);
     setInput("");
@@ -79,8 +129,24 @@ export default function Home() {
   };
 
   const handleNewChat = () => {
+    setActiveChatId(null);
     setMessages([]);
     setInput("");
+  };
+
+  const handleLoadChat = (session) => {
+    setActiveChatId(session.id);
+    setMessages(session.messages);
+    setInput("");
+  };
+
+  const handleDeleteChat = (e, sessionId) => {
+    e.stopPropagation();
+    setChatSessions((prev) => prev.filter((s) => s.id !== sessionId));
+    if (activeChatId === sessionId) {
+      setActiveChatId(null);
+      setMessages([]);
+    }
   };
 
   const isEmpty = messages.length === 0;
@@ -96,21 +162,35 @@ export default function Home() {
         <div className={styles.sidebarNav}>
           <div className={styles.navSection}>
             <span className={styles.navLabel}>Recent</span>
-            {messages.length > 0 && (
-              <div className={styles.navItem}>
+            {chatSessions.map((session) => (
+              <div
+                key={session.id}
+                className={`${styles.navItem} ${session.id === activeChatId ? styles.navItemActive : ""}`}
+                onClick={() => handleLoadChat(session)}
+              >
                 <ChatBubbleIcon />
                 <span className={styles.navText}>
-                  {messages[0]?.content?.slice(0, 28)}...
+                  {session.title}
                 </span>
+                <button
+                  className={styles.deleteBtn}
+                  onClick={(e) => handleDeleteChat(e, session.id)}
+                  title="Delete chat"
+                >
+                  <TrashIcon />
+                </button>
               </div>
+            ))}
+            {chatSessions.length === 0 && (
+              <div className={styles.navEmpty}>No conversations yet</div>
             )}
           </div>
         </div>
 
         <div className={styles.sidebarFooter}>
           <div className={styles.footerItem}>
-            <GradCapIcon />
-            <span>UniAssist v1.0</span>
+            <Image src="/lpu-logo.webp" alt="LPU" width={20} height={20} />
+            <span>LpuAssist v1.0</span>
           </div>
         </div>
       </aside>
@@ -119,7 +199,7 @@ export default function Home() {
       <main className={styles.main}>
         {/* Header */}
         <header className={styles.header}>
-          <span className={styles.modelName}>UniAssist</span>
+          <span className={styles.modelName}>LpuAssist</span>
         </header>
 
         {/* Chat Area */}
@@ -127,10 +207,7 @@ export default function Home() {
           {isEmpty ? (
             <div className={styles.empty}>
               <div className={styles.emptyLogo}>
-                <svg width="40" height="40" viewBox="0 0 24 24" fill="none">
-                  <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"
-                    stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
+                <Image src="/lpu-logo.webp" alt="LPU Logo" width={64} height={64} priority />
               </div>
               <h1 className={styles.emptyTitle}>What can I help with?</h1>
               <div className={styles.suggestions}>
@@ -147,14 +224,11 @@ export default function Home() {
                 <div key={msg.id} className={`${styles.msgRow} ${msg.role === "user" ? styles.msgRowUser : ""}`}>
                   {msg.role === "assistant" && (
                     <div className={styles.avatar}>
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"
-                          stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                      </svg>
+                      <Image src="/lpu-logo.webp" alt="LPU" width={28} height={28} />
                     </div>
                   )}
                   <div className={`${styles.msgContent} ${msg.role === "user" ? styles.msgContentUser : ""}`}>
-                    {msg.role === "assistant" && <div className={styles.msgLabel}>UniAssist</div>}
+                    {msg.role === "assistant" && <div className={styles.msgLabel}>LpuAssist</div>}
                     <div className={`${styles.msgText} ${msg.isError ? styles.msgError : ""}`}>
                       <FormattedText text={msg.content} />
                     </div>
@@ -173,13 +247,10 @@ export default function Home() {
               {isLoading && (
                 <div className={styles.msgRow}>
                   <div className={styles.avatar}>
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                      <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"
-                        stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
+                    <Image src="/lpu-logo.webp" alt="LPU" width={28} height={28} />
                   </div>
                   <div className={styles.msgContent}>
-                    <div className={styles.msgLabel}>UniAssist</div>
+                    <div className={styles.msgLabel}>LpuAssist</div>
                     <div className={styles.thinking}>
                       <div className={styles.dot} />
                       <div className={styles.dot} />
@@ -202,7 +273,7 @@ export default function Home() {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder="Ask UniAssist anything..."
+              placeholder="Ask LpuAssist anything..."
               rows={1}
               disabled={isLoading}
             />
@@ -219,7 +290,7 @@ export default function Home() {
             </button>
           </div>
           <p className={styles.disclaimer}>
-            UniAssist retrieves answers from official university documents. Always verify critical information.
+            LpuAssist retrieves answers from official university documents. Always verify critical information.
           </p>
         </div>
       </main>
@@ -231,7 +302,12 @@ export default function Home() {
 function FormattedText({ text }) {
   if (!text) return null;
 
-  return text.split("\n").map((line, i) => {
+  // Safety net: strip any leaked <think>...</think> blocks from reasoning models
+  let cleaned = text.replace(/<think>[\s\S]*?<\/think>/g, "").trim();
+  cleaned = cleaned.replace(/<think>[\s\S]*$/g, "").trim();
+  cleaned = cleaned.replace(/<\/?think>/g, "").trim();
+
+  return cleaned.split("\n").map((line, i) => {
     const trimmed = line.trim();
     if (!trimmed) return <br key={i} />;
     if (trimmed === "---") return <hr key={i} className={styles.hr} />;
@@ -268,8 +344,8 @@ function PlusIcon() {
 function ChatBubbleIcon() {
   return <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>;
 }
-function GradCapIcon() {
-  return <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>;
+function TrashIcon() {
+  return <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6h14" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>;
 }
 function ArrowUpIcon() {
   return <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 19V5M5 12l7-7 7 7" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg>;
