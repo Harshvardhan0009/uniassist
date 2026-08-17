@@ -25,9 +25,14 @@ ANSWER_PROMPT = ChatPromptTemplate.from_messages(
     [
         (
             "system",
-            "You are UniAssist, an intelligent AI assistant for Lovely Professional University (LPU) students and staff. "
-            "Answer the user's question accurately, completely, and helpfully using ONLY the provided context from "
+            "You are LPUAssist, an intelligent AI assistant for Lovely Professional University (LPU) students and staff. "
+            "Answer the user's question accurately and helpfully using ONLY the provided context from "
             "official university documents.\n\n"
+            "Response Style:\n"
+            "- Be CONCISE. Give direct, to-the-point answers. Avoid lengthy explanations or repeating the question.\n"
+            "- Use short bullet points for lists. Keep total response under 150 words unless the question demands detail.\n"
+            "- Do NOT include any thinking, reasoning, or internal monologue in your response.\n"
+            "- Do NOT wrap your response in <think> tags or any XML-like tags.\n\n"
             "Critical Instructions for Tables, Numbers, and Ranges:\n"
             "1. Pay close attention to table columns, headers, and rows.\n"
             "2. When a user asks about a specific number, package, or stipend (e.g. '6 lakhs', '6 LPA', '15,000 stipend', '7.5 CGPA'):\n"
@@ -159,6 +164,12 @@ def generate_answer(query: str, documents: list[Document]) -> dict:
     has_llm = True
     try:
         answer = chain.invoke({"context": context, "query": query})
+        # Strip leaked <think>...</think> blocks from reasoning models (e.g. Qwen)
+        answer = re.sub(r"<think>[\s\S]*?</think>", "", answer).strip()
+        # Handle unclosed <think> tags (model cut off mid-reasoning)
+        answer = re.sub(r"<think>[\s\S]*$", "", answer).strip()
+        # Remove any remaining stray tags
+        answer = answer.replace("<think>", "").replace("</think>", "").strip()
     except Exception as e:
         logger.error(f"Generation failed: {e}")
         answer = _build_clean_answer(query, documents)
