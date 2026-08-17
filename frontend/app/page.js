@@ -190,7 +190,7 @@ export default function Home() {
         <div className={styles.sidebarFooter}>
           <div className={styles.footerItem}>
             <Image src="/lpu-logo.webp" alt="LPU" width={20} height={20} />
-            <span>LpuAssist v1.0</span>
+            <span>LPUAssist v1.0</span>
           </div>
         </div>
       </aside>
@@ -199,7 +199,7 @@ export default function Home() {
       <main className={styles.main}>
         {/* Header */}
         <header className={styles.header}>
-          <span className={styles.modelName}>LpuAssist</span>
+          <span className={styles.modelName}>LPUAssist</span>
         </header>
 
         {/* Chat Area */}
@@ -228,7 +228,7 @@ export default function Home() {
                     </div>
                   )}
                   <div className={`${styles.msgContent} ${msg.role === "user" ? styles.msgContentUser : ""}`}>
-                    {msg.role === "assistant" && <div className={styles.msgLabel}>LpuAssist</div>}
+                    {msg.role === "assistant" && <div className={styles.msgLabel}>LPUAssist</div>}
                     <div className={`${styles.msgText} ${msg.isError ? styles.msgError : ""}`}>
                       <FormattedText text={msg.content} />
                     </div>
@@ -250,7 +250,7 @@ export default function Home() {
                     <Image src="/lpu-logo.webp" alt="LPU" width={28} height={28} />
                   </div>
                   <div className={styles.msgContent}>
-                    <div className={styles.msgLabel}>LpuAssist</div>
+                    <div className={styles.msgLabel}>LPUAssist</div>
                     <div className={styles.thinking}>
                       <div className={styles.dot} />
                       <div className={styles.dot} />
@@ -273,7 +273,7 @@ export default function Home() {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder="Ask LpuAssist anything..."
+              placeholder="Ask LPUAssist anything..."
               rows={1}
               disabled={isLoading}
             />
@@ -290,7 +290,7 @@ export default function Home() {
             </button>
           </div>
           <p className={styles.disclaimer}>
-            LpuAssist retrieves answers from official university documents. Always verify critical information.
+            LPUAssist retrieves answers from official university documents. Always verify critical information.
           </p>
         </div>
       </main>
