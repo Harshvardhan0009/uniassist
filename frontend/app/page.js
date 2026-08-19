@@ -15,6 +15,15 @@ const SUGGESTIONS = [
   "What academic benefits are offered?",
 ];
 
+// Cap on how many chat sessions we keep in localStorage.
+const MAX_SESSIONS = 50;
+
+// Collision-free id generator (falls back when crypto.randomUUID is unavailable).
+const genId = () =>
+  typeof crypto !== "undefined" && crypto.randomUUID
+    ? crypto.randomUUID()
+    : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+
 export default function Home() {
   const [chatSessions, setChatSessions] = useState([]);
   const [activeChatId, setActiveChatId] = useState(null);
@@ -23,6 +32,10 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef(null);
   const textareaRef = useRef(null);
+  const abortRef = useRef(null);
+
+  // Abort any in-flight request when the component unmounts.
+  useEffect(() => () => abortRef.current?.abort(), []);
 
   // Load chat sessions from localStorage on mount
   useEffect(() => {
@@ -61,7 +74,7 @@ export default function Home() {
           copy[idx] = updated;
           return copy;
         }
-        return [updated, ...prev];
+        return [updated, ...prev].slice(0, MAX_SESSIONS);
       });
     }
   }, [messages, activeChatId]);
@@ -86,10 +99,10 @@ export default function Home() {
 
     // Create a new session if none is active
     if (!activeChatId) {
-      setActiveChatId(Date.now().toString());
+      setActiveChatId(genId());
     }
 
-    setMessages((prev) => [...prev, { role: "user", content: question, id: Date.now() }]);
+    setMessages((prev) => [...prev, { role: "user", content: question, id: genId() }]);
     setInput("");
     setIsLoading(true);
 
@@ -99,11 +112,17 @@ export default function Home() {
       .map((m) => ({ role: m.role, content: m.content }))
       .slice(-8);
 
+    // Cancel any previous in-flight request before starting a new one.
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+
     try {
       const res = await fetch(`${API_BASE}/api/query`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ question, history }),
+        signal: controller.signal,
       });
       if (!res.ok) throw new Error(`Server error (${res.status})`);
       const data = await res.json();
@@ -112,16 +131,20 @@ export default function Home() {
         role: "assistant",
         content: data.answer,
         sources: data.sources,
-        id: Date.now() + 1,
+        id: genId(),
       }]);
     } catch (err) {
+      // Ignore aborts (navigation / superseded request).
+      if (err.name === "AbortError") return;
       setMessages((prev) => [...prev, {
         role: "assistant",
         content: `Something went wrong: ${err.message}. Please make sure the backend server is running.`,
         isError: true,
-        id: Date.now() + 1,
+        retryQuestion: question,
+        id: genId(),
       }]);
     } finally {
+      if (abortRef.current === controller) abortRef.current = null;
       setIsLoading(false);
       textareaRef.current?.focus();
     }
@@ -161,7 +184,7 @@ export default function Home() {
     <div className={styles.app}>
       {/* ── Sidebar ──────────────────────────────────────────── */}
       <aside className={styles.sidebar}>
-        <button className={styles.newChatBtn} onClick={handleNewChat}>
+        <button className={styles.newChatBtn} type="button" onClick={handleNewChat}>
           <PlusIcon /> New chat
         </button>
 
@@ -180,8 +203,10 @@ export default function Home() {
                 </span>
                 <button
                   className={styles.deleteBtn}
+                  type="button"
                   onClick={(e) => handleDeleteChat(e, session.id)}
                   title="Delete chat"
+                  aria-label="Delete chat"
                 >
                   <TrashIcon />
                 </button>
@@ -238,11 +263,20 @@ export default function Home() {
                     <div className={`${styles.msgText} ${msg.isError ? styles.msgError : ""}`}>
                       <FormattedText text={msg.content} />
                     </div>
+                    {msg.isError && msg.retryQuestion && (
+                      <button
+                        type="button"
+                        className={styles.retryBtn}
+                        onClick={() => sendMessage(msg.retryQuestion)}
+                      >
+                        ↻ Retry
+                      </button>
+                    )}
                     {msg.sources && msg.sources.length > 0 && (
                       <div className={styles.srcRow}>
                         {msg.sources.map((s) => (
                           <span key={s} className={styles.srcBadge}>
-                            📄 {s.replace(".pdf", "")}
+                            📄 {s.split("/").pop().replace(/\.(pdf|docx|txt|md)$/i, "")}
                           </span>
                         ))}
                       </div>
@@ -285,8 +319,10 @@ export default function Home() {
             />
             <button
               className={styles.sendBtn}
+              type="button"
               onClick={() => sendMessage()}
               disabled={!input.trim() || isLoading}
+              aria-label="Send message"
             >
               {isLoading ? (
                 <div className={styles.spinner} />
@@ -305,6 +341,25 @@ export default function Home() {
 }
 
 /* ── Text Formatter ──────────────────────────────────────────────── */
+
+// Render inline **bold** spans within a line of text.
+function renderInline(text) {
+  return text.split(/\*\*(.+?)\*\*/g).map((part, i) =>
+    i % 2 === 1 ? <strong key={i}>{part}</strong> : part
+  );
+}
+
+const isTableRow = (line) => /^\|.*\|$/.test(line.trim());
+const isTableSeparator = (line) =>
+  /^\|[\s:|-]+\|$/.test(line.trim()) && line.includes("-");
+
+function parseRow(line) {
+  const cells = line.trim().split("|");
+  if (cells.length && cells[0].trim() === "") cells.shift();
+  if (cells.length && cells[cells.length - 1].trim() === "") cells.pop();
+  return cells.map((c) => c.trim());
+}
+
 function FormattedText({ text }) {
   if (!text) return null;
 
@@ -313,34 +368,92 @@ function FormattedText({ text }) {
   cleaned = cleaned.replace(/<think>[\s\S]*$/g, "").trim();
   cleaned = cleaned.replace(/<\/?think>/g, "").trim();
 
-  return cleaned.split("\n").map((line, i) => {
-    const trimmed = line.trim();
-    if (!trimmed) return <br key={i} />;
-    if (trimmed === "---") return <hr key={i} className={styles.hr} />;
+  const lines = cleaned.split("\n");
+  const blocks = [];
+  let i = 0;
+  let key = 0;
 
-    // Bold headers: **text**
-    if (trimmed.startsWith("**") && trimmed.endsWith("**")) {
-      return <h4 key={i} className={styles.h4}>{trimmed.replace(/\*\*/g, "")}</h4>;
+  while (i < lines.length) {
+    const trimmed = lines[i].trim();
+
+    if (!trimmed) { blocks.push(<br key={key++} />); i++; continue; }
+
+    // Markdown table: header row followed by a separator row
+    if (isTableRow(trimmed) && i + 1 < lines.length && isTableSeparator(lines[i + 1])) {
+      const header = parseRow(trimmed);
+      i += 2;
+      const rows = [];
+      while (i < lines.length && isTableRow(lines[i]) && !isTableSeparator(lines[i])) {
+        rows.push(parseRow(lines[i]));
+        i++;
+      }
+      blocks.push(
+        <div key={key++} className={styles.tableWrap}>
+          <table className={styles.table}>
+            <thead>
+              <tr>{header.map((h, hi) => <th key={hi}>{renderInline(h)}</th>)}</tr>
+            </thead>
+            <tbody>
+              {rows.map((r, ri) => (
+                <tr key={ri}>
+                  {header.map((_, ci) => <td key={ci}>{renderInline(r[ci] || "")}</td>)}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      );
+      continue;
     }
 
-    // Bold prefix: **From Source:**
-    const boldMatch = trimmed.match(/^\*\*(.*?)\*\*(.*)$/);
-    if (boldMatch) {
-      return <p key={i} className={styles.p}><strong>{boldMatch[1]}</strong>{boldMatch[2]}</p>;
-    }
+    // Horizontal rule
+    if (trimmed === "---") { blocks.push(<hr key={key++} className={styles.hr} />); i++; continue; }
 
-    // Italic note: *text*
-    if (trimmed.startsWith("*") && trimmed.endsWith("*") && !trimmed.startsWith("**")) {
-      return <p key={i} className={styles.note}>{trimmed.replace(/^\*|\*$/g, "")}</p>;
-    }
-
-    // Bullet points
+    // Grouped bullet list
     if (trimmed.startsWith("- ") || trimmed.startsWith("• ")) {
-      return <li key={i} className={styles.li}>{trimmed.slice(2)}</li>;
+      const items = [];
+      while (i < lines.length) {
+        const t = lines[i].trim();
+        if (t.startsWith("- ") || t.startsWith("• ")) { items.push(t.slice(2)); i++; }
+        else break;
+      }
+      blocks.push(
+        <ul key={key++} className={styles.ul}>
+          {items.map((it, ii) => (
+            <li key={ii} className={styles.li}>{renderInline(it)}</li>
+          ))}
+        </ul>
+      );
+      continue;
     }
 
-    return <p key={i} className={styles.p}>{trimmed}</p>;
-  });
+    // Full-line bold header (only when there is a single bold span)
+    if (
+      trimmed.startsWith("**") &&
+      trimmed.endsWith("**") &&
+      trimmed.length > 4 &&
+      trimmed.indexOf("**", 2) === trimmed.length - 2
+    ) {
+      blocks.push(<h4 key={key++} className={styles.h4}>{trimmed.slice(2, -2)}</h4>);
+      i++;
+      continue;
+    }
+
+    // Italic note: *text* (single, not bold)
+    if (trimmed.startsWith("*") && trimmed.endsWith("*") && !trimmed.startsWith("**")) {
+      blocks.push(
+        <p key={key++} className={styles.note}>{trimmed.replace(/^\*|\*$/g, "")}</p>
+      );
+      i++;
+      continue;
+    }
+
+    // Paragraph (with inline bold)
+    blocks.push(<p key={key++} className={styles.p}>{renderInline(trimmed)}</p>);
+    i++;
+  }
+
+  return blocks;
 }
 
 /* ── Icons ────────────────────────────────────────────────────────── */

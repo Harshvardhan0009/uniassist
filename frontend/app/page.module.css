@@ -459,3 +459,58 @@
   .inputBar { padding: 0 16px 12px; }
   .msgContentUser { max-width: 90%; }
 }
+
+/* ── Lists, tables & retry (rich answer formatting) ──────────────── */
+.ul {
+  margin: 4px 0 8px;
+  padding-left: 4px;
+}
+.ul:last-child { margin-bottom: 0; }
+
+.tableWrap {
+  overflow-x: auto;
+  margin: 8px 0;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+}
+
+.table th,
+.table td {
+  padding: 7px 12px;
+  text-align: left;
+  border-bottom: 1px solid var(--border-color);
+  vertical-align: top;
+}
+
+.table th {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.table tr:last-child td { border-bottom: none; }
+.table td { color: var(--text-secondary); }
+
+.retryBtn {
+  margin-top: 8px;
+  padding: 5px 14px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border-accent);
+  background: transparent;
+  color: var(--accent-light);
+  font-family: var(--font-sans);
+  font-size: 0.78rem;
+  cursor: pointer;
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.retryBtn:hover {
+  background: var(--accent-glow);
+  color: var(--accent);
+}
