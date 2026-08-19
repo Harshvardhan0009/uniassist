@@ -9,9 +9,11 @@ Provides REST API endpoints for:
 
 import logging
 import secrets
+import time
+from collections import defaultdict, deque
 from typing import Literal
 
-from fastapi import Depends, FastAPI, Header, HTTPException
+from fastapi import Depends, FastAPI, Header, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 from rich.logging import RichHandler
@@ -60,6 +62,26 @@ def verify_ingest_token(authorization: str | None = Header(default=None)) -> Non
     scheme, _, token = (authorization or "").partition(" ")
     if scheme.lower() != "bearer" or not secrets.compare_digest(token, settings.INGEST_TOKEN):
         raise HTTPException(status_code=401, detail="Invalid or missing ingestion token.")
+
+
+# Best-effort in-memory per-IP rate limiter (per process). For multi-worker
+# deployments use a shared store (e.g. Redis) instead.
+_request_log: dict[str, deque] = defaultdict(deque)
+
+
+def rate_limit(request: Request) -> None:
+    """Throttle requests per client IP when RATE_LIMIT_PER_MINUTE > 0."""
+    limit = settings.RATE_LIMIT_PER_MINUTE
+    if limit <= 0:
+        return
+    ip = request.client.host if request.client else "unknown"
+    now = time.monotonic()
+    bucket = _request_log[ip]
+    while bucket and now - bucket[0] > 60.0:
+        bucket.popleft()
+    if len(bucket) >= limit:
+        raise HTTPException(status_code=429, detail="Too many requests. Please slow down.")
+    bucket.append(now)
 
 
 # ── Request/Response Models ──────────────────────────────────────────
@@ -132,7 +154,7 @@ async def health_check():
     )
 
 
-@app.post("/api/query", response_model=QueryResponse)
+@app.post("/api/query", response_model=QueryResponse, dependencies=[Depends(rate_limit)])
 async def ask_question(request: QueryRequest):
     """
     Ask a question against the university document corpus.

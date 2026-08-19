@@ -30,6 +30,8 @@ class Settings(BaseSettings):
     # Bearer token required to trigger the /api/ingest endpoint.
     # If left empty, ingestion over HTTP is DISABLED (the CLI pipeline still works).
     INGEST_TOKEN: str = ""
+    # Per-IP requests/minute for /api/query. 0 disables rate limiting.
+    RATE_LIMIT_PER_MINUTE: int = 0
 
     # ── ChromaDB (Local or Client-Server Mode) ─────────────────────────
     # If CHROMA_HOST is empty, runs in local file mode using CHROMA_PERSIST_DIR.
@@ -42,6 +44,9 @@ class Settings(BaseSettings):
 
     # ── Embedding ────────────────────────────────────────────────────
     EMBEDDING_MODEL: str = "all-MiniLM-L6-v2"
+
+    # Max concurrent LLM calls when summarizing chunks during ingestion.
+    SUMMARY_CONCURRENCY: int = 5
 
     # ── LLM (OpenRouter / xAI Grok / OpenAI-compatible) ───────────────
     # Provider-neutral names. Legacy GROK_* env vars are still accepted.

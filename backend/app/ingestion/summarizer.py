@@ -76,14 +76,26 @@ def summarize_chunks(chunks: list[Document]) -> list[Document]:
     logger.info(f"Summarizing {len(chunks)} chunks with {settings.LLM_MODEL}...")
     chain = SUMMARY_PROMPT | llm
 
+    # Summarize concurrently (bounded) instead of one blocking call per chunk.
+    inputs = [{"content": chunk.page_content} for chunk in chunks]
+    try:
+        results = chain.batch(
+            inputs,
+            config={"max_concurrency": max(1, settings.SUMMARY_CONCURRENCY)},
+            return_exceptions=True,
+        )
+    except Exception as e:
+        logger.warning(f"Batch summarization failed ({e}); falling back to raw text.")
+        results = [e] * len(chunks)
+
     summarized: list[Document] = []
-    for i, chunk in enumerate(chunks, 1):
-        try:
-            result = chain.invoke({"content": chunk.page_content})
-            summary = result.content.strip()
-        except Exception as e:
-            logger.warning(f"  Summarization failed for chunk {i}: {e}")
+    failures = 0
+    for chunk, result in zip(chunks, results):
+        if isinstance(result, BaseException):
+            failures += 1
             summary = chunk.page_content  # fallback to raw
+        else:
+            summary = (getattr(result, "content", "") or "").strip() or chunk.page_content
 
         # Restructure: summary as searchable content, raw in metadata
         doc = Document(
@@ -95,9 +107,8 @@ def summarize_chunks(chunks: list[Document]) -> list[Document]:
         )
         summarized.append(doc)
 
-        if i % 10 == 0:
-            logger.info(f"  Summarized {i}/{len(chunks)} chunks")
-
+    if failures:
+        logger.warning(f"  {failures}/{len(chunks)} chunk summaries fell back to raw text")
     logger.info(f"Summarization complete: {len(summarized)} chunks")
     return summarized
 
