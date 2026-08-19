@@ -85,7 +85,14 @@ def run_pipeline(data_dir: Path | None = None) -> dict:
     )
     summary_table.add_row("Total chunks", str(len(all_chunks)))
     summary_table.add_row("Documents stored", str(stored_count))
-    summary_table.add_row("Vector store", str(settings.CHROMA_PERSIST_DIR))
+    if settings.is_chroma_server:
+        vector_store_desc = (
+            f"{'https' if settings.CHROMA_SSL else 'http'}://"
+            f"{settings.CHROMA_HOST}:{settings.CHROMA_PORT} (server)"
+        )
+    else:
+        vector_store_desc = str(settings.CHROMA_PERSIST_DIR)
+    summary_table.add_row("Vector store", vector_store_desc)
     summary_table.add_row("Collection", settings.CHROMA_COLLECTION)
     summary_table.add_row("Embedding model", settings.EMBEDDING_MODEL)
     summary_table.add_row(

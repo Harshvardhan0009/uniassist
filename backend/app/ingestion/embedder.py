@@ -23,6 +23,19 @@ logger = logging.getLogger(__name__)
 _embedding_fn = None
 _vector_store = None
 
+
+def _select_device() -> str:
+    """Use CUDA when available, otherwise fall back to CPU."""
+    try:
+        import torch
+
+        if torch.cuda.is_available():
+            return "cuda"
+    except Exception:
+        pass
+    return "cpu"
+
+
 def get_embedding_function() -> HuggingFaceEmbeddings:
     """
     Create the embedding function used across ingestion and query.
@@ -32,10 +45,11 @@ def get_embedding_function() -> HuggingFaceEmbeddings:
     """
     global _embedding_fn
     if _embedding_fn is None:
-        logger.info(f"Loading embedding model: {settings.EMBEDDING_MODEL}")
+        device = _select_device()
+        logger.info(f"Loading embedding model: {settings.EMBEDDING_MODEL} (device={device})")
         _embedding_fn = HuggingFaceEmbeddings(
             model_name=settings.EMBEDDING_MODEL,
-            model_kwargs={"device": "cpu"},
+            model_kwargs={"device": device},
             encode_kwargs={"normalize_embeddings": True},
         )
     return _embedding_fn
@@ -81,6 +95,7 @@ def get_vector_store(
             client=client,
             collection_name=settings.CHROMA_COLLECTION,
             embedding_function=embedding_function,
+            collection_metadata={"hnsw:space": "cosine"},
         )
         return _vector_store
     else:
@@ -92,6 +107,7 @@ def get_vector_store(
             collection_name=settings.CHROMA_COLLECTION,
             embedding_function=embedding_function,
             persist_directory=str(settings.CHROMA_PERSIST_DIR),
+            collection_metadata={"hnsw:space": "cosine"},
         )
         return _vector_store
 
@@ -117,6 +133,13 @@ def embed_and_store(documents: list[Document]) -> int:
     # ChromaDB metadata values must be str, int, float, or bool.
     sanitized_docs = _sanitize_metadata(documents)
 
+    # Remove any previously-stored vectors for these sources so re-ingestion
+    # doesn't leave orphaned chunks behind (e.g. when a document shrinks).
+    sources = {
+        doc.metadata.get("source_file", "unknown") for doc in sanitized_docs
+    }
+    _delete_existing_sources(vector_store, sources)
+
     # Add documents in batches
     batch_size = 50
     total_stored = 0
@@ -124,7 +147,8 @@ def embed_and_store(documents: list[Document]) -> int:
     for i in range(0, len(sanitized_docs), batch_size):
         batch = sanitized_docs[i : i + batch_size]
         ids = [
-            f"{doc.metadata.get('source_file', 'unknown')}__chunk_{doc.metadata.get('chunk_index', idx)}"
+            f"{doc.metadata.get('source_file', 'unknown')}__chunk_"
+            f"{doc.metadata.get('chunk_index', i + idx)}"
             for idx, doc in enumerate(batch)
         ]
         vector_store.add_documents(batch, ids=ids)
@@ -136,6 +160,23 @@ def embed_and_store(documents: list[Document]) -> int:
         f"collection '{settings.CHROMA_COLLECTION}'"
     )
     return total_stored
+
+
+def _delete_existing_sources(vector_store: Chroma, sources: set[str]) -> None:
+    """
+    Delete existing vectors for the given source files before re-ingesting.
+
+    This keeps ingestion idempotent and prevents orphaned chunks from a prior
+    run. Failures are non-fatal (e.g. empty collection on first ingest).
+    """
+    clean_sources = [s for s in sources if s and s != "unknown"]
+    if not clean_sources:
+        return
+    try:
+        vector_store._collection.delete(where={"source_file": {"$in": clean_sources}})
+        logger.info(f"  Cleared existing vectors for {len(clean_sources)} source(s)")
+    except Exception as e:
+        logger.warning(f"  Could not clear existing vectors before re-ingest: {e}")
 
 
 def _sanitize_metadata(documents: list[Document]) -> list[Document]:
