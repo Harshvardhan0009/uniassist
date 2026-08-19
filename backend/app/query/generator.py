@@ -13,13 +13,17 @@ import logging
 import re
 
 from langchain_core.documents import Document
+from langchain_core.messages import AIMessage, HumanMessage
 from langchain_core.output_parsers import StrOutputParser
-from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_openai import ChatOpenAI
 
 from app.config import settings
 
 logger = logging.getLogger(__name__)
+
+# Maximum number of prior conversation messages to feed the model.
+MAX_HISTORY_MESSAGES = 6
 
 ANSWER_PROMPT = ChatPromptTemplate.from_messages(
     [
@@ -42,6 +46,7 @@ ANSWER_PROMPT = ChatPromptTemplate.from_messages(
             "4. If the answer is genuinely NOT in the context, state that clearly.\n"
             "5. Cite the source document(s) used.",
         ),
+        MessagesPlaceholder("history", optional=True),
         (
             "human",
             "Context from university documents:\n"
@@ -122,13 +127,33 @@ def _build_clean_answer(query: str, documents: list[Document]) -> str:
     return "\n".join(answer_parts)
 
 
-def generate_answer(query: str, documents: list[Document]) -> dict:
+def _to_history_messages(history: list[dict] | None) -> list:
+    """Convert [{role, content}] turns into LangChain messages (capped)."""
+    if not history:
+        return []
+    messages = []
+    for turn in history:
+        content = (turn.get("content") or "").strip()
+        if not content:
+            continue
+        role = turn.get("role")
+        if role == "user":
+            messages.append(HumanMessage(content=content))
+        elif role == "assistant":
+            messages.append(AIMessage(content=content))
+    return messages[-MAX_HISTORY_MESSAGES:]
+
+
+def generate_answer(
+    query: str, documents: list[Document], history: list[dict] | None = None
+) -> dict:
     """
     Generate the final answer using the configured LLM.
 
     Args:
         query: The user's question.
         documents: Reranked documents with context.
+        history: Optional prior conversation turns for follow-up context.
 
     Returns:
         Dict with:
@@ -161,7 +186,13 @@ def generate_answer(query: str, documents: list[Document]) -> dict:
 
     has_llm = True
     try:
-        answer = chain.invoke({"context": context, "query": query})
+        answer = chain.invoke(
+            {
+                "context": context,
+                "query": query,
+                "history": _to_history_messages(history),
+            }
+        )
         # Strip leaked <think>...</think> blocks from reasoning models (e.g. Qwen)
         answer = re.sub(r"<think>[\s\S]*?</think>", "", answer).strip()
         # Handle unclosed <think> tags (model cut off mid-reasoning)

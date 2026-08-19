@@ -93,11 +93,17 @@ export default function Home() {
     setInput("");
     setIsLoading(true);
 
+    // Prior turns (exclude errors) give the backend follow-up context.
+    const history = messages
+      .filter((m) => !m.isError)
+      .map((m) => ({ role: m.role, content: m.content }))
+      .slice(-8);
+
     try {
       const res = await fetch(`${API_BASE}/api/query`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ question }),
+        body: JSON.stringify({ question, history }),
       });
       if (!res.ok) throw new Error(`Server error (${res.status})`);
       const data = await res.json();

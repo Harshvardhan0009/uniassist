@@ -9,6 +9,7 @@ Provides REST API endpoints for:
 
 import logging
 import secrets
+from typing import Literal
 
 from fastapi import Depends, FastAPI, Header, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -64,9 +65,19 @@ def verify_ingest_token(authorization: str | None = Header(default=None)) -> Non
 # ── Request/Response Models ──────────────────────────────────────────
 
 
+class ChatMessage(BaseModel):
+    role: Literal["user", "assistant"]
+    content: str = Field(..., max_length=8000)
+
+
 class QueryRequest(BaseModel):
     question: str = Field(
         ..., min_length=3, max_length=1000, description="The question to ask"
+    )
+    history: list[ChatMessage] = Field(
+        default_factory=list,
+        max_length=20,
+        description="Prior conversation turns for follow-up context",
     )
 
 
@@ -131,7 +142,7 @@ async def ask_question(request: QueryRequest):
     from app.query.chain import query
 
     try:
-        result = query(request.question)
+        result = query(request.question, history=[m.model_dump() for m in request.history])
         return QueryResponse(**result)
     except Exception as e:
         logger.error(f"Query failed: {e}", exc_info=True)
