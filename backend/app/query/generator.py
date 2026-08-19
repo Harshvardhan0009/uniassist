@@ -2,7 +2,7 @@
 Answer Generator — Step 9 of the pipeline.
 
 Pulls raw content from reranked documents' metadata and passes it
-along with the user's query to Grok/OpenRouter for final answer generation.
+along with the user's query to the configured LLM for final answer generation.
 
 Optimized for table comprehension, range matching (e.g. salary slabs, CGPA, stipends),
 and structured responses.
@@ -124,7 +124,7 @@ def _build_clean_answer(query: str, documents: list[Document]) -> str:
 
 def generate_answer(query: str, documents: list[Document]) -> dict:
     """
-    Generate the final answer using Grok/OpenRouter LLM.
+    Generate the final answer using the configured LLM.
 
     Args:
         query: The user's question.
@@ -138,21 +138,21 @@ def generate_answer(query: str, documents: list[Document]) -> dict:
     """
     sources = list(dict.fromkeys(doc.metadata.get("source_file", "Unknown") for doc in documents))
 
-    if not settings.has_grok:
-        logger.warning("GROK_API_KEY not set — generating structured response from context.")
+    if not settings.has_llm:
+        logger.warning("LLM_API_KEY not set — generating structured response from context.")
         return {
             "answer": _build_clean_answer(query, documents),
             "sources": sources,
             "has_llm": False,
         }
 
-    logger.info(f"Generating answer with {settings.GROK_MODEL}...")
+    logger.info(f"Generating answer with {settings.LLM_MODEL}...")
     context = _format_context(documents)
 
     llm = ChatOpenAI(
-        api_key=settings.GROK_API_KEY,
-        base_url=settings.GROK_BASE_URL,
-        model=settings.GROK_MODEL,
+        api_key=settings.LLM_API_KEY,
+        base_url=settings.LLM_BASE_URL,
+        model=settings.LLM_MODEL,
         temperature=0.1,
         max_tokens=1024,
     )

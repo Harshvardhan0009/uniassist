@@ -197,3 +197,47 @@ def _sanitize_metadata(documents: list[Document]) -> list[Document]:
             Document(page_content=doc.page_content, metadata=clean_meta)
         )
     return sanitized
+
+
+_health_client = None
+
+
+def check_chroma() -> dict:
+    """
+    Lightweight ChromaDB connectivity check for the health endpoint.
+
+    Avoids loading the embedding model: performs an HTTP heartbeat in server
+    mode, or verifies the persist directory in local mode. Reports the indexed
+    document count only when a vector store has already been initialized.
+    """
+    global _health_client
+    connected = False
+    documents: int | None = None
+    try:
+        if settings.is_chroma_server:
+            if _health_client is None:
+                headers = (
+                    {"X-Chroma-Token": settings.CHROMA_AUTH_TOKEN}
+                    if settings.CHROMA_AUTH_TOKEN
+                    else None
+                )
+                _health_client = chromadb.HttpClient(
+                    host=settings.CHROMA_HOST,
+                    port=settings.CHROMA_PORT,
+                    ssl=settings.CHROMA_SSL,
+                    headers=headers,
+                )
+            _health_client.heartbeat()
+            connected = True
+        else:
+            connected = settings.CHROMA_PERSIST_DIR.exists()
+
+        if _vector_store is not None:
+            try:
+                documents = _vector_store._collection.count()
+            except Exception:
+                documents = None
+    except Exception as e:
+        logger.warning(f"Chroma health check failed: {e}")
+        connected = False
+    return {"connected": connected, "documents": documents}

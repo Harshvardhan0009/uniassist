@@ -89,12 +89,14 @@ class IngestResponse(BaseModel):
 
 class HealthResponse(BaseModel):
     status: str
-    grok_configured: bool
+    llm_configured: bool
     cohere_configured: bool
     embedding_model: str
     collection: str
     chroma_mode: str
     chroma_host: str | None = None
+    chroma_connected: bool
+    documents_indexed: int | None = None
 
 
 # ── Endpoints ────────────────────────────────────────────────────────
@@ -102,15 +104,20 @@ class HealthResponse(BaseModel):
 
 @app.get("/api/health", response_model=HealthResponse)
 async def health_check():
-    """Check system health and configuration status."""
+    """Check system health, configuration, and ChromaDB connectivity."""
+    from app.ingestion.embedder import check_chroma
+
+    chroma = check_chroma()
     return HealthResponse(
-        status="ok",
-        grok_configured=settings.has_grok,
+        status="ok" if chroma["connected"] else "degraded",
+        llm_configured=settings.has_llm,
         cohere_configured=settings.has_cohere,
         embedding_model=settings.EMBEDDING_MODEL,
         collection=settings.CHROMA_COLLECTION,
         chroma_mode="client_server" if settings.is_chroma_server else "local_persistent",
         chroma_host=f"{'https' if settings.CHROMA_SSL else 'http'}://{settings.CHROMA_HOST}:{settings.CHROMA_PORT}" if settings.is_chroma_server else None,
+        chroma_connected=chroma["connected"],
+        documents_indexed=chroma["documents"],
     )
 
 

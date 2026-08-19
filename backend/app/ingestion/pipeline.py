@@ -97,7 +97,7 @@ def run_pipeline(data_dir: Path | None = None) -> dict:
     summary_table.add_row("Embedding model", settings.EMBEDDING_MODEL)
     summary_table.add_row(
         "Summarization",
-        "✓ Enabled" if settings.has_grok else "⚠ Skipped (no API key)",
+        "✓ Enabled" if settings.has_llm else "⚠ Skipped (no API key)",
     )
     console.print(summary_table)
 

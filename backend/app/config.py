@@ -6,6 +6,8 @@ Supports both local file persistence and shared Client-Server ChromaDB.
 """
 
 from pathlib import Path
+
+from pydantic import AliasChoices, Field
 from pydantic_settings import BaseSettings
 
 
@@ -41,10 +43,19 @@ class Settings(BaseSettings):
     # ── Embedding ────────────────────────────────────────────────────
     EMBEDDING_MODEL: str = "all-MiniLM-L6-v2"
 
-    # ── LLM (OpenRouter / Grok / OpenAI-compatible) ───────────────────
-    GROK_API_KEY: str = ""
-    GROK_BASE_URL: str = "https://api.x.ai/v1"
-    GROK_MODEL: str = "grok-3-mini"
+    # ── LLM (OpenRouter / xAI Grok / OpenAI-compatible) ───────────────
+    # Provider-neutral names. Legacy GROK_* env vars are still accepted.
+    LLM_API_KEY: str = Field(
+        default="", validation_alias=AliasChoices("LLM_API_KEY", "GROK_API_KEY")
+    )
+    LLM_BASE_URL: str = Field(
+        default="https://api.x.ai/v1",
+        validation_alias=AliasChoices("LLM_BASE_URL", "GROK_BASE_URL"),
+    )
+    LLM_MODEL: str = Field(
+        default="grok-3-mini",
+        validation_alias=AliasChoices("LLM_MODEL", "GROK_MODEL"),
+    )
 
     # ── Cohere Reranker ──────────────────────────────────────────────
     COHERE_API_KEY: str = ""
@@ -76,8 +87,8 @@ class Settings(BaseSettings):
         return bool(self.CHROMA_HOST and self.CHROMA_HOST.strip())
 
     @property
-    def has_grok(self) -> bool:
-        return bool(self.GROK_API_KEY)
+    def has_llm(self) -> bool:
+        return bool(self.LLM_API_KEY)
 
     @property
     def has_cohere(self) -> bool:
