@@ -2,24 +2,28 @@
 Answer Generator — Step 9 of the pipeline.
 
 Pulls raw content from reranked documents' metadata and passes it
-along with the user's query to Grok/OpenRouter for final answer generation.
+along with the user's query to the configured LLM for final answer generation.
 
 Optimized for table comprehension, range matching (e.g. salary slabs, CGPA, stipends),
 and structured responses.
 """
 
+import json
 import logging
-import re
 import re
 
 from langchain_core.documents import Document
+from langchain_core.messages import AIMessage, HumanMessage
 from langchain_core.output_parsers import StrOutputParser
-from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_openai import ChatOpenAI
 
 from app.config import settings
 
 logger = logging.getLogger(__name__)
+
+# Maximum number of prior conversation messages to feed the model.
+MAX_HISTORY_MESSAGES = 6
 
 ANSWER_PROMPT = ChatPromptTemplate.from_messages(
     [
@@ -42,6 +46,7 @@ ANSWER_PROMPT = ChatPromptTemplate.from_messages(
             "4. If the answer is genuinely NOT in the context, state that clearly.\n"
             "5. Cite the source document(s) used.",
         ),
+        MessagesPlaceholder("history", optional=True),
         (
             "human",
             "Context from university documents:\n"
@@ -54,15 +59,13 @@ ANSWER_PROMPT = ChatPromptTemplate.from_messages(
 )
 
 
-import json
-
 def _extract_raw(doc: Document) -> str:
     """Get raw text content from a document, handling ChromaDB serialization."""
     raw = doc.metadata.get("raw_content", doc.page_content)
     if isinstance(raw, str) and raw.startswith("["):
         try:
             raw = "\n".join(json.loads(raw))
-        except (ValueError, SyntaxError):
+        except ValueError:
             pass
     return raw.strip()
 
@@ -124,13 +127,33 @@ def _build_clean_answer(query: str, documents: list[Document]) -> str:
     return "\n".join(answer_parts)
 
 
-def generate_answer(query: str, documents: list[Document]) -> dict:
+def _to_history_messages(history: list[dict] | None) -> list:
+    """Convert [{role, content}] turns into LangChain messages (capped)."""
+    if not history:
+        return []
+    messages = []
+    for turn in history:
+        content = (turn.get("content") or "").strip()
+        if not content:
+            continue
+        role = turn.get("role")
+        if role == "user":
+            messages.append(HumanMessage(content=content))
+        elif role == "assistant":
+            messages.append(AIMessage(content=content))
+    return messages[-MAX_HISTORY_MESSAGES:]
+
+
+def generate_answer(
+    query: str, documents: list[Document], history: list[dict] | None = None
+) -> dict:
     """
-    Generate the final answer using Grok/OpenRouter LLM.
+    Generate the final answer using the configured LLM.
 
     Args:
         query: The user's question.
         documents: Reranked documents with context.
+        history: Optional prior conversation turns for follow-up context.
 
     Returns:
         Dict with:
@@ -140,21 +163,21 @@ def generate_answer(query: str, documents: list[Document]) -> dict:
     """
     sources = list(dict.fromkeys(doc.metadata.get("source_file", "Unknown") for doc in documents))
 
-    if not settings.has_grok:
-        logger.warning("GROK_API_KEY not set — generating structured response from context.")
+    if not settings.has_llm:
+        logger.warning("LLM_API_KEY not set — generating structured response from context.")
         return {
             "answer": _build_clean_answer(query, documents),
             "sources": sources,
             "has_llm": False,
         }
 
-    logger.info(f"Generating answer with {settings.GROK_MODEL}...")
+    logger.info(f"Generating answer with {settings.LLM_MODEL}...")
     context = _format_context(documents)
 
     llm = ChatOpenAI(
-        api_key=settings.GROK_API_KEY,
-        base_url=settings.GROK_BASE_URL,
-        model=settings.GROK_MODEL,
+        api_key=settings.LLM_API_KEY,
+        base_url=settings.LLM_BASE_URL,
+        model=settings.LLM_MODEL,
         temperature=0.1,
         max_tokens=1024,
     )
@@ -163,7 +186,13 @@ def generate_answer(query: str, documents: list[Document]) -> dict:
 
     has_llm = True
     try:
-        answer = chain.invoke({"context": context, "query": query})
+        answer = chain.invoke(
+            {
+                "context": context,
+                "query": query,
+                "history": _to_history_messages(history),
+            }
+        )
         # Strip leaked <think>...</think> blocks from reasoning models (e.g. Qwen)
         answer = re.sub(r"<think>[\s\S]*?</think>", "", answer).strip()
         # Handle unclosed <think> tags (model cut off mid-reasoning)

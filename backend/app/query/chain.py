@@ -15,12 +15,14 @@ from app.query.retriever import retrieve
 logger = logging.getLogger(__name__)
 
 
-def query(question: str) -> dict:
+def query(question: str, history: list[dict] | None = None) -> dict:
     """
     Run the full RAG query pipeline.
 
     Args:
         question: The user's natural language question.
+        history: Optional prior conversation turns ([{role, content}, ...])
+            used to give the generator follow-up context.
 
     Returns:
         Dict with:
@@ -56,7 +58,7 @@ def query(question: str) -> dict:
 
     # ── Step 9: Generate ─────────────────────────────────────────────
     t0 = time.time()
-    result = generate_answer(question, reranked)
+    result = generate_answer(question, reranked, history=history)
     timings["generation"] = round(time.time() - t0, 3)
 
     timings["total"] = round(time.time() - start, 3)

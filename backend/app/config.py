@@ -6,6 +6,8 @@ Supports both local file persistence and shared Client-Server ChromaDB.
 """
 
 from pathlib import Path
+
+from pydantic import AliasChoices, Field
 from pydantic_settings import BaseSettings
 
 
@@ -21,6 +23,16 @@ class Settings(BaseSettings):
     DATA_DIR: Path = Path(__file__).resolve().parent.parent.parent / "Data"
     CHROMA_PERSIST_DIR: Path = Path(__file__).resolve().parent.parent / "chroma_db"
 
+    # ── API / Security ───────────────────────────────────────────────
+    # Comma-separated list of CORS origins allowed to call the API.
+    # Override in production, e.g. "https://uniassist.vercel.app".
+    ALLOWED_ORIGINS: str = "http://localhost:3000,http://127.0.0.1:3000"
+    # Bearer token required to trigger the /api/ingest endpoint.
+    # If left empty, ingestion over HTTP is DISABLED (the CLI pipeline still works).
+    INGEST_TOKEN: str = ""
+    # Per-IP requests/minute for /api/query. 0 disables rate limiting.
+    RATE_LIMIT_PER_MINUTE: int = 0
+
     # ── ChromaDB (Local or Client-Server Mode) ─────────────────────────
     # If CHROMA_HOST is empty, runs in local file mode using CHROMA_PERSIST_DIR.
     # If CHROMA_HOST is set (e.g. 'my-chroma.onrender.com' or 'localhost'), connects via HttpClient.
@@ -33,10 +45,22 @@ class Settings(BaseSettings):
     # ── Embedding ────────────────────────────────────────────────────
     EMBEDDING_MODEL: str = "all-MiniLM-L6-v2"
 
-    # ── LLM (OpenRouter / Grok / OpenAI-compatible) ───────────────────
-    GROK_API_KEY: str = ""
-    GROK_BASE_URL: str = "https://api.x.ai/v1"
-    GROK_MODEL: str = "grok-3-mini"
+    # Max concurrent LLM calls when summarizing chunks during ingestion.
+    SUMMARY_CONCURRENCY: int = 5
+
+    # ── LLM (OpenRouter / xAI Grok / OpenAI-compatible) ───────────────
+    # Provider-neutral names. Legacy GROK_* env vars are still accepted.
+    LLM_API_KEY: str = Field(
+        default="", validation_alias=AliasChoices("LLM_API_KEY", "GROK_API_KEY")
+    )
+    LLM_BASE_URL: str = Field(
+        default="https://api.x.ai/v1",
+        validation_alias=AliasChoices("LLM_BASE_URL", "GROK_BASE_URL"),
+    )
+    LLM_MODEL: str = Field(
+        default="grok-3-mini",
+        validation_alias=AliasChoices("LLM_MODEL", "GROK_MODEL"),
+    )
 
     # ── Cohere Reranker ──────────────────────────────────────────────
     COHERE_API_KEY: str = ""
@@ -45,6 +69,9 @@ class Settings(BaseSettings):
     # ── Retrieval tuning ─────────────────────────────────────────────
     RETRIEVAL_TOP_K: int = 20  # broad candidate set from ChromaDB
     RERANK_TOP_N: int = 5     # precise set after Cohere rerank
+    # Drop candidates whose cosine relevance score is below this threshold.
+    # 0.0 keeps everything; raise it (e.g. 0.2) to filter weak matches.
+    RETRIEVAL_MIN_SCORE: float = 0.0
 
     model_config = {
         "env_file": str(Path(__file__).resolve().parent.parent / ".env"),
@@ -55,13 +82,18 @@ class Settings(BaseSettings):
     # ── Helpers ──────────────────────────────────────────────────────
 
     @property
+    def allowed_origins_list(self) -> list[str]:
+        """Parse ALLOWED_ORIGINS into a clean list of origins."""
+        return [o.strip() for o in self.ALLOWED_ORIGINS.split(",") if o.strip()]
+
+    @property
     def is_chroma_server(self) -> bool:
         """True if configured to connect to a remote/shared ChromaDB server."""
         return bool(self.CHROMA_HOST and self.CHROMA_HOST.strip())
 
     @property
-    def has_grok(self) -> bool:
-        return bool(self.GROK_API_KEY)
+    def has_llm(self) -> bool:
+        return bool(self.LLM_API_KEY)
 
     @property
     def has_cohere(self) -> bool:

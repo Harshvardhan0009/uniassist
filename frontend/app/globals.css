@@ -106,11 +106,6 @@ a {
   to { opacity: 1; }
 }
 
-@keyframes slideIn {
-  from { opacity: 0; transform: translateX(-8px); }
-  to { opacity: 1; transform: translateX(0); }
-}
-
 @keyframes typing {
   0%, 60%, 100% { transform: translateY(0); }
   30% { transform: translateY(-4px); }
@@ -118,9 +113,4 @@ a {
 
 @keyframes spin {
   to { transform: rotate(360deg); }
-}
-
-@keyframes pulse {
-  0%, 100% { opacity: 0.6; }
-  50% { opacity: 1; }
 }

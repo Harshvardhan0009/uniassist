@@ -37,9 +37,14 @@ def retrieve(query: str, top_k: int | None = None) -> list[Document]:
         k=top_k,
     )
 
-    # Attach score to metadata for downstream use
+    # Attach score to metadata for downstream use, filtering weak matches
+    min_score = settings.RETRIEVAL_MIN_SCORE
     documents = []
+    dropped = 0
     for doc, score in results:
+        if score < min_score:
+            dropped += 1
+            continue
         doc.metadata["relevance_score"] = round(score, 4)
         documents.append(doc)
 
@@ -47,7 +52,8 @@ def retrieve(query: str, top_k: int | None = None) -> list[Document]:
         logger.info(
             f"  Retrieved {len(documents)} candidates "
             f"(score range: {documents[0].metadata['relevance_score']:.3f} "
-            f"— {documents[-1].metadata['relevance_score']:.3f})"
+            f"— {documents[-1].metadata['relevance_score']:.3f}"
+            f"{f', dropped {dropped} below {min_score}' if dropped else ''})"
         )
     else:
         logger.info("  No candidates found.")

@@ -1,11 +1,12 @@
 """
 Chunk Summarization — Step 5 of the pipeline.
 
-Calls Grok (via LangChain's ChatOpenAI) to generate a concise summary
-of each chunk. The summary becomes the searchable `page_content`, while
-the raw text is preserved in metadata for accurate answer generation.
+Calls the configured LLM (via LangChain's ChatOpenAI-compatible client) to
+generate a concise summary of each chunk. The summary becomes the searchable
+`page_content`, while the raw text is preserved in metadata for accurate answer
+generation.
 
-If no GROK_API_KEY is set, summarization is **skipped** — raw text is
+If no LLM_API_KEY is set, summarization is **skipped** — raw text is
 used as page_content directly. This lets you ingest and test retrieval
 without an API key.
 """
@@ -35,13 +36,13 @@ SUMMARY_PROMPT = ChatPromptTemplate.from_messages(
 
 
 def _get_llm() -> ChatOpenAI | None:
-    """Get the Grok LLM if an API key is configured."""
-    if not settings.has_grok:
+    """Get the summarization LLM if an API key is configured."""
+    if not settings.has_llm:
         return None
     return ChatOpenAI(
-        api_key=settings.GROK_API_KEY,
-        base_url=settings.GROK_BASE_URL,
-        model=settings.GROK_MODEL,
+        api_key=settings.LLM_API_KEY,
+        base_url=settings.LLM_BASE_URL,
+        model=settings.LLM_MODEL,
         temperature=0.0,
         max_tokens=256,
     )
@@ -66,23 +67,35 @@ def summarize_chunks(chunks: list[Document]) -> list[Document]:
 
     if llm is None:
         logger.warning(
-            "⚠ GROK_API_KEY not set — skipping summarization. "
+            "⚠ LLM_API_KEY not set — skipping summarization. "
             "Raw text will be used as page_content. "
-            "Set GROK_API_KEY in .env to enable summarization."
+            "Set LLM_API_KEY in .env to enable summarization."
         )
         return _passthrough(chunks)
 
-    logger.info(f"Summarizing {len(chunks)} chunks with {settings.GROK_MODEL}...")
+    logger.info(f"Summarizing {len(chunks)} chunks with {settings.LLM_MODEL}...")
     chain = SUMMARY_PROMPT | llm
 
+    # Summarize concurrently (bounded) instead of one blocking call per chunk.
+    inputs = [{"content": chunk.page_content} for chunk in chunks]
+    try:
+        results = chain.batch(
+            inputs,
+            config={"max_concurrency": max(1, settings.SUMMARY_CONCURRENCY)},
+            return_exceptions=True,
+        )
+    except Exception as e:
+        logger.warning(f"Batch summarization failed ({e}); falling back to raw text.")
+        results = [e] * len(chunks)
+
     summarized: list[Document] = []
-    for i, chunk in enumerate(chunks, 1):
-        try:
-            result = chain.invoke({"content": chunk.page_content})
-            summary = result.content.strip()
-        except Exception as e:
-            logger.warning(f"  Summarization failed for chunk {i}: {e}")
+    failures = 0
+    for chunk, result in zip(chunks, results):
+        if isinstance(result, BaseException):
+            failures += 1
             summary = chunk.page_content  # fallback to raw
+        else:
+            summary = (getattr(result, "content", "") or "").strip() or chunk.page_content
 
         # Restructure: summary as searchable content, raw in metadata
         doc = Document(
@@ -94,9 +107,8 @@ def summarize_chunks(chunks: list[Document]) -> list[Document]:
         )
         summarized.append(doc)
 
-        if i % 10 == 0:
-            logger.info(f"  Summarized {i}/{len(chunks)} chunks")
-
+    if failures:
+        logger.warning(f"  {failures}/{len(chunks)} chunk summaries fell back to raw text")
     logger.info(f"Summarization complete: {len(summarized)} chunks")
     return summarized
 

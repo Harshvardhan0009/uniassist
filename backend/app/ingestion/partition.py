@@ -173,7 +173,12 @@ def partition_directory(data_dir: Path) -> dict[str, list[Document]]:
         try:
             docs = partition_file(file_path)
             if docs:
-                results[file_path.name] = docs
+                # Use the path relative to the data dir as a unique key so that
+                # files sharing a name across subfolders don't overwrite each other.
+                rel_key = file_path.relative_to(data_dir).as_posix()
+                for d in docs:
+                    d.metadata["source_file"] = rel_key
+                results[rel_key] = docs
         except Exception as e:
             logger.error(f"Failed to partition {file_path.name}: {e}")
 
