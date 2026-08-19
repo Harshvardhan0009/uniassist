@@ -8,8 +8,8 @@ Optimized for table comprehension, range matching (e.g. salary slabs, CGPA, stip
 and structured responses.
 """
 
+import json
 import logging
-import re
 import re
 
 from langchain_core.documents import Document
@@ -54,15 +54,13 @@ ANSWER_PROMPT = ChatPromptTemplate.from_messages(
 )
 
 
-import json
-
 def _extract_raw(doc: Document) -> str:
     """Get raw text content from a document, handling ChromaDB serialization."""
     raw = doc.metadata.get("raw_content", doc.page_content)
     if isinstance(raw, str) and raw.startswith("["):
         try:
             raw = "\n".join(json.loads(raw))
-        except (ValueError, SyntaxError):
+        except ValueError:
             pass
     return raw.strip()
 

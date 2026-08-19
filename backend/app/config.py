@@ -53,6 +53,9 @@ class Settings(BaseSettings):
     # ── Retrieval tuning ─────────────────────────────────────────────
     RETRIEVAL_TOP_K: int = 20  # broad candidate set from ChromaDB
     RERANK_TOP_N: int = 5     # precise set after Cohere rerank
+    # Drop candidates whose cosine relevance score is below this threshold.
+    # 0.0 keeps everything; raise it (e.g. 0.2) to filter weak matches.
+    RETRIEVAL_MIN_SCORE: float = 0.0
 
     model_config = {
         "env_file": str(Path(__file__).resolve().parent.parent / ".env"),
