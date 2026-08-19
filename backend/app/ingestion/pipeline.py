@@ -2,7 +2,7 @@
 Ingestion Pipeline Orchestrator — Steps 3–6 combined.
 
 Runs the full ingestion flow:
-  partition PDFs → chunk by title → summarize → embed → store in ChromaDB
+  partition documents → chunk → summarize → embed → store in ChromaDB
 
 Can be run as a CLI script:
   python -m app.ingestion.pipeline
@@ -17,7 +17,7 @@ from rich.logging import RichHandler
 from rich.table import Table
 
 from app.config import settings
-from app.ingestion.chunker import chunk_by_title
+from app.ingestion.chunker import chunk_documents
 from app.ingestion.embedder import embed_and_store
 from app.ingestion.partition import partition_directory
 from app.ingestion.summarizer import summarize_chunks
@@ -34,7 +34,7 @@ logger = logging.getLogger(__name__)
 
 def run_pipeline(data_dir: Path | None = None) -> dict:
     """
-    Run the full ingestion pipeline on all PDFs in the data directory.
+    Run the full ingestion pipeline on all documents in the data directory.
 
     Args:
         data_dir: Override the default data directory from config.
@@ -47,18 +47,18 @@ def run_pipeline(data_dir: Path | None = None) -> dict:
     console.rule("[bold blue]UniAssist — Ingestion Pipeline[/bold blue]")
 
     # ── Step 3: Partition ────────────────────────────────────────────
-    console.print("\n[bold]Step 3:[/bold] Partitioning PDFs...")
+    console.print("\n[bold]Step 3:[/bold] Partitioning documents...")
     all_elements = partition_directory(data_dir)
 
     if not all_elements:
-        console.print("[red]No PDFs found or processed. Aborting.[/red]")
-        return {"status": "error", "reason": "no_pdfs"}
+        console.print("[red]No documents found or processed. Aborting.[/red]")
+        return {"status": "error", "reason": "no_documents"}
 
-    # ── Step 4: Chunk by title ───────────────────────────────────────
-    console.print("\n[bold]Step 4:[/bold] Chunking by title...")
+    # ── Step 4: Chunk ────────────────────────────────────────────────
+    console.print("\n[bold]Step 4:[/bold] Chunking documents...")
     all_chunks = []
     for filename, elements in all_elements.items():
-        chunks = chunk_by_title(elements, source_file=filename)
+        chunks = chunk_documents(elements, source_file=filename)
         all_chunks.extend(chunks)
 
     console.print(f"  Total chunks: [green]{len(all_chunks)}[/green]")
