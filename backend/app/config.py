@@ -21,6 +21,14 @@ class Settings(BaseSettings):
     DATA_DIR: Path = Path(__file__).resolve().parent.parent.parent / "Data"
     CHROMA_PERSIST_DIR: Path = Path(__file__).resolve().parent.parent / "chroma_db"
 
+    # ── API / Security ───────────────────────────────────────────────
+    # Comma-separated list of CORS origins allowed to call the API.
+    # Override in production, e.g. "https://uniassist.vercel.app".
+    ALLOWED_ORIGINS: str = "http://localhost:3000,http://127.0.0.1:3000"
+    # Bearer token required to trigger the /api/ingest endpoint.
+    # If left empty, ingestion over HTTP is DISABLED (the CLI pipeline still works).
+    INGEST_TOKEN: str = ""
+
     # ── ChromaDB (Local or Client-Server Mode) ─────────────────────────
     # If CHROMA_HOST is empty, runs in local file mode using CHROMA_PERSIST_DIR.
     # If CHROMA_HOST is set (e.g. 'my-chroma.onrender.com' or 'localhost'), connects via HttpClient.
@@ -53,6 +61,11 @@ class Settings(BaseSettings):
     }
 
     # ── Helpers ──────────────────────────────────────────────────────
+
+    @property
+    def allowed_origins_list(self) -> list[str]:
+        """Parse ALLOWED_ORIGINS into a clean list of origins."""
+        return [o.strip() for o in self.ALLOWED_ORIGINS.split(",") if o.strip()]
 
     @property
     def is_chroma_server(self) -> bool:

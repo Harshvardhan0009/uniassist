@@ -8,8 +8,9 @@ Provides REST API endpoints for:
 """
 
 import logging
+import secrets
 
-from fastapi import FastAPI, HTTPException
+from fastapi import Depends, FastAPI, Header, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 from rich.logging import RichHandler
@@ -31,14 +32,33 @@ app = FastAPI(
     version="0.1.0",
 )
 
-# CORS — allow the Next.js frontend
+# CORS — allow the configured frontend origins
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],
+    allow_origins=settings.allowed_origins_list,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+# ── Security ─────────────────────────────────────────────────────────
+
+
+def verify_ingest_token(authorization: str | None = Header(default=None)) -> None:
+    """
+    Guard the ingestion endpoint with a bearer token.
+
+    Ingestion is disabled over HTTP unless INGEST_TOKEN is configured.
+    """
+    if not settings.INGEST_TOKEN:
+        raise HTTPException(
+            status_code=403,
+            detail="Ingestion via the API is disabled. Set INGEST_TOKEN to enable it.",
+        )
+    scheme, _, token = (authorization or "").partition(" ")
+    if scheme.lower() != "bearer" or not secrets.compare_digest(token, settings.INGEST_TOKEN):
+        raise HTTPException(status_code=401, detail="Invalid or missing ingestion token.")
 
 
 # ── Request/Response Models ──────────────────────────────────────────
@@ -108,16 +128,24 @@ async def ask_question(request: QueryRequest):
         return QueryResponse(**result)
     except Exception as e:
         logger.error(f"Query failed: {e}", exc_info=True)
-        raise HTTPException(status_code=500, detail=f"Query failed: {str(e)}")
+        raise HTTPException(
+            status_code=500,
+            detail="Failed to process the query. Please try again later.",
+        )
 
 
-@app.post("/api/ingest", response_model=IngestResponse)
+@app.post(
+    "/api/ingest",
+    response_model=IngestResponse,
+    dependencies=[Depends(verify_ingest_token)],
+)
 async def run_ingestion():
     """
     Trigger the document ingestion pipeline.
 
-    Processes all PDFs in the data directory, chunks them,
-    generates summaries (if LLM is configured), embeds, and stores in ChromaDB.
+    Protected by a bearer token (INGEST_TOKEN). Processes all documents in the
+    data directory, chunks them, generates summaries (if an LLM is configured),
+    embeds, and stores them in ChromaDB.
     """
     from app.ingestion.pipeline import run_pipeline
 
@@ -126,4 +154,7 @@ async def run_ingestion():
         return IngestResponse(**result)
     except Exception as e:
         logger.error(f"Ingestion failed: {e}", exc_info=True)
-        raise HTTPException(status_code=500, detail=f"Ingestion failed: {str(e)}")
+        raise HTTPException(
+            status_code=500,
+            detail="Ingestion failed. Check the server logs for details.",
+        )
