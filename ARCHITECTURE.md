@@ -5,6 +5,10 @@
 > BGE-M3 microservice, LangGraph routing), see [`uniassist.md`](./uniassist.md). Several items
 > in that document are **roadmap / not yet built** — the "Gap vs. design doc" section below
 > reconciles the two.
+>
+> **Evaluation program:** for the ongoing evaluation/benchmarking effort, see the Phase 0 audit
+> [`docs/CURRENT_STATE.md`](./docs/CURRENT_STATE.md) and the frozen reference configuration
+> [`docs/BASELINE_V1.md`](./docs/BASELINE_V1.md).
 
 ---
 
@@ -127,8 +131,8 @@ answer + source citations + per-step timings.
 ### Currently configured deployment (from `backend/.env`)
 - **LLM provider:** OpenRouter (`LLM_BASE_URL=https://openrouter.ai/api/v1`), **model `google/gemini-2.5-flash`**.
   *(Code defaults, if unset, are xAI Grok: `https://api.x.ai/v1`, `grok-3-mini`.)*
-- **Reranker:** **not currently configured** (no `COHERE_API_KEY`) → the rerank step is **skipped**
-  and the top‑N retrieval results are used as-is.
+- **Reranker:** **configured and active** — `COHERE_API_KEY` is set, so Cohere `rerank-v3.5`
+  reranks the top‑K candidates down to top‑N (`RERANK_TOP_N`).
 - **Vector store:** **client-server mode** against `uniassist-chroma.onrender.com:443` (SSL),
   collection `university_docs`.
 - **Embeddings:** loaded in-process on CPU.
@@ -275,7 +279,7 @@ Interactive docs are available at `/docs` (Swagger) and `/redoc`.
 {
   "status": "ok",
   "llm_configured": true,
-  "cohere_configured": false,
+  "cohere_configured": true,
   "embedding_model": "all-MiniLM-L6-v2",
   "collection": "university_docs",
   "chroma_mode": "client_server",
@@ -395,7 +399,7 @@ The original design describes a larger system. What is **actually built today**:
 | BGE-M3 embeddings (microservice) | ➖ `all-MiniLM-L6-v2`, in-process |
 | Grok for summarize/generate | ✅ Configurable LLM (currently OpenRouter `gemini-2.5-flash`) |
 | ChromaDB vector store | ✅ Implemented (local or Render client-server) |
-| Cohere Rerank v3.5 | ✅ Implemented (optional; not keyed in current `.env`) |
+| Cohere Rerank v3.5 | ✅ Implemented **and active** (keyed in current `.env`) |
 | LangChain orchestration | ✅ Implemented |
 | LangGraph adaptive routing | ❌ Not built (roadmap) |
 | Hybrid search / metadata filtering | ❌ Not built (roadmap) |

@@ -1,0 +1,80 @@
+{
+  "id": "baseline_v1",
+  "name": "Baseline V1 - current production configuration",
+  "status": "frozen",
+  "frozen_on": "2026-08-20",
+  "code_commit": "7881175",
+  "description": "Reference RAG configuration captured from the live deployment. This is the fixed point every future experiment is compared against. Do NOT modify this file; create a new config for any variation (one major variable at a time).",
+  "parser": {
+    "pdf": "pdfplumber (table-aware, tables -> Markdown); PyPDFLoader fallback",
+    "docx": "python-docx (paragraphs + table rows)",
+    "txt_md": "langchain TextLoader (utf-8)",
+    "granularity": "one Document per PDF page; single Document for docx/txt",
+    "images": "not ingested"
+  },
+  "chunking": {
+    "splitter": "RecursiveCharacterTextSplitter",
+    "size": 2500,
+    "overlap": 300,
+    "keep_whole_if_leq_chars": 2500,
+    "separators": ["\n\n", "\n", ". ", " ", ""]
+  },
+  "indexing": {
+    "content_indexed": "llm_summary",
+    "content_indexed_note": "When an LLM key is set, the searchable page_content is an LLM summary; the original text is kept in metadata.raw_content and used for answer generation. With no LLM key, raw text is used for both.",
+    "raw_preserved_in": "metadata.raw_content",
+    "summarizer": {
+      "model": "google/gemini-2.5-flash",
+      "provider": "openrouter",
+      "temperature": 0.0,
+      "max_tokens": 256,
+      "concurrency": 5
+    }
+  },
+  "embedding": {
+    "name": "all-MiniLM-L6-v2",
+    "provider": "huggingface-sentence-transformers (in-process)",
+    "dimensions": 384,
+    "normalize_embeddings": true,
+    "similarity": "cosine"
+  },
+  "vector_store": {
+    "engine": "chromadb",
+    "collection": "university_docs",
+    "space": "cosine",
+    "production_mode": "client_server (remote Render, ssl, port 443)",
+    "experiment_mode": "TBD (recommend local persistent Chroma with a per-experiment collection)"
+  },
+  "retrieval": {
+    "method": "similarity_search_with_relevance_scores",
+    "top_k": 20,
+    "min_relevance_score": 0.0
+  },
+  "reranker": {
+    "name": "rerank-v3.5",
+    "provider": "cohere",
+    "top_n": 5,
+    "enabled": true
+  },
+  "generation": {
+    "llm": "google/gemini-2.5-flash",
+    "provider": "openrouter",
+    "base_url": "https://openrouter.ai/api/v1",
+    "temperature": 0.1,
+    "max_tokens": 1024,
+    "max_history_messages": 6,
+    "context_source": "metadata.raw_content"
+  },
+  "corpus": {
+    "root": "Data/",
+    "ingestible_files": 14,
+    "pdf": 12,
+    "docx": 1,
+    "txt": 1,
+    "ignored_images": 1
+  },
+  "environment": {
+    "python": "3.13.1",
+    "lockfile": "backend/requirements.lock"
+  }
+}
