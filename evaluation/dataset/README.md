@@ -5,11 +5,15 @@ This is the fixed question set every experiment runs against (freeze rule #2).
 
 - **File:** [`questions.json`](./questions.json)
 - **Current size:** 63 questions (target 100+; expandable without renumbering existing IDs)
-- **Built:** Phase 2 (2026-08-20). Every question was written after reading the actual source
-  document it targets, so answerable questions are genuinely answerable from the corpus.
+- **Built:** Phase 2 (questions) + Phase 3 (ground truth), 2026-08-20. Every question was written
+  after reading the actual source document it targets, so answerable questions are genuinely
+  answerable from the corpus.
+- **Status:** ✅ Ground truth complete — all 57 answerable items have `expected_sources`,
+  `expected_pages`, and a `ground_truth_answer`; all 6 unanswerable items expect abstention.
 
-> **Do not fabricate ground truth.** Answers/sources/pages are attached in **Phase 3** strictly
-> from the real documents.
+> **Ground truth is not fabricated.** Every answer was taken from the real documents, and each
+> `expected_pages` value was verified against the partitioner's page output (the same page numbers
+> the RAG system stores in metadata).
 
 ---
 
@@ -26,10 +30,11 @@ Each entry in `questions[]` has:
 | `answerable` | 2 | bool | `false` = intentionally out-of-corpus (abstention test). |
 | `question` | 2 | string | The user query (for conversational items, the follow-up turn). |
 | `history` | 2 | array | Conversational items only: prior `{role, content}` turns. |
-| `expected_sources` | **3** | string[] | Corpus file(s) (relative to `Data/`) that contain the answer. |
-| `expected_pages` | **3** | int[] | Page number(s) supporting the answer. |
-| `ground_truth_answer` | **3** | string\|null | Reference answer (null for unanswerable). |
-| `expected_behavior` | **3** | string | For unanswerable: the required abstention response. |
+| `expected_sources` | 3 | string[] | Corpus file(s) (relative to `Data/`) that contain the answer. `[]` for unanswerable. |
+| `expected_pages` | 3 | int[] | Page number(s) supporting the answer (verified against the partitioner). `[]` for unanswerable. |
+| `ground_truth_answer` | 3 | string\|null | Reference answer (`null` for unanswerable). |
+| `expected_behavior` | 3 | string | Unanswerable items only: `"abstain"`. |
+| `expected_abstention_text` | 3 | string | Unanswerable items only: the exact abstention message the system should return. |
 
 Top-level keys: `dataset`, `version`, `created`, `phase`, `description`, `categories`, `topics`,
 `notes`, `questions`.
