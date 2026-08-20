@@ -22,6 +22,14 @@ from app.ingestion.embedder import embed_and_store
 from app.ingestion.partition import partition_directory
 from app.ingestion.summarizer import summarize_chunks
 
+# Ensure UTF-8 stdout/stderr so rich/logging can emit Unicode (→, ✓, ⚠, —)
+# on Windows consoles that default to cp1252.
+for _stream in (sys.stdout, sys.stderr):
+    try:
+        _stream.reconfigure(encoding="utf-8")
+    except (AttributeError, ValueError):
+        pass
+
 # ── Logging setup ────────────────────────────────────────────────────
 console = Console()
 logging.basicConfig(
