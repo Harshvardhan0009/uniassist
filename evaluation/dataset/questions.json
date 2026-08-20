@@ -1,0 +1,564 @@
+{
+  "dataset": "uniassist_eval_v1",
+  "version": "0.1.0-phase2",
+  "created": "2026-08-20",
+  "phase": "Phase 2 (questions + metadata only). Ground truth (expected_sources, expected_pages, ground_truth_answer, expected abstention) is added in Phase 3.",
+  "description": "Benchmark of real student queries grounded in the LPU document corpus under Data/. Each item is grounded in a specific document that was read during construction. Answers are NOT included yet.",
+  "categories": [
+    "direct_factual",
+    "policy",
+    "academic",
+    "placement",
+    "table_based",
+    "multi_condition",
+    "conversational",
+    "exact_terminology",
+    "unanswerable"
+  ],
+  "topics": [
+    "library",
+    "dress_code",
+    "residential",
+    "academic_benefits",
+    "placement_career",
+    "ojt",
+    "semester_abroad",
+    "nss",
+    "campus_map"
+  ],
+  "notes": [
+    "answerable=false items are intentional out-of-corpus questions to test abstention (no hallucination).",
+    "conversational items carry a `history` array (prior turns); the `question` is the follow-up and is deliberately ambiguous without that history.",
+    "`topic` is coarse document-area metadata for balance tracking, not the precise expected source (that is Phase 3)."
+  ],
+  "questions": [
+    {
+      "id": "Q001",
+      "category": "direct_factual",
+      "topic": "library",
+      "difficulty": "easy",
+      "answerable": true,
+      "question": "What are the timings of the Central LPU Library?"
+    },
+    {
+      "id": "Q002",
+      "category": "direct_factual",
+      "topic": "library",
+      "difficulty": "easy",
+      "answerable": true,
+      "question": "How much is the late fee (compounding fee) charged per book per day when a student returns a library book late?"
+    },
+    {
+      "id": "Q003",
+      "category": "direct_factual",
+      "topic": "semester_abroad",
+      "difficulty": "easy",
+      "answerable": true,
+      "question": "What is the processing fee to apply for the Semester/Year Abroad program?"
+    },
+    {
+      "id": "Q004",
+      "category": "direct_factual",
+      "topic": "ojt",
+      "difficulty": "easy",
+      "answerable": true,
+      "question": "What is the minimum duration of a one-semester OJT or internship?"
+    },
+    {
+      "id": "Q005",
+      "category": "direct_factual",
+      "topic": "nss",
+      "difficulty": "easy",
+      "answerable": true,
+      "question": "How many NSS hours must a volunteer complete and over what period?"
+    },
+    {
+      "id": "Q006",
+      "category": "direct_factual",
+      "topic": "campus_map",
+      "difficulty": "easy",
+      "answerable": true,
+      "question": "Which block houses the Central Library on the LPU campus?"
+    },
+    {
+      "id": "Q007",
+      "category": "direct_factual",
+      "topic": "dress_code",
+      "difficulty": "easy",
+      "answerable": true,
+      "question": "Are jeans allowed under the student dress code?"
+    },
+    {
+      "id": "Q008",
+      "category": "direct_factual",
+      "topic": "residential",
+      "difficulty": "easy",
+      "answerable": true,
+      "question": "What is the annual charge for the laundry facility in the residential facilities charges?"
+    },
+    {
+      "id": "Q009",
+      "category": "policy",
+      "topic": "library",
+      "difficulty": "medium",
+      "answerable": true,
+      "question": "What rules must students follow while using the LPU libraries?"
+    },
+    {
+      "id": "Q010",
+      "category": "policy",
+      "topic": "placement_career",
+      "difficulty": "medium",
+      "answerable": true,
+      "question": "What is the 'One Student - One Offer' policy in career services?"
+    },
+    {
+      "id": "Q011",
+      "category": "policy",
+      "topic": "library",
+      "difficulty": "medium",
+      "answerable": true,
+      "question": "At what point is a student's library membership suspended due to unpaid compounding fees?"
+    },
+    {
+      "id": "Q012",
+      "category": "policy",
+      "topic": "nss",
+      "difficulty": "medium",
+      "answerable": true,
+      "question": "Who is not eligible to be selected as an NSS volunteer?"
+    },
+    {
+      "id": "Q013",
+      "category": "policy",
+      "topic": "dress_code",
+      "difficulty": "medium",
+      "answerable": true,
+      "question": "What are students expected to wear during winter under the dress code policy?"
+    },
+    {
+      "id": "Q014",
+      "category": "policy",
+      "topic": "residential",
+      "difficulty": "medium",
+      "answerable": true,
+      "question": "If a continuing student cancels their hostel facility on or after 1st September, how much refund are they entitled to?"
+    },
+    {
+      "id": "Q015",
+      "category": "policy",
+      "topic": "semester_abroad",
+      "difficulty": "medium",
+      "answerable": true,
+      "question": "Can a student change the university or the duration after joining the host university for a semester abroad?"
+    },
+    {
+      "id": "Q016",
+      "category": "policy",
+      "topic": "library",
+      "difficulty": "easy",
+      "answerable": true,
+      "question": "What is the policy on using mobile phones inside the library?"
+    },
+    {
+      "id": "Q017",
+      "category": "academic",
+      "topic": "academic_benefits",
+      "difficulty": "medium",
+      "answerable": true,
+      "question": "What is the minimum CGPA required to be eligible for the 10% Attendance Benefit?"
+    },
+    {
+      "id": "Q018",
+      "category": "academic",
+      "topic": "academic_benefits",
+      "difficulty": "medium",
+      "answerable": true,
+      "question": "What is the standard minimum CGPA required for internship-based academic benefits?"
+    },
+    {
+      "id": "Q019",
+      "category": "academic",
+      "topic": "academic_benefits",
+      "difficulty": "medium",
+      "answerable": true,
+      "question": "Is there a minimum CGPA requirement to avail the Grade Upgradation benefit?"
+    },
+    {
+      "id": "Q020",
+      "category": "academic",
+      "topic": "academic_benefits",
+      "difficulty": "medium",
+      "answerable": true,
+      "question": "For Recognition of Prior Learning (RPL), what grade must a student secure in the RPL exam to get a complete course waiver?"
+    },
+    {
+      "id": "Q021",
+      "category": "academic",
+      "topic": "academic_benefits",
+      "difficulty": "hard",
+      "answerable": true,
+      "question": "What academic benefit is granted for a patent that has been granted (Stage 3)?"
+    },
+    {
+      "id": "Q022",
+      "category": "academic",
+      "topic": "academic_benefits",
+      "difficulty": "medium",
+      "answerable": true,
+      "question": "What minimum CGPA is required to get complete course equivalence through NPTEL / Proctored MOOCs?"
+    },
+    {
+      "id": "Q023",
+      "category": "academic",
+      "topic": "academic_benefits",
+      "difficulty": "medium",
+      "answerable": true,
+      "question": "How many days of Duty Leave can be granted to a student for a competitive exam?"
+    },
+    {
+      "id": "Q024",
+      "category": "placement",
+      "topic": "placement_career",
+      "difficulty": "medium",
+      "answerable": true,
+      "question": "What is the minimum current CGPA required to register for Career Services for admission batches 2017 onwards?"
+    },
+    {
+      "id": "Q025",
+      "category": "placement",
+      "topic": "placement_career",
+      "difficulty": "medium",
+      "answerable": true,
+      "question": "Under what conditions is a registered student temporarily debarred from career services?"
+    },
+    {
+      "id": "Q026",
+      "category": "placement",
+      "topic": "placement_career",
+      "difficulty": "medium",
+      "answerable": true,
+      "question": "What are the different types of recruitment / placement drives at LPU?"
+    },
+    {
+      "id": "Q027",
+      "category": "placement",
+      "topic": "placement_career",
+      "difficulty": "medium",
+      "answerable": true,
+      "question": "What minimum marks in the End Term Test (ETT) must a student achieve to avail the placement academic benefit?"
+    },
+    {
+      "id": "Q028",
+      "category": "placement",
+      "topic": "ojt",
+      "difficulty": "medium",
+      "answerable": true,
+      "question": "What is the eligibility CGPA criterion for going on an OJT / internship?"
+    },
+    {
+      "id": "Q029",
+      "category": "placement",
+      "topic": "placement_career",
+      "difficulty": "medium",
+      "answerable": true,
+      "question": "If a student wants to surrender or reject a placement offer, within how many days must they do so in writing?"
+    },
+    {
+      "id": "Q030",
+      "category": "placement",
+      "topic": "ojt",
+      "difficulty": "medium",
+      "answerable": true,
+      "question": "What must a student obtain before going for an independently arranged (self-sourced) OJT or internship offer?"
+    },
+    {
+      "id": "Q031",
+      "category": "table_based",
+      "topic": "residential",
+      "difficulty": "medium",
+      "answerable": true,
+      "question": "What is the charge (in INR) for a Standard Air Conditioned 1-Seater hostel room with EDB till 31st March 2026?"
+    },
+    {
+      "id": "Q032",
+      "category": "table_based",
+      "topic": "placement_career",
+      "difficulty": "medium",
+      "answerable": true,
+      "question": "What IELTS band is required to be awarded an 'A' equivalent grade under the benefit for clearing competitive exams?"
+    },
+    {
+      "id": "Q033",
+      "category": "table_based",
+      "topic": "placement_career",
+      "difficulty": "medium",
+      "answerable": true,
+      "question": "For the placement academic benefit, which package category corresponds to a salary package above 5 LPA and up to 10 LPA?"
+    },
+    {
+      "id": "Q034",
+      "category": "table_based",
+      "topic": "residential",
+      "difficulty": "medium",
+      "answerable": true,
+      "question": "What is the charge (in INR) for the 'Standard Mess 04 Meals' plan (Breakfast, Lunch, Snacks & Dinner)?"
+    },
+    {
+      "id": "Q035",
+      "category": "table_based",
+      "topic": "placement_career",
+      "difficulty": "hard",
+      "answerable": true,
+      "question": "Under the Internship-with-PPO academic benefit, which monthly stipend range maps to the Z(D) package category?"
+    },
+    {
+      "id": "Q036",
+      "category": "table_based",
+      "topic": "placement_career",
+      "difficulty": "medium",
+      "answerable": true,
+      "question": "How many GATE marks are needed to be awarded an 'A+' equivalent grade under the competitive exam benefit?"
+    },
+    {
+      "id": "Q037",
+      "category": "table_based",
+      "topic": "residential",
+      "difficulty": "medium",
+      "answerable": true,
+      "question": "What is the charge (in INR) for the GYM facility without EDB (after 31st March 2026)?"
+    },
+    {
+      "id": "Q038",
+      "category": "multi_condition",
+      "topic": "academic_benefits",
+      "difficulty": "hard",
+      "answerable": true,
+      "question": "A final-year student with a 7.0 CGPA and 65% attendance cleared GATE. Are they eligible for the 10% Attendance Benefit?"
+    },
+    {
+      "id": "Q039",
+      "category": "multi_condition",
+      "topic": "semester_abroad",
+      "difficulty": "hard",
+      "answerable": true,
+      "question": "A student in a 2-year program has a 6.5 CGPA and one backlog. Do they meet the CGPA and backlog eligibility for a semester abroad, and for how long can they go?"
+    },
+    {
+      "id": "Q040",
+      "category": "multi_condition",
+      "topic": "library",
+      "difficulty": "medium",
+      "answerable": true,
+      "question": "How many books can a student in an honors course borrow, and for how long?"
+    },
+    {
+      "id": "Q041",
+      "category": "multi_condition",
+      "topic": "placement_career",
+      "difficulty": "hard",
+      "answerable": true,
+      "question": "A student placed in the Z(D) category has 4 pathway courses graded B, A, A+ and C. What are the updated grades after the placement benefit?"
+    },
+    {
+      "id": "Q042",
+      "category": "multi_condition",
+      "topic": "nss",
+      "difficulty": "medium",
+      "answerable": true,
+      "question": "For an NSS volunteer, how many hours must be completed per academic year and how many special camps are mandatory?"
+    },
+    {
+      "id": "Q043",
+      "category": "multi_condition",
+      "topic": "semester_abroad",
+      "difficulty": "medium",
+      "answerable": true,
+      "question": "During a semester abroad, which expenses is the student responsible for, and are they still considered enrolled at LPU?"
+    },
+    {
+      "id": "Q044",
+      "category": "conversational",
+      "topic": "library",
+      "difficulty": "medium",
+      "answerable": true,
+      "history": [
+        { "role": "user", "content": "What are the timings of the Central LPU Library?" },
+        { "role": "assistant", "content": "The Central LPU Library is open from 08:00 am to 12:00 am (midnight) on all days, including Sundays and holidays." }
+      ],
+      "question": "And what about the other block libraries?"
+    },
+    {
+      "id": "Q045",
+      "category": "conversational",
+      "topic": "placement_career",
+      "difficulty": "medium",
+      "answerable": true,
+      "history": [
+        { "role": "user", "content": "What is the minimum CGPA to register for Career Services?" },
+        { "role": "assistant", "content": "For admission batches 2017 onwards, the minimum current CGPA to register is 5 (it is 5.5 for batches admitted before 2017)." }
+      ],
+      "question": "What happens if it falls below that after I have registered?"
+    },
+    {
+      "id": "Q046",
+      "category": "conversational",
+      "topic": "ojt",
+      "difficulty": "easy",
+      "answerable": true,
+      "history": [
+        { "role": "user", "content": "How long is a one-semester OJT?" },
+        { "role": "assistant", "content": "A one-semester Internship/OJT must be a minimum of 4 months." }
+      ],
+      "question": "And a two-semester one?"
+    },
+    {
+      "id": "Q047",
+      "category": "conversational",
+      "topic": "semester_abroad",
+      "difficulty": "medium",
+      "answerable": true,
+      "history": [
+        { "role": "user", "content": "What is the minimum CGPA required for a semester abroad?" },
+        { "role": "assistant", "content": "You need a minimum of 6.5 CGPA and must also meet the host/partner university's requirements." }
+      ],
+      "question": "If my program is 3 years long, how much time can I spend abroad?"
+    },
+    {
+      "id": "Q048",
+      "category": "conversational",
+      "topic": "academic_benefits",
+      "difficulty": "medium",
+      "answerable": true,
+      "history": [
+        { "role": "user", "content": "What grade do I get for a granted patent under grade upgradation?" },
+        { "role": "assistant", "content": "A granted patent (Stage 3) gives an O grade (maximum 4 credits) in one mapped course." }
+      ],
+      "question": "And for a published patent?"
+    },
+    {
+      "id": "Q049",
+      "category": "conversational",
+      "topic": "campus_map",
+      "difficulty": "easy",
+      "answerable": true,
+      "history": [
+        { "role": "user", "content": "Which block is the Central Library in?" },
+        { "role": "assistant", "content": "The Central Library is in Block 37." }
+      ],
+      "question": "And where is the School of Law?"
+    },
+    {
+      "id": "Q050",
+      "category": "exact_terminology",
+      "topic": "ojt",
+      "difficulty": "easy",
+      "answerable": true,
+      "question": "What does the abbreviation 'OJT' stand for?"
+    },
+    {
+      "id": "Q051",
+      "category": "exact_terminology",
+      "topic": "placement_career",
+      "difficulty": "easy",
+      "answerable": true,
+      "question": "What does 'PPO' stand for in the placement policy?"
+    },
+    {
+      "id": "Q052",
+      "category": "exact_terminology",
+      "topic": "placement_career",
+      "difficulty": "easy",
+      "answerable": true,
+      "question": "What does 'PEP' stand for in the career services policy?"
+    },
+    {
+      "id": "Q053",
+      "category": "exact_terminology",
+      "topic": "placement_career",
+      "difficulty": "medium",
+      "answerable": true,
+      "question": "Which course codes are applicable for the IELTS/TOEFL/PTE benefit for clearing competitive exams?"
+    },
+    {
+      "id": "Q054",
+      "category": "exact_terminology",
+      "topic": "placement_career",
+      "difficulty": "easy",
+      "answerable": true,
+      "question": "What does 'LPA' mean in the career services policy?"
+    },
+    {
+      "id": "Q055",
+      "category": "exact_terminology",
+      "topic": "placement_career",
+      "difficulty": "medium",
+      "answerable": true,
+      "question": "In the 3rd Party Industry Tests academic benefit, which two assessments are used?"
+    },
+    {
+      "id": "Q056",
+      "category": "unanswerable",
+      "topic": "residential",
+      "difficulty": "easy",
+      "answerable": false,
+      "question": "What is today's mess menu?"
+    },
+    {
+      "id": "Q057",
+      "category": "unanswerable",
+      "topic": "campus_map",
+      "difficulty": "easy",
+      "answerable": false,
+      "question": "Who is the current Vice Chancellor of LPU?"
+    },
+    {
+      "id": "Q058",
+      "category": "unanswerable",
+      "topic": "placement_career",
+      "difficulty": "medium",
+      "answerable": false,
+      "question": "What is the last date to apply for admission to LPU in 2027?"
+    },
+    {
+      "id": "Q059",
+      "category": "unanswerable",
+      "topic": "academic_benefits",
+      "difficulty": "medium",
+      "answerable": false,
+      "question": "How many marks are required to pass the Data Structures end-term exam?"
+    },
+    {
+      "id": "Q060",
+      "category": "unanswerable",
+      "topic": "residential",
+      "difficulty": "easy",
+      "answerable": false,
+      "question": "What is the Wi-Fi password for the hostel?"
+    },
+    {
+      "id": "Q061",
+      "category": "unanswerable",
+      "topic": "placement_career",
+      "difficulty": "medium",
+      "answerable": false,
+      "question": "What is the annual tuition fee for the B.Tech CSE program?"
+    },
+    {
+      "id": "Q062",
+      "category": "exact_terminology",
+      "topic": "semester_abroad",
+      "difficulty": "medium",
+      "answerable": true,
+      "question": "Which division should a student contact for clarity on Semester/Year Abroad matters?"
+    },
+    {
+      "id": "Q063",
+      "category": "policy",
+      "topic": "nss",
+      "difficulty": "medium",
+      "answerable": true,
+      "question": "What is the objective of LPU-NSS?"
+    }
+  ]
+}
