@@ -9,6 +9,7 @@ Provides REST API endpoints for:
 
 import logging
 import secrets
+import sys
 import time
 from collections import defaultdict, deque
 from typing import Literal
@@ -19,6 +20,14 @@ from pydantic import BaseModel, Field
 from rich.logging import RichHandler
 
 from app.config import settings
+
+# Ensure UTF-8 stdout/stderr so rich/logging can emit Unicode (→, ✓, ⚠, —)
+# on Windows consoles that default to cp1252.
+for _stream in (sys.stdout, sys.stderr):
+    try:
+        _stream.reconfigure(encoding="utf-8")
+    except (AttributeError, ValueError):
+        pass
 
 # ── Logging ──────────────────────────────────────────────────────────
 logging.basicConfig(
