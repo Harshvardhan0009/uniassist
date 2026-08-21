@@ -7,8 +7,9 @@
 > reconciles the two.
 >
 > **Evaluation program:** for the ongoing evaluation/benchmarking effort, see the Phase 0 audit
-> [`docs/CURRENT_STATE.md`](./docs/CURRENT_STATE.md) and the frozen reference configuration
-> [`docs/BASELINE_V1.md`](./docs/BASELINE_V1.md).
+> [`docs/CURRENT_STATE.md`](./docs/CURRENT_STATE.md), the frozen reference configuration
+> [`docs/BASELINE_V1.md`](./docs/BASELINE_V1.md), and the **evaluation framework**
+> [`evaluation/README.md`](./evaluation/README.md) (Phase 4, §14 below).
 
 ---
 
@@ -185,6 +186,13 @@ uniassist/
 │   ├── package.json
 │   └── .env.example
 ├── Data/                         # university documents (see §8)
+├── evaluation/                   # evaluation framework (Phase 4+, see §14)
+│   ├── configs/baseline_v1.json  # frozen reference config (Phase 1)
+│   ├── dataset/questions.json    # 63-question benchmark + ground truth (Phases 2-3)
+│   ├── lib/                      # snapshot, indexer, harness, experiment glue
+│   ├── runners/                  # retrieval_eval.py, full_rag_eval.py
+│   ├── metrics/                  # Phase 5 (retrieval) / Phase 13 (generation)
+│   └── experiments/ · reports/   # result artifacts + reports
 ├── docker-compose.yml            # ChromaDB container
 ├── README.md                     # quickstart
 ├── uniassist.md                  # original design/roadmap doc
@@ -406,8 +414,9 @@ The original design describes a larger system. What is **actually built today**:
 | Multi-turn conversation | ✅ Implemented (frontend history → generator prompt) |
 
 **Not yet implemented (roadmap):** file upload + auth, async ingestion queue, image/OCR ingestion,
-query routing/reformulation, hybrid (dense+sparse) search, metadata-scoped retrieval, evaluation
-and tracing pipelines.
+query routing/reformulation, hybrid (dense+sparse) search, metadata-scoped retrieval, and tracing
+pipelines. An **evaluation/benchmarking framework is now built** (Phase 4, see §14); model-selection
+experiments (embeddings, reranker, chunking, LLM) build on it.
 
 ---
 
@@ -429,3 +438,53 @@ cd frontend && npm install
 cp .env.example .env.local        # optional: set NEXT_PUBLIC_API_BASE
 npm run dev                       # http://localhost:3000
 ```
+
+---
+
+## 14. Evaluation & benchmarking framework (Phase 4)
+
+An offline framework under [`evaluation/`](./evaluation/README.md) measures the RAG
+system with reproducible, controlled experiments. It is the basis for the
+model-selection work (embeddings, reranker, chunking, LLM) in later phases.
+
+**Architecture & guarantees**
+
+```mermaid
+flowchart LR
+    DATA["/Data (committed)/"] --> SNAP["snapshot.py<br/>freeze partition→chunk→summarize"]
+    SNAP --> JSONL[("snapshots/&lt;name&gt;.jsonl<br/>+ manifest (fingerprints)")]
+    JSONL --> IDX["indexer.py<br/>embed → isolated LOCAL Chroma"]
+    IDX --> STORE[(".chroma/&lt;collection&gt;<br/>never the prod store")]
+    QS["dataset/questions.json<br/>(63 Qs + ground truth)"] --> RUN
+    STORE --> RUN["runners/*<br/>retrieve → rerank → (generate)"]
+    RUN --> ART[("experiments/results/*.json<br/>raw ranked records + latency")]
+    ART --> MET["metrics/* (Phase 5+)<br/>Recall@K · MRR · faithfulness"]
+```
+
+- **No production mutation** — experiments use their own **local** Chroma
+  collection; the production remote store and singletons are never touched
+  (freeze rule #6).
+- **Frozen snapshot** — the corpus is frozen once (partition → chunk → summarize)
+  and re-embedded identically for every experiment, so only the variable under
+  test changes (freeze rule #1). Manifests carry `raw_content_sha256`
+  (corpus fingerprint) and `snapshot_sha256` (exact indexed text).
+- **Production-faithful** — reuses the real `app.*` parser, chunker, summariser,
+  Cohere reranker and LLM generator.
+- **Separation of concerns** — runners emit *raw* records; metric scoring is a
+  distinct step (Phase 5 retrieval metrics, Phase 13 generation metrics).
+
+**Ground-truth alignment.** `metadata.source_file` (path relative to `Data/`) and
+`page_number` match the dataset's `expected_sources`/`expected_pages` exactly, so
+source- and page-level Recall@K / MRR are directly computable.
+
+**Current status.** The pipeline runs end-to-end (MiniLM retrieval avg ~14 ms;
+expected source in retrieved top-k for 56/57 answerable questions). Two runtime
+blockers prevent a *faithful* Baseline V1 (Phase 6) until resolved:
+
+- **LLM (OpenRouter) `402 Payment Required`** → chunk summaries and LLM answers
+  unavailable; the snapshot currently freezes **raw chunk text**
+  (`summarizer.effective = false`) and answers fall back to extractive text.
+- **Cohere Trial key `429` (10/min)** → reranking is rate-limited and falls back
+  to retrieval order for most questions.
+
+Retrieval-only evaluation is fully functional without either key.
