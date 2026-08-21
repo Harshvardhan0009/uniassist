@@ -111,8 +111,12 @@ retrieval artifact is a smoke-test signal only — **not** the Recall/MRR metric
 | 2 | `dataset/questions.json` (63 Qs) | done |
 | 3 | ground truth on all 63 | done |
 | **4** | **evaluation pipeline (this framework)** | **done — runs end-to-end** |
-| 5 | `metrics/retrieval_metrics.py` (Recall@1/5/10/20, MRR, Precision@K, HitRate@K) | pending |
+| **5** | **`metrics/retrieval_metrics.py`** (Recall@1/5/10/20, MRR, Precision@K, HitRate@K, set-recall) | **done — dense baseline scored** |
 | 6 | official `results/baseline_v1.json` reference numbers | pending (needs working keys) |
+
+**Phase 5 dense-retrieval baseline (all-MiniLM-L6-v2, source level):** Recall@1
+0.877 · Recall@5 0.965 · Recall@10 0.983 · MRR 0.912 (57 answerable questions).
+See [`reports/retrieval_metrics_baseline_v1.md`](./reports/retrieval_metrics_baseline_v1.md).
 
 ### ⚠ Runtime blockers for the *faithful* baseline (discovered in Phase 4)
 

@@ -1,0 +1,311 @@
+{
+  "scored_from": "baseline_v1_retrieval",
+  "kind": "retrieval_metrics",
+  "dataset": {
+    "name": "uniassist_eval_v1",
+    "version": "1.0.0-phase3",
+    "phase": "Phase 3 complete: ground truth (expected_sources, expected_pages, ground_truth_answer) attached to answerable items; abstention expectation set for unanswerable items.",
+    "questions": 63,
+    "answerable": 57,
+    "unanswerable": 6,
+    "evaluated": 63
+  },
+  "config": {
+    "id": "baseline_v1",
+    "embedding": {
+      "name": "all-MiniLM-L6-v2",
+      "content_indexed": "llm_summary"
+    },
+    "chunking": {
+      "size": 2500,
+      "overlap": 300
+    },
+    "retrieval": {
+      "top_k": 20,
+      "min_relevance_score": 0.0
+    },
+    "reranker": {
+      "name": "rerank-v3.5",
+      "top_n": 5,
+      "enabled": false
+    },
+    "llm": {
+      "name": "google/gemini-2.5-flash"
+    },
+    "snapshot": "baseline_v1",
+    "collection": "eval_baseline_v1"
+  },
+  "snapshot": {
+    "name": "baseline_v1",
+    "summarizer_effective": false
+  },
+  "index": {
+    "reused": true,
+    "collection": "eval_baseline_v1",
+    "embedding_model": "all-MiniLM-L6-v2",
+    "dimensions": 384,
+    "vectors": 184,
+    "index_seconds": 0.0,
+    "persist_dir": "C:\\Users\\laukik\\Desktop\\uniassist\\uniassist\\evaluation\\.chroma\\eval_baseline_v1"
+  },
+  "scored": {
+    "answerable_scored": 57,
+    "excluded_unanswerable_or_no_gt": 6
+  },
+  "rerank_status": {
+    "rerank_enabled": false,
+    "reranker_used_questions": 0,
+    "total_questions": 63,
+    "note": "rerank disabled for this run (dense-only)"
+  },
+  "metrics": {
+    "retrieved": {
+      "source": {
+        "mrr": 0.9121,
+        "recall@1": 0.8772,
+        "precision@1": 0.8772,
+        "recall@5": 0.9649,
+        "precision@5": 0.6316,
+        "recall@10": 0.9825,
+        "precision@10": 0.5175,
+        "recall@20": 0.9825,
+        "precision@20": 0.3904,
+        "set_recall@1": 0.8772,
+        "set_recall@5": 0.9649,
+        "set_recall@10": 0.9825,
+        "set_recall@20": 0.9825
+      },
+      "page": {
+        "mrr": 0.7075,
+        "recall@1": 0.6316,
+        "precision@1": 0.6316,
+        "recall@5": 0.807,
+        "precision@5": 0.2421,
+        "recall@10": 0.8772,
+        "precision@10": 0.1421,
+        "recall@20": 0.9649,
+        "precision@20": 0.0816
+      }
+    },
+    "reranked": {
+      "source": {
+        "mrr": 0.9099,
+        "recall@1": 0.8772,
+        "precision@1": 0.8772,
+        "recall@5": 0.9649,
+        "precision@5": 0.6316,
+        "set_recall@1": 0.8772,
+        "set_recall@5": 0.9649
+      },
+      "page": {
+        "mrr": 0.6904,
+        "recall@1": 0.6316,
+        "precision@1": 0.6316,
+        "recall@5": 0.807,
+        "precision@5": 0.2421
+      }
+    }
+  },
+  "by_category": {
+    "academic": {
+      "n": 7,
+      "retrieved_source": {
+        "mrr": 1.0,
+        "recall@1": 1.0,
+        "precision@1": 1.0,
+        "recall@5": 1.0,
+        "precision@5": 0.7429,
+        "recall@10": 1.0,
+        "precision@10": 0.6857,
+        "recall@20": 1.0,
+        "precision@20": 0.4929,
+        "set_recall@1": 1.0,
+        "set_recall@5": 1.0,
+        "set_recall@10": 1.0,
+        "set_recall@20": 1.0
+      }
+    },
+    "conversational": {
+      "n": 6,
+      "retrieved_source": {
+        "mrr": 0.5764,
+        "recall@1": 0.5,
+        "precision@1": 0.5,
+        "recall@5": 0.6667,
+        "precision@5": 0.3333,
+        "recall@10": 0.8333,
+        "precision@10": 0.3,
+        "recall@20": 0.8333,
+        "precision@20": 0.225,
+        "set_recall@1": 0.5,
+        "set_recall@5": 0.6667,
+        "set_recall@10": 0.8333,
+        "set_recall@20": 0.8333
+      }
+    },
+    "direct_factual": {
+      "n": 8,
+      "retrieved_source": {
+        "mrr": 0.9375,
+        "recall@1": 0.875,
+        "precision@1": 0.875,
+        "recall@5": 1.0,
+        "precision@5": 0.65,
+        "recall@10": 1.0,
+        "precision@10": 0.4875,
+        "recall@20": 1.0,
+        "precision@20": 0.3875,
+        "set_recall@1": 0.875,
+        "set_recall@5": 1.0,
+        "set_recall@10": 1.0,
+        "set_recall@20": 1.0
+      }
+    },
+    "exact_terminology": {
+      "n": 7,
+      "retrieved_source": {
+        "mrr": 0.8333,
+        "recall@1": 0.7143,
+        "precision@1": 0.7143,
+        "recall@5": 1.0,
+        "precision@5": 0.6571,
+        "recall@10": 1.0,
+        "precision@10": 0.5143,
+        "recall@20": 1.0,
+        "precision@20": 0.4071,
+        "set_recall@1": 0.7143,
+        "set_recall@5": 1.0,
+        "set_recall@10": 1.0,
+        "set_recall@20": 1.0
+      }
+    },
+    "multi_condition": {
+      "n": 6,
+      "retrieved_source": {
+        "mrr": 1.0,
+        "recall@1": 1.0,
+        "precision@1": 1.0,
+        "recall@5": 1.0,
+        "precision@5": 0.7,
+        "recall@10": 1.0,
+        "precision@10": 0.5167,
+        "recall@20": 1.0,
+        "precision@20": 0.3917,
+        "set_recall@1": 1.0,
+        "set_recall@5": 1.0,
+        "set_recall@10": 1.0,
+        "set_recall@20": 1.0
+      }
+    },
+    "placement": {
+      "n": 7,
+      "retrieved_source": {
+        "mrr": 0.8857,
+        "recall@1": 0.8571,
+        "precision@1": 0.8571,
+        "recall@5": 1.0,
+        "precision@5": 0.5143,
+        "recall@10": 1.0,
+        "precision@10": 0.5429,
+        "recall@20": 1.0,
+        "precision@20": 0.4857,
+        "set_recall@1": 0.8571,
+        "set_recall@5": 1.0,
+        "set_recall@10": 1.0,
+        "set_recall@20": 1.0
+      }
+    },
+    "policy": {
+      "n": 9,
+      "retrieved_source": {
+        "mrr": 1.0,
+        "recall@1": 1.0,
+        "precision@1": 1.0,
+        "recall@5": 1.0,
+        "precision@5": 0.7778,
+        "recall@10": 1.0,
+        "precision@10": 0.6222,
+        "recall@20": 1.0,
+        "precision@20": 0.4722,
+        "set_recall@1": 1.0,
+        "set_recall@5": 1.0,
+        "set_recall@10": 1.0,
+        "set_recall@20": 1.0
+      }
+    },
+    "table_based": {
+      "n": 7,
+      "retrieved_source": {
+        "mrr": 1.0,
+        "recall@1": 1.0,
+        "precision@1": 1.0,
+        "recall@5": 1.0,
+        "precision@5": 0.6,
+        "recall@10": 1.0,
+        "precision@10": 0.4143,
+        "recall@20": 1.0,
+        "precision@20": 0.2143,
+        "set_recall@1": 1.0,
+        "set_recall@5": 1.0,
+        "set_recall@10": 1.0,
+        "set_recall@20": 1.0
+      }
+    }
+  },
+  "by_difficulty": {
+    "easy": {
+      "n": 15,
+      "retrieved_source": {
+        "mrr": 0.7639,
+        "recall@1": 0.6667,
+        "precision@1": 0.6667,
+        "recall@5": 0.8667,
+        "precision@5": 0.5733,
+        "recall@10": 0.9333,
+        "precision@10": 0.4267,
+        "recall@20": 0.9333,
+        "precision@20": 0.3533,
+        "set_recall@1": 0.6667,
+        "set_recall@5": 0.8667,
+        "set_recall@10": 0.9333,
+        "set_recall@20": 0.9333
+      }
+    },
+    "hard": {
+      "n": 5,
+      "retrieved_source": {
+        "mrr": 1.0,
+        "recall@1": 1.0,
+        "precision@1": 1.0,
+        "recall@5": 1.0,
+        "precision@5": 0.6,
+        "recall@10": 1.0,
+        "precision@10": 0.42,
+        "recall@20": 1.0,
+        "precision@20": 0.26,
+        "set_recall@1": 1.0,
+        "set_recall@5": 1.0,
+        "set_recall@10": 1.0,
+        "set_recall@20": 1.0
+      }
+    },
+    "medium": {
+      "n": 37,
+      "retrieved_source": {
+        "mrr": 0.9604,
+        "recall@1": 0.9459,
+        "precision@1": 0.9459,
+        "recall@5": 1.0,
+        "precision@5": 0.6595,
+        "recall@10": 1.0,
+        "precision@10": 0.5676,
+        "recall@20": 1.0,
+        "precision@20": 0.423,
+        "set_recall@1": 0.9459,
+        "set_recall@5": 1.0,
+        "set_recall@10": 1.0,
+        "set_recall@20": 1.0
+      }
+    }
+  }
+}
