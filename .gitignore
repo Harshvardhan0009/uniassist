@@ -23,6 +23,14 @@ backend/.env
 # Vector store (large, regenerated)
 backend/chroma_db/
 
+# Evaluation: local per-experiment Chroma stores (regenerated from committed snapshots)
+evaluation/.chroma/
+# Evaluation: frozen corpus snapshots are large & regenerable from committed Data/ + builder.
+# (When a summary-based baseline snapshot is locked, force-add it for exact reproducibility.)
+evaluation/snapshots/
+# Evaluation caches
+evaluation/**/__pycache__/
+
 # Node
 node_modules/
 .next/
