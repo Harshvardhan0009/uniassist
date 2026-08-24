@@ -2,10 +2,10 @@
 
 > Auto/hand-maintained status of the evaluation program. Metric tables
 > (Recall@K, MRR, faithfulness, …) appear here from Phase 5 onward. This file
-> records Phases 4-5 completion, the first retrieval numbers, and the
-> environment blockers found.
+> records Phases 4-6 completion, the retrieval + reranked baseline numbers, and
+> the environment blockers found.
 
-**Updated:** 2026-08-21 · **Branch:** `laukik-uniassist-branch`
+**Updated:** 2026-08-25 · **Branch:** `laukik-uniassist-branch`
 
 ---
 
@@ -73,22 +73,73 @@ is regenerable (`retrieval_eval --no-rerank`) and left uncommitted.
 
 ---
 
-## ⚠ Blockers before a faithful Baseline V1 (Phase 6)
+## Phase 6 — Baseline V1 reference numbers ✅ (retrieval+rerank) · ⚠ (generation partial)
 
-| Blocker | Effect | Needed to resolve |
+Produced `experiments/results/baseline_v1.json`. **Retrieval and reranking are
+complete and faithful** to the frozen Baseline V1 (same corpus/chunking, embedding
+`all-MiniLM-L6-v2`, reranker Cohere `rerank-v3.5`); the Cohere key now works, so
+the reranker's **true contribution** is measured for the first time (Phase 5 had it
+disabled). Full tables: [`retrieval_metrics_baseline_v1_gemini36.md`](./retrieval_metrics_baseline_v1_gemini36.md).
+
+**Reranker contribution — dense vs Cohere rerank-v3.5 (57 answerable):**
+
+| Metric | Dense (Phase 5) | + Cohere rerank | Δ |
+|---|---:|---:|---:|
+| source Recall@1 | 0.877 | **0.930** | +0.053 |
+| source Recall@5 | 0.965 | **0.982** | +0.018 |
+| source MRR | 0.912 | **0.953** | +0.041 |
+| source P@5 | 0.632 | **0.716** | +0.084 |
+| **page Recall@1** | 0.632 | **0.895** | **+0.263** |
+| page Recall@5 | 0.807 | **0.965** | +0.158 |
+| page MRR | 0.708 | **0.924** | +0.216 |
+
+- **Reranking clearly helps**, and the **page-level** gain is dramatic (Recall@1
+  0.63 → 0.90): Cohere surfaces the *exact right page* at rank 1 far more often.
+  Direct evidence the reranker is worth its ~640 ms (relevant to citations, Phase 20).
+- Reranking was applied on **63/63** questions (no rate-limit fallback) via an
+  eval-only trial throttle + 429-retry added to the harness.
+
+**Latency (ms):** retrieval avg **31.6** (p95 40) · reranking avg **640** (p95 1005)
+· generation avg **~5000** (p95 7208, **n=16** real answers; gemini-3.6-flash
+"thinking" + first-call warmup).
+
+**⚠ Generation is only partially captured (16/63).** Two deviations from the frozen
+spec, both documented in `baseline_v1.json`:
+
+1. **LLM substitution** — the frozen `google/gemini-2.5-flash` returns 404 ("no longer
+   available to new users") on the available Google key; Google's named successor
+   **`gemini-3.6-flash`** was used instead. Retrieval/rerank are unaffected (LLM-independent).
+2. **Free-tier daily cap** — `gemini-3.6-flash` free tier allows **20 requests/day**.
+   After the cap, `generate_answer` fell back to extractive text (`has_llm=false`).
+   A full 63-question answer set needs a paid tier (or ~4 days at 20/day).
+
+**Committed artifacts:** `experiments/results/baseline_v1.json` (reference),
+`experiments/results/baseline_v1_gemini36_retrieval_scored.json` (metrics),
+`reports/retrieval_metrics_baseline_v1_gemini36.md` (tables). The full-RAG raw dump
+(all 63 answers: 16 real + 47 extractive fallback) is left uncommitted per convention
+— but note the 16 real answers are **not cheaply reproducible** while the free-tier cap
+stands, so keep the local copy until answer-quality is re-run on a paid tier.
+
+---
+
+## Environment blockers — status
+
+| Blocker | Status | Notes |
 |---|---|---|
-| OpenRouter LLM `402 Payment Required` | No chunk summaries (indexing), no LLM answers | Fund/replace the LLM key, **or** decide to index raw text |
-| Cohere Trial key `429` (10/min) | Reranking rate-limited → falls back to retrieval order | Upgrade Cohere key, **or** throttle the eval reranker, **or** run reranker eval later (Phase 9) |
-
-Retrieval-only metrics (Phase 5) can be produced now on the MiniLM index without
-either key; the reranked/answer-quality numbers need the keys.
+| Cohere Trial `429` (10/min) | ✅ **worked around** | eval harness throttle (`EVAL_COHERE_MIN_INTERVAL_MS`) + 429-retry → 63/63 reranked, no fallback |
+| OpenRouter LLM `402` | ⛔ still unfunded | account never purchased credits; abandoned in favour of the Google key |
+| `gemini-2.5-flash` 404 | ⛔ unavailable | deprecated for new accounts → substituted `gemini-3.6-flash` |
+| `gemini-3.6-flash` free tier | ⚠ **20 req/day cap** | blocks full answer capture; needs paid tier or multi-day capture |
 
 ---
 
 ## Next
 
-- **Phase 6** — produce the official `baseline_v1.json` (retrieval metrics +
-  reranked metrics + full-RAG latency + captured answers) once the LLM key is
-  funded (summaries + answers) and Cohere reranking is available.
-- The Phase 5 dense numbers above are the reference bar for **Phase 7** (BGE/E5
-  embedding experiments), which reuse this exact frozen snapshot and dataset.
+- **Answer-quality (Phases 13-14)** — needs a paid Gemini tier (or another funded
+  LLM) to capture all 63 answers in one pass; otherwise capture ~17/day over ~4 days.
+  Retrieval/rerank do not block on this.
+- **Phase 7 (BGE/E5 embeddings)** — ready to start now: reuse this exact frozen
+  snapshot + dataset + Cohere reranker. The bar to beat is the reranked source
+  Recall@5 **0.982** / MRR **0.953** (dense Recall@5 0.965 / MRR 0.912).
+- **Phase 9 (reranker A/B)** — largely answered above (rerank helps, esp. page-level);
+  can be formalised as its own report when convenient.

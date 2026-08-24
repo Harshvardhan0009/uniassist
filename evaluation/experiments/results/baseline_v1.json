@@ -1,0 +1,421 @@
+{
+  "experiment": "baseline_v1",
+  "kind": "baseline_reference",
+  "phase": "Phase 6 — Baseline V1 reference numbers",
+  "created": "2026-08-25T00:32:17+0530",
+  "status": {
+    "retrieval_and_rerank": "COMPLETE and faithful to frozen Baseline V1 (embedding all-MiniLM-L6-v2 + Cohere rerank-v3.5, same corpus/chunking/top-k).",
+    "generation": "PARTIAL — see llm_substitution + answer_coverage."
+  },
+  "llm_substitution": {
+    "frozen_baseline_llm": "google/gemini-2.5-flash (via OpenRouter)",
+    "used_llm": "gemini-3.6-flash (via Google Gemini OpenAI-compatible endpoint)",
+    "reason": "OpenRouter key had no credits (402). On the available Google Gemini key, gemini-2.5-flash returns 404 'no longer available to new users'; Google's named successor gemini-3.6-flash was used instead.",
+    "impact": "Retrieval + rerank metrics are unaffected (LLM-independent). Answer-quality numbers are NOT the frozen-baseline LLM and are only partially captured."
+  },
+  "answer_coverage": {
+    "real_llm_answers": 16,
+    "total_questions": 63,
+    "fallback_extractive": 47,
+    "blocker": "Gemini free tier cap: GenerateRequestsPerDayPerProjectPerModel-FreeTier = 20 req/day for gemini-3.6-flash. After the daily cap, generate_answer fell back to extractive text (has_llm=false). Full answer capture needs a paid tier or ~4 days at 20/day.",
+    "answered_ids": [
+      "Q001",
+      "Q002",
+      "Q003",
+      "Q004",
+      "Q005",
+      "Q006",
+      "Q007",
+      "Q008",
+      "Q009",
+      "Q010",
+      "Q011",
+      "Q012",
+      "Q015",
+      "Q016",
+      "Q018",
+      "Q021"
+    ]
+  },
+  "dataset": {
+    "name": "uniassist_eval_v1",
+    "version": "1.0.0-phase3",
+    "phase": "Phase 3 complete: ground truth (expected_sources, expected_pages, ground_truth_answer) attached to answerable items; abstention expectation set for unanswerable items.",
+    "questions": 63,
+    "answerable": 57,
+    "unanswerable": 6,
+    "evaluated": 63
+  },
+  "config": {
+    "id": "baseline_v1_gemini36",
+    "embedding": {
+      "name": "all-MiniLM-L6-v2",
+      "content_indexed": "raw"
+    },
+    "chunking": {
+      "size": 2500,
+      "overlap": 300
+    },
+    "retrieval": {
+      "top_k": 20,
+      "min_relevance_score": 0.0
+    },
+    "reranker": {
+      "name": "rerank-v3.5",
+      "top_n": 5,
+      "enabled": true
+    },
+    "llm": {
+      "name": "gemini-3.6-flash"
+    },
+    "snapshot": "baseline_v1",
+    "collection": "eval_baseline_v1"
+  },
+  "config_source": "evaluation/configs/baseline_v1_gemini36.json (variant; frozen configs/baseline_v1.json untouched)",
+  "provenance": {
+    "snapshot": {
+      "name": "baseline_v1",
+      "snapshot_sha256": "0a779ea2a503e5f79bbd8aa9d8496102b75e1f36f195a49ebdb76b31c6a8c6ef",
+      "counts": {
+        "files": 14,
+        "pages": 144,
+        "chunks": 184,
+        "frozen": 184,
+        "summary_equals_raw": 184
+      }
+    },
+    "index": {
+      "reused": true,
+      "collection": "eval_baseline_v1",
+      "embedding_model": "all-MiniLM-L6-v2",
+      "dimensions": 384,
+      "vectors": 184,
+      "index_seconds": 0.0,
+      "persist_dir": "C:\\Users\\laukik\\Desktop\\uniassist\\uniassist\\evaluation\\.chroma\\eval_baseline_v1"
+    },
+    "environment": {
+      "python": "3.13.1",
+      "platform": "Windows-11-10.0.26200-SP0"
+    },
+    "scored_answerable": {
+      "answerable_scored": 57,
+      "excluded_unanswerable_or_no_gt": 6
+    },
+    "rerank_status": {
+      "rerank_enabled": true,
+      "reranker_used_questions": 63,
+      "total_questions": 63,
+      "note": "if reranker_used < total, some/all reranking fell back to retrieval order (e.g. Cohere rate-limit)"
+    }
+  },
+  "embedding": {
+    "name": "all-MiniLM-L6-v2",
+    "dimensions": 384
+  },
+  "chunking": {
+    "size": 2500,
+    "overlap": 300
+  },
+  "retrieval": {
+    "top_k": 20
+  },
+  "reranker": {
+    "name": "rerank-v3.5",
+    "top_n": 5,
+    "provider": "cohere",
+    "enabled": true
+  },
+  "llm": {
+    "name": "gemini-3.6-flash",
+    "provider": "google-gemini",
+    "note": "substitute for frozen google/gemini-2.5-flash (see llm_substitution)"
+  },
+  "parser": {
+    "pdf": "pdfplumber (+PyPDF fallback)",
+    "docx": "python-docx",
+    "txt_md": "TextLoader"
+  },
+  "metrics": {
+    "retrieval_dense": {
+      "source": {
+        "mrr": 0.9121,
+        "recall@1": 0.8772,
+        "precision@1": 0.8772,
+        "recall@5": 0.9649,
+        "precision@5": 0.6316,
+        "recall@10": 0.9825,
+        "precision@10": 0.5175,
+        "recall@20": 0.9825,
+        "precision@20": 0.3904,
+        "set_recall@1": 0.8772,
+        "set_recall@5": 0.9649,
+        "set_recall@10": 0.9825,
+        "set_recall@20": 0.9825
+      },
+      "page": {
+        "mrr": 0.7075,
+        "recall@1": 0.6316,
+        "precision@1": 0.6316,
+        "recall@5": 0.807,
+        "precision@5": 0.2421,
+        "recall@10": 0.8772,
+        "precision@10": 0.1421,
+        "recall@20": 0.9649,
+        "precision@20": 0.0816
+      }
+    },
+    "reranked_cohere": {
+      "source": {
+        "mrr": 0.9532,
+        "recall@1": 0.9298,
+        "precision@1": 0.9298,
+        "recall@5": 0.9825,
+        "precision@5": 0.7158,
+        "set_recall@1": 0.9298,
+        "set_recall@5": 0.9825
+      },
+      "page": {
+        "mrr": 0.924,
+        "recall@1": 0.8947,
+        "precision@1": 0.8947,
+        "recall@5": 0.9649,
+        "precision@5": 0.2912
+      }
+    },
+    "by_category_dense_source": {
+      "academic": {
+        "n": 7,
+        "retrieved_source": {
+          "mrr": 1.0,
+          "recall@1": 1.0,
+          "precision@1": 1.0,
+          "recall@5": 1.0,
+          "precision@5": 0.7429,
+          "recall@10": 1.0,
+          "precision@10": 0.6857,
+          "recall@20": 1.0,
+          "precision@20": 0.4929,
+          "set_recall@1": 1.0,
+          "set_recall@5": 1.0,
+          "set_recall@10": 1.0,
+          "set_recall@20": 1.0
+        }
+      },
+      "conversational": {
+        "n": 6,
+        "retrieved_source": {
+          "mrr": 0.5764,
+          "recall@1": 0.5,
+          "precision@1": 0.5,
+          "recall@5": 0.6667,
+          "precision@5": 0.3333,
+          "recall@10": 0.8333,
+          "precision@10": 0.3,
+          "recall@20": 0.8333,
+          "precision@20": 0.225,
+          "set_recall@1": 0.5,
+          "set_recall@5": 0.6667,
+          "set_recall@10": 0.8333,
+          "set_recall@20": 0.8333
+        }
+      },
+      "direct_factual": {
+        "n": 8,
+        "retrieved_source": {
+          "mrr": 0.9375,
+          "recall@1": 0.875,
+          "precision@1": 0.875,
+          "recall@5": 1.0,
+          "precision@5": 0.65,
+          "recall@10": 1.0,
+          "precision@10": 0.4875,
+          "recall@20": 1.0,
+          "precision@20": 0.3875,
+          "set_recall@1": 0.875,
+          "set_recall@5": 1.0,
+          "set_recall@10": 1.0,
+          "set_recall@20": 1.0
+        }
+      },
+      "exact_terminology": {
+        "n": 7,
+        "retrieved_source": {
+          "mrr": 0.8333,
+          "recall@1": 0.7143,
+          "precision@1": 0.7143,
+          "recall@5": 1.0,
+          "precision@5": 0.6571,
+          "recall@10": 1.0,
+          "precision@10": 0.5143,
+          "recall@20": 1.0,
+          "precision@20": 0.4071,
+          "set_recall@1": 0.7143,
+          "set_recall@5": 1.0,
+          "set_recall@10": 1.0,
+          "set_recall@20": 1.0
+        }
+      },
+      "multi_condition": {
+        "n": 6,
+        "retrieved_source": {
+          "mrr": 1.0,
+          "recall@1": 1.0,
+          "precision@1": 1.0,
+          "recall@5": 1.0,
+          "precision@5": 0.7,
+          "recall@10": 1.0,
+          "precision@10": 0.5167,
+          "recall@20": 1.0,
+          "precision@20": 0.3917,
+          "set_recall@1": 1.0,
+          "set_recall@5": 1.0,
+          "set_recall@10": 1.0,
+          "set_recall@20": 1.0
+        }
+      },
+      "placement": {
+        "n": 7,
+        "retrieved_source": {
+          "mrr": 0.8857,
+          "recall@1": 0.8571,
+          "precision@1": 0.8571,
+          "recall@5": 1.0,
+          "precision@5": 0.5143,
+          "recall@10": 1.0,
+          "precision@10": 0.5429,
+          "recall@20": 1.0,
+          "precision@20": 0.4857,
+          "set_recall@1": 0.8571,
+          "set_recall@5": 1.0,
+          "set_recall@10": 1.0,
+          "set_recall@20": 1.0
+        }
+      },
+      "policy": {
+        "n": 9,
+        "retrieved_source": {
+          "mrr": 1.0,
+          "recall@1": 1.0,
+          "precision@1": 1.0,
+          "recall@5": 1.0,
+          "precision@5": 0.7778,
+          "recall@10": 1.0,
+          "precision@10": 0.6222,
+          "recall@20": 1.0,
+          "precision@20": 0.4722,
+          "set_recall@1": 1.0,
+          "set_recall@5": 1.0,
+          "set_recall@10": 1.0,
+          "set_recall@20": 1.0
+        }
+      },
+      "table_based": {
+        "n": 7,
+        "retrieved_source": {
+          "mrr": 1.0,
+          "recall@1": 1.0,
+          "precision@1": 1.0,
+          "recall@5": 1.0,
+          "precision@5": 0.6,
+          "recall@10": 1.0,
+          "precision@10": 0.4143,
+          "recall@20": 1.0,
+          "precision@20": 0.2143,
+          "set_recall@1": 1.0,
+          "set_recall@5": 1.0,
+          "set_recall@10": 1.0,
+          "set_recall@20": 1.0
+        }
+      }
+    },
+    "by_difficulty_dense_source": {
+      "easy": {
+        "n": 15,
+        "retrieved_source": {
+          "mrr": 0.7639,
+          "recall@1": 0.6667,
+          "precision@1": 0.6667,
+          "recall@5": 0.8667,
+          "precision@5": 0.5733,
+          "recall@10": 0.9333,
+          "precision@10": 0.4267,
+          "recall@20": 0.9333,
+          "precision@20": 0.3533,
+          "set_recall@1": 0.6667,
+          "set_recall@5": 0.8667,
+          "set_recall@10": 0.9333,
+          "set_recall@20": 0.9333
+        }
+      },
+      "hard": {
+        "n": 5,
+        "retrieved_source": {
+          "mrr": 1.0,
+          "recall@1": 1.0,
+          "precision@1": 1.0,
+          "recall@5": 1.0,
+          "precision@5": 0.6,
+          "recall@10": 1.0,
+          "precision@10": 0.42,
+          "recall@20": 1.0,
+          "precision@20": 0.26,
+          "set_recall@1": 1.0,
+          "set_recall@5": 1.0,
+          "set_recall@10": 1.0,
+          "set_recall@20": 1.0
+        }
+      },
+      "medium": {
+        "n": 37,
+        "retrieved_source": {
+          "mrr": 0.9604,
+          "recall@1": 0.9459,
+          "precision@1": 0.9459,
+          "recall@5": 1.0,
+          "precision@5": 0.6595,
+          "recall@10": 1.0,
+          "precision@10": 0.5676,
+          "recall@20": 1.0,
+          "precision@20": 0.423,
+          "set_recall@1": 0.9459,
+          "set_recall@5": 1.0,
+          "set_recall@10": 1.0,
+          "set_recall@20": 1.0
+        }
+      }
+    }
+  },
+  "latency_ms": {
+    "retrieval": {
+      "avg": 31.64,
+      "p50": 34.49,
+      "p95": 40.13,
+      "max": 54.44,
+      "n": 63
+    },
+    "reranking": {
+      "avg": 640.47,
+      "p50": 565.47,
+      "p95": 1005.46,
+      "max": 1824.14,
+      "n": 63
+    },
+    "generation": {
+      "avg": 4997.39,
+      "p50": 4970.41,
+      "p95": 7208.12,
+      "max": 8079.65,
+      "n": 16
+    },
+    "total": {
+      "avg": 5633.47,
+      "p50": 5460.22,
+      "p95": 7921.81,
+      "max": 8635.97,
+      "n": 16
+    },
+    "note": "retrieval/reranking over all 63 questions; generation/total over the 16 real-LLM answers only (fallback 429s excluded). generation includes gemini-3.6-flash 'thinking' + first-call warmup."
+  },
+  "answers_artifact": "evaluation/experiments/results/baseline_v1_gemini36_full_rag_raw.json",
+  "metrics_artifact": "evaluation/experiments/results/baseline_v1_gemini36_retrieval_scored.json"
+}

@@ -60,8 +60,13 @@ def prepare_store(
     return store, manifest, index_info, len(docs)
 
 
-def run_retrieval(store: Chroma, config: ExperimentConfig, item: dict) -> dict:
-    """Run retrieve (+rerank) for one question and return a raw ranked record.
+def _retrieve_and_rerank(store: Chroma, config: ExperimentConfig, item: dict) -> tuple[dict, list]:
+    """Retrieve (+rerank) once for one question.
+
+    Returns ``(record, reranked_docs)`` where ``record`` is the raw ranked
+    record and ``reranked_docs`` are the actual reranked Documents (so callers
+    that also generate an answer reuse the *same* reranked context instead of
+    issuing a second, redundant rerank call — important on a rate-limited key).
 
     Faithful to production: conversational follow-ups are retrieved on the bare
     question (history is NOT used for retrieval today — see chain.py). This is
@@ -75,7 +80,7 @@ def run_retrieval(store: Chroma, config: ExperimentConfig, item: dict) -> dict:
         question, candidates, config.rerank_top_n, config.rerank_model, config.rerank_enabled
     )
 
-    return {
+    record = {
         "id": item["id"],
         "category": item.get("category"),
         "topic": item.get("topic"),
@@ -93,22 +98,25 @@ def run_retrieval(store: Chroma, config: ExperimentConfig, item: dict) -> dict:
         "n_reranked": len(reranked),
         "latency_ms": {"retrieval": ret_ms, "reranking": rr_ms},
     }
+    return record, reranked
+
+
+def run_retrieval(store: Chroma, config: ExperimentConfig, item: dict) -> dict:
+    """Run retrieve (+rerank) for one question and return a raw ranked record."""
+    record, _ = _retrieve_and_rerank(store, config, item)
+    return record
 
 
 def run_full_rag(store: Chroma, config: ExperimentConfig, item: dict) -> dict:
     """Run the full pipeline for one question (retrieve -> rerank -> generate).
 
     Captures the generated answer + sources for later generation/human eval
-    (Phases 13-14). Reuses the production generator so answers match live behaviour.
+    (Phases 13-14). Reuses the production generator so answers match live
+    behaviour, and reuses the *same* reranked context that was recorded (a single
+    rerank call per question — no redundant second rerank).
     """
-    record = run_retrieval(store, config, item)
-
-    # Rebuild the reranked Documents for generation (records only hold refs).
+    record, reranked = _retrieve_and_rerank(store, config, item)
     question = item["question"]
-    candidates, _ = retrieve_candidates(store, question, config.top_k, config.min_relevance_score)
-    reranked, _, _ = rerank_candidates(
-        question, candidates, config.rerank_top_n, config.rerank_model, config.rerank_enabled
-    )
 
     t0 = time.perf_counter()
     result = generate_answer(question, reranked, history=item.get("history"))

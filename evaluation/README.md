@@ -112,25 +112,30 @@ retrieval artifact is a smoke-test signal only — **not** the Recall/MRR metric
 | 3 | ground truth on all 63 | done |
 | **4** | **evaluation pipeline (this framework)** | **done — runs end-to-end** |
 | **5** | **`metrics/retrieval_metrics.py`** (Recall@1/5/10/20, MRR, Precision@K, HitRate@K, set-recall) | **done — dense baseline scored** |
-| 6 | official `results/baseline_v1.json` reference numbers | pending (needs working keys) |
+| **6** | **official `results/baseline_v1.json`** (retrieval + reranked metrics + latency) | **retrieval+rerank done; generation partial (16/63, Gemini free-tier cap)** |
 
 **Phase 5 dense-retrieval baseline (all-MiniLM-L6-v2, source level):** Recall@1
 0.877 · Recall@5 0.965 · Recall@10 0.983 · MRR 0.912 (57 answerable questions).
 See [`reports/retrieval_metrics_baseline_v1.md`](./reports/retrieval_metrics_baseline_v1.md).
 
-### ⚠ Runtime blockers for the *faithful* baseline (discovered in Phase 4)
+**Phase 6 reranked baseline (+ Cohere rerank-v3.5, source level):** Recall@1
+**0.930** · Recall@5 **0.982** · MRR **0.953**; page Recall@1 0.63 → **0.90**.
+Reranking applied on 63/63 (no fallback). See
+[`reports/retrieval_metrics_baseline_v1_gemini36.md`](./reports/retrieval_metrics_baseline_v1_gemini36.md)
+and `experiments/results/baseline_v1.json`.
 
-The pipeline is complete and runs, but two **external API keys** are currently
-non-functional, which blocks a production-faithful Baseline V1 (summaries +
-Cohere rerank + LLM answers):
+### ⚠ Runtime blockers — status (updated Phase 6)
 
-1. **LLM (OpenRouter) → `402 Payment Required`.** No credit, so chunk
-   summarisation (indexing) and answer generation are unavailable. The current
-   snapshot therefore freezes **raw chunk text** (`summarizer.effective = false`),
-   and full-RAG answers fall back to extractive text (`has_llm = false`).
-2. **Cohere → Trial key, 10 calls/min (`429`).** Reranking is rate-limited across
-   the 63-question benchmark and falls back to retrieval order for most items.
-
-Retrieval (MiniLM, local) is fully functional and reproducible. Resolving the two
-keys (or an explicit decision to index raw text / skip reranking) is required
-before the Phase 6 baseline numbers can be considered faithful.
+- **Cohere Trial `429` (10/min)** — ✅ **worked around.** The harness applies an
+  eval-only throttle (`EVAL_COHERE_MIN_INTERVAL_MS`, e.g. 7000) plus a bounded
+  429-retry, so all 63 questions were reranked cleanly (no fallback to retrieval
+  order). Production `app/query/reranker.py` is untouched.
+- **LLM (OpenRouter) `402`** — ⛔ still unfunded (account never purchased credits).
+  Abandoned in favour of a Google Gemini key.
+- **`gemini-2.5-flash` 404** — ⛔ the frozen-baseline LLM is "no longer available to
+  new users"; substituted Google's named successor **`gemini-3.6-flash`** (recorded
+  as a deviation in `configs/baseline_v1_gemini36.json` and `results/baseline_v1.json`).
+- **`gemini-3.6-flash` free tier** — ⚠ **20 requests/day** cap. Only 16/63 answers
+  were captured with a real LLM; the rest fell back to extractive text. Full answer
+  capture (Phases 13-14) needs a paid tier or multi-day capture. Retrieval/rerank
+  are complete and do not depend on the LLM.
