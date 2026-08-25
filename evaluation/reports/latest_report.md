@@ -153,7 +153,7 @@ decision: [`EMBEDDING_DECISION.md`](./EMBEDDING_DECISION.md).
 | Cohere Trial `429` (10/min) | ✅ **worked around** | eval harness throttle (`EVAL_COHERE_MIN_INTERVAL_MS`) + 429-retry → 63/63 reranked, no fallback |
 | OpenRouter LLM `402` | ⛔ still unfunded | account never purchased credits; abandoned in favour of the Google key |
 | `gemini-2.5-flash` 404 | ⛔ unavailable | deprecated for new accounts → substituted `gemini-3.6-flash` |
-| `gemini-3.6-flash` free tier | ⚠ **20 req/day cap** | blocks full answer capture; needs paid tier or multi-day capture |
+| `gemini-3.6-flash` free tier | ✅ **mitigated** | 20 req/day cap; a **Groq `openai/gpt-oss-120b` fallback** now auto-fails-over in `generator.py`, so answers no longer degrade to extractive after the cap. A full 63-answer re-capture can be run on demand. |
 
 ---
 

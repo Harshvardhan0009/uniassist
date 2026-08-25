@@ -126,6 +126,7 @@ answer + source citations + per-step timings.
 |---|---|---|---|
 | **Text embeddings** | `all-MiniLM-L6-v2` (384-dim, normalized, cosine) | In-process (CPU, auto-CUDA) | `EMBEDDING_MODEL` |
 | **LLM (summarize + generate)** | OpenAI-compatible chat model | External API | `LLM_API_KEY` / `LLM_BASE_URL` / `LLM_MODEL` (legacy `GROK_*` accepted) |
+| **Fallback LLM** | OpenAI-compatible chat model (e.g. Groq `openai/gpt-oss-120b`) | External API | `FALLBACK_LLM_API_KEY` (legacy `GROQ_API_KEY`) / `FALLBACK_LLM_BASE_URL` / `FALLBACK_LLM_MODEL` |
 | **Reranker** | `rerank-v3.5` (cross-encoder) | Cohere API | `COHERE_API_KEY` / `COHERE_RERANK_MODEL` |
 | **Vector store** | ChromaDB (`university_docs`) | Local file **or** remote HTTP | `CHROMA_*` |
 
@@ -143,10 +144,15 @@ answer + source citations + per-step timings.
   collection `university_docs`.
 - **Embeddings:** loaded in-process on CPU (`all-MiniLM-L6-v2`; evaluation recommends
   `e5-base-v2` — see §14, pending promotion).
+- **Fallback LLM:** **Groq `openai/gpt-oss-120b`** is configured (`FALLBACK_LLM_*`). When the
+  primary LLM errors, rate-limits, hits its quota, or returns empty, generation **automatically
+  fails over** to Groq before resorting to the extractive response. This makes answers resilient
+  to the Gemini free-tier daily cap.
 
-> Both the LLM and Cohere are **optional at runtime**: without an LLM key the backend returns a
-> structured extract of retrieved passages; without a Cohere key it skips reranking. This lets you
-> test retrieval end-to-end with no paid keys.
+> The primary LLM, fallback LLM, and Cohere are all **optional at runtime**: with no LLM at all the
+> backend returns a structured extract of retrieved passages; without a Cohere key it skips
+> reranking. The fallback LLM is used only when the primary fails, so a single funded provider is
+> enough for full answers.
 
 ### Model / retrieval parameters
 | Parameter | Value | Location |
@@ -251,8 +257,10 @@ flowchart LR
    no key; errors fall back to retrieval order.
 3. **Generate** (`generator.py`) — builds context from each doc's **`raw_content`**, injects up to
    `MAX_HISTORY_MESSAGES` (6) prior turns, and calls the LLM with a citation-focused, table-aware
-   system prompt. Leaked `<think>…</think>` reasoning blocks are stripped. Without an LLM key, a
-   structured extract of the passages is returned instead.
+   system prompt. Uses an automatic **failover chain**: **primary LLM → fallback LLM (Groq) →
+   extractive**. On any primary error/quota/empty response it retries with the fallback; only if
+   both fail does it return a structured extract (`has_llm=False`). Leaked `<think>…</think>`
+   reasoning blocks are stripped. The response records which model answered (`model_used`).
 
 ### 6.3 API endpoints (`app/main.py`)
 
@@ -352,6 +360,9 @@ its `.txt` companion for searchable content.
 | `LLM_API_KEY` | *(empty)* | LLM key *(legacy `GROK_API_KEY` accepted)* |
 | `LLM_BASE_URL` | `https://api.x.ai/v1` | OpenAI-compatible base URL *(legacy `GROK_BASE_URL`)* |
 | `LLM_MODEL` | `grok-3-mini` | Chat model *(legacy `GROK_MODEL`)* |
+| `FALLBACK_LLM_API_KEY` | *(empty)* | Fallback LLM key *(legacy `GROQ_API_KEY`)*; enables automatic failover |
+| `FALLBACK_LLM_BASE_URL` | `https://api.groq.com/openai/v1` | Fallback OpenAI-compatible base URL (Groq) |
+| `FALLBACK_LLM_MODEL` | `openai/gpt-oss-120b` | Fallback chat model |
 | `COHERE_API_KEY` | *(empty)* | Enables reranking |
 | `COHERE_RERANK_MODEL` | `rerank-v3.5` | Cohere rerank model |
 | `CHROMA_HOST` | *(empty)* | Empty = local file mode; set = client-server mode |
@@ -504,6 +515,8 @@ living status and [`evaluation/README.md`](./evaluation/README.md) for usage.
 - **LLM keys.** OpenRouter key is unfunded (`402`); the frozen `gemini-2.5-flash` is now
   `404` for new Google accounts, so evaluation uses **`gemini-3.6-flash`** via Google's
   OpenAI-compatible endpoint. Its **free tier caps at 20 requests/day**, so only 16/63
-  answers were captured with a real LLM (retrieval/rerank are LLM-independent and complete).
+  answers were captured with a real LLM in the Phase 6 run (retrieval/rerank are
+  LLM-independent and complete). A **Groq `openai/gpt-oss-120b` fallback** is now configured
+  so subsequent runs fail over automatically instead of degrading to extractive answers.
 
 Retrieval-only evaluation is fully functional without any LLM key.

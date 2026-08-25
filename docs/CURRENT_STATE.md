@@ -316,19 +316,22 @@ the eval framework design** (Phase 4) to keep experiments valid and reproducible
 ## 13. Status updates since Phase 0
 
 > The sections above are frozen as the 2026-08-20 Phase 0 audit. This section tracks material changes
-> since then so the doc stays current. Latest: **2026-08-25**.
+> since then so the doc stays current. Latest: **2026-08-26**.
 
 ### 13.1 Configuration changes (`backend/.env`)
 
-| Field | Phase 0 (2026-08-20) | Now (2026-08-25) | Why |
+| Field | Phase 0 (2026-08-20) | Now | Why |
 |---|---|---|---|
 | LLM base URL | `https://openrouter.ai/api/v1` | `https://generativelanguage.googleapis.com/v1beta/openai/` | OpenRouter key unfunded (`402`); moved to a Google Gemini key |
 | LLM model | `google/gemini-2.5-flash` | `gemini-3.6-flash` | `gemini-2.5-flash` returns `404` "no longer available to new users" on the Google key |
+| **Fallback LLM** | none | **Groq `openai/gpt-oss-120b`** (`FALLBACK_LLM_*`) | automatic failover when the primary LLM errors / rate-limits / hits its daily cap / returns empty (added 2026-08-26) |
 | Cohere | Trial key (works, 10/min) | unchanged | eval throttles it (`EVAL_COHERE_MIN_INTERVAL_MS`) to avoid `429` |
 
-> ⚠ The Gemini **free tier caps at 20 requests/day** for `gemini-3.6-flash`. Production `/api/query`
-> will fall back to extractive answers after the cap — use a paid tier for real traffic. `.env` stays
-> gitignored. The LLM/base-URL are still set via the legacy `GROK_*` names (via `AliasChoices`).
+> ⚠ The Gemini **free tier caps at 20 requests/day** for `gemini-3.6-flash`. With the Groq fallback
+> configured, `/api/query` now **fails over to Groq `openai/gpt-oss-120b`** after the cap instead of
+> degrading to extractive answers (use a paid primary tier for high traffic). `.env` stays gitignored.
+> The primary LLM/base-URL are still set via the legacy `GROK_*` names (via `AliasChoices`); the
+> fallback uses `FALLBACK_LLM_*` (legacy `GROQ_API_KEY`).
 
 ### 13.2 Evaluation program progress (Phases 4–7)
 

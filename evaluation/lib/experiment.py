@@ -126,6 +126,8 @@ def run_full_rag(store: Chroma, config: ExperimentConfig, item: dict) -> dict:
     record["answer"] = result.get("answer")
     record["answer_sources"] = result.get("sources", [])
     record["has_llm"] = result.get("has_llm", False)
+    record["model_used"] = result.get("model_used")
+    record["llm_role"] = result.get("llm_role")
     record["latency_ms"]["generation"] = gen_ms
     record["latency_ms"]["total"] = round(
         record["latency_ms"]["retrieval"] + record["latency_ms"]["reranking"] + gen_ms, 2
