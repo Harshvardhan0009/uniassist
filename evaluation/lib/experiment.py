@@ -55,7 +55,8 @@ def prepare_store(
     docs = snap.load_snapshot(config.snapshot)
     manifest = snap.load_manifest(config.snapshot)
     store, index_info = build_index(
-        docs, collection=config.collection, embedding_model=config.embedding_model, force=rebuild_index
+        docs, collection=config.collection, embedding_model=config.embedding_model,
+        force=rebuild_index, query_prefix=config.query_prefix, passage_prefix=config.passage_prefix,
     )
     return store, manifest, index_info, len(docs)
 

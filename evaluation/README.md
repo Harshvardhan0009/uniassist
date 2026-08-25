@@ -67,6 +67,25 @@ backend\venv\Scripts\python.exe -m evaluation.runners.full_rag_eval --config bas
 Useful flags: `--limit N`, `--no-rerank`, `--rebuild-snapshot`, `--rebuild-index`,
 `--snapshot NAME`, `--collection NAME`, `--verbose`.
 
+**Cohere Trial throttle.** The eval Cohere key is Trial-tier (10 calls/min). To get a
+clean reranked run without `429` fallbacks, set a minimum interval between rerank
+calls (the harness also retries on 429):
+
+```powershell
+$env:EVAL_COHERE_MIN_INTERVAL_MS=7000   # ~8.5 rerank calls/min
+backend\venv\Scripts\python.exe -m evaluation.runners.full_rag_eval --config baseline_v1_gemini36
+```
+
+**Embedding experiments (Phase 7).** Each embedding model gets its own config + isolated
+collection, reusing the same frozen snapshot. E5/BGE instruction prefixes go in the
+config's `embedding.query_prefix` / `embedding.passage_prefix` (the harness applies them
+at index and query time). Dense-only isolates the embedding:
+
+```powershell
+backend\venv\Scripts\python.exe -m evaluation.runners.retrieval_eval --config e5_base_v2 --no-rerank
+backend\venv\Scripts\python.exe -m evaluation.metrics.retrieval_metrics --result evaluation\experiments\results\e5_base_v2_retrieval_raw.json
+```
+
 ---
 
 ## Experiment configuration
@@ -113,6 +132,7 @@ retrieval artifact is a smoke-test signal only — **not** the Recall/MRR metric
 | **4** | **evaluation pipeline (this framework)** | **done — runs end-to-end** |
 | **5** | **`metrics/retrieval_metrics.py`** (Recall@1/5/10/20, MRR, Precision@K, HitRate@K, set-recall) | **done — dense baseline scored** |
 | **6** | **official `results/baseline_v1.json`** (retrieval + reranked metrics + latency) | **retrieval+rerank done; generation partial (16/63, Gemini free-tier cap)** |
+| **7** | **embedding comparison** (MiniLM vs BGE vs E5) | **done — `EMBEDDING_DECISION.md` recommends e5-base-v2** |
 
 **Phase 5 dense-retrieval baseline (all-MiniLM-L6-v2, source level):** Recall@1
 0.877 · Recall@5 0.965 · Recall@10 0.983 · MRR 0.912 (57 answerable questions).
@@ -123,6 +143,12 @@ See [`reports/retrieval_metrics_baseline_v1.md`](./reports/retrieval_metrics_bas
 Reranking applied on 63/63 (no fallback). See
 [`reports/retrieval_metrics_baseline_v1_gemini36.md`](./reports/retrieval_metrics_baseline_v1_gemini36.md)
 and `experiments/results/baseline_v1.json`.
+
+**Phase 7 embedding comparison (dense, source level):** `e5-base-v2` Recall@5
+**1.000** / MRR **0.927** beats MiniLM (0.965 / 0.912) and bge-base (0.983 / 0.915),
+and wins page-level too — at 768-dim and ~3× query latency. Recommended (promotion
+gated on approval). See [`reports/EMBEDDING_COMPARISON.md`](./reports/EMBEDDING_COMPARISON.md)
+and [`reports/EMBEDDING_DECISION.md`](./reports/EMBEDDING_DECISION.md).
 
 ### ⚠ Runtime blockers — status (updated Phase 6)
 

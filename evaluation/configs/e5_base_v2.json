@@ -1,0 +1,37 @@
+{
+  "id": "e5_base_v2",
+  "name": "Phase 7 embedding experiment - intfloat/e5-base-v2 (768-dim)",
+  "status": "experiment",
+  "based_on": "baseline_v1_gemini36",
+  "created": "2026-08-25",
+  "experiment": {
+    "variable_under_test": "embedding model (all-MiniLM-L6-v2 -> intfloat/e5-base-v2)",
+    "held_constant": "same frozen snapshot baseline_v1 (raw chunk text), same 2500/300 chunking, same corpus, same top_k=20, same dataset, same Cohere reranker (rerank-v3.5).",
+    "snapshot": "baseline_v1",
+    "collection": "eval_e5_base_v2"
+  },
+  "chunking": { "splitter": "RecursiveCharacterTextSplitter", "size": 2500, "overlap": 300 },
+  "indexing": {
+    "content_indexed": "raw",
+    "content_indexed_note": "RAW chunk text (reuses Phase 5/6 snapshot 'baseline_v1'); only the embedding model changes."
+  },
+  "embedding": {
+    "name": "intfloat/e5-base-v2",
+    "provider": "huggingface-sentence-transformers (in-process)",
+    "dimensions": 768,
+    "normalize_embeddings": true,
+    "similarity": "cosine",
+    "query_prefix": "query: ",
+    "passage_prefix": "passage: ",
+    "prefix_note": "E5 REQUIRES 'query: ' / 'passage: ' prefixes; omitting them badly degrades retrieval. Applied at both index and query time."
+  },
+  "vector_store": { "engine": "chromadb", "space": "cosine", "experiment_mode": "local persistent Chroma, collection eval_e5_base_v2 (isolated)" },
+  "retrieval": { "method": "similarity_search_with_relevance_scores", "top_k": 20, "min_relevance_score": 0.0 },
+  "reranker": { "name": "rerank-v3.5", "provider": "cohere", "top_n": 5, "enabled": true },
+  "generation": {
+    "llm": "gemini-3.6-flash",
+    "provider": "google-gemini (OpenAI-compatible endpoint)",
+    "note": "Not exercised in the dense retrieval sweep (--no-rerank / retrieval_eval). Recorded for provenance only."
+  },
+  "corpus": { "root": "Data/", "ingestible_files": 14 }
+}

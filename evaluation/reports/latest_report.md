@@ -2,8 +2,8 @@
 
 > Auto/hand-maintained status of the evaluation program. Metric tables
 > (Recall@K, MRR, faithfulness, …) appear here from Phase 5 onward. This file
-> records Phases 4-6 completion, the retrieval + reranked baseline numbers, and
-> the environment blockers found.
+> records Phases 4-7 completion, the retrieval + reranked baseline numbers, the
+> embedding-model comparison, and the environment blockers found.
 
 **Updated:** 2026-08-25 · **Branch:** `laukik-uniassist-branch`
 
@@ -122,6 +122,30 @@ stands, so keep the local copy until answer-quality is re-run on a paid tier.
 
 ---
 
+## Phase 7 — Embedding model experiments ✅
+
+Compared `all-MiniLM-L6-v2` (baseline) vs `BAAI/bge-base-en-v1.5` vs
+`intfloat/e5-base-v2` on the **frozen `baseline_v1` snapshot** (raw text, 2500/300),
+same 63-question benchmark, same `top_k=20`, dense-only (no rerank) to isolate the
+embedding. E5/BGE query/passage instruction prefixes are wired into the eval harness
+(`_PrefixedEmbeddings`). Full tables: [`EMBEDDING_COMPARISON.md`](./EMBEDDING_COMPARISON.md);
+decision: [`EMBEDDING_DECISION.md`](./EMBEDDING_DECISION.md).
+
+| Model | dim | src Recall@5 | src MRR | page Recall@1 | page MRR | query ms |
+|---|--:|--:|--:|--:|--:|--:|
+| all-MiniLM-L6-v2 | 384 | 0.965 | 0.912 | 0.632 | 0.708 | 20 |
+| bge-base-en-v1.5 | 768 | 0.983 | 0.915 | 0.614 | 0.713 | 66 |
+| **e5-base-v2** | 768 | **1.000** | **0.927** | **0.649** | **0.743** | 62 |
+
+- **E5-base-v2 wins on every quality metric** — perfect source Recall@5, best MRR
+  (source + page), best page-level recall (57/57 expected sources in top-k). **Recommended.**
+- BGE-base is only marginally above MiniLM and not worth its cost here.
+- MiniLM is already near-ceiling and ~3× faster; the corpus is small/clean so headroom is limited.
+- **Promotion gated** (per plan): confirm the gain survives reranking, and wire E5's
+  `query:`/`passage:` prefixes into production `embedder.py`/`retriever.py` + full re-index.
+
+---
+
 ## Environment blockers — status
 
 | Blocker | Status | Notes |
@@ -135,11 +159,13 @@ stands, so keep the local copy until answer-quality is re-run on a paid tier.
 
 ## Next
 
-- **Answer-quality (Phases 13-14)** — needs a paid Gemini tier (or another funded
-  LLM) to capture all 63 answers in one pass; otherwise capture ~17/day over ~4 days.
-  Retrieval/rerank do not block on this.
-- **Phase 7 (BGE/E5 embeddings)** — ready to start now: reuse this exact frozen
-  snapshot + dataset + Cohere reranker. The bar to beat is the reranked source
-  Recall@5 **0.982** / MRR **0.953** (dense Recall@5 0.965 / MRR 0.912).
-- **Phase 9 (reranker A/B)** — largely answered above (rerank helps, esp. page-level);
+- **Phase 8 gate (embedding promotion)** — recommended model is `e5-base-v2`. Before
+  touching production: (a) confirm the gain survives reranking (MiniLM vs E5 + Cohere),
+  and (b) wire E5 `query:`/`passage:` prefixes into `embedder.py`/`retriever.py` + full
+  re-index. **Awaiting approval.**
+- **Answer-quality (Phases 13-14)** — needs a paid Gemini tier (or another funded LLM)
+  to capture all 63 answers in one pass; otherwise ~17/day over ~4 days on free tier.
+- **Phase 10 (chunking experiments)** — ready to run on the same harness (new snapshots
+  per chunk size); no LLM needed for the retrieval half.
+- **Phase 9 (reranker A/B)** — largely answered in Phase 6 (rerank helps, esp. page-level);
   can be formalised as its own report when convenient.

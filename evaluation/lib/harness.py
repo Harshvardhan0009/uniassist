@@ -57,13 +57,20 @@ class ExperimentConfig:
     snapshot: str
     collection: str
     source_path: str
+    query_prefix: str = ""
+    passage_prefix: str = ""
     raw: dict[str, Any] = field(default_factory=dict)
 
     def summary(self) -> dict:
         """Compact, machine-readable description for result artifacts."""
         return {
             "id": self.id,
-            "embedding": {"name": self.embedding_model, "content_indexed": self.content_indexed},
+            "embedding": {
+                "name": self.embedding_model,
+                "content_indexed": self.content_indexed,
+                "query_prefix": self.query_prefix,
+                "passage_prefix": self.passage_prefix,
+            },
             "chunking": {"size": self.chunk_size, "overlap": self.chunk_overlap},
             "retrieval": {"top_k": self.top_k, "min_relevance_score": self.min_relevance_score},
             "reranker": {"name": self.rerank_model, "top_n": self.rerank_top_n, "enabled": self.rerank_enabled},
@@ -99,6 +106,8 @@ def load_config(config_id_or_path: str, snapshot: str | None = None, collection:
         name=cfg.get("name", cfg_id),
         embedding_model=cfg["embedding"]["name"],
         content_indexed=cfg.get("indexing", {}).get("content_indexed", "llm_summary"),
+        query_prefix=cfg["embedding"].get("query_prefix", ""),
+        passage_prefix=cfg["embedding"].get("passage_prefix", ""),
         chunk_size=cfg["chunking"]["size"],
         chunk_overlap=cfg["chunking"]["overlap"],
         top_k=cfg["retrieval"]["top_k"],
