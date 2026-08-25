@@ -66,6 +66,16 @@ class Settings(BaseSettings):
     COHERE_API_KEY: str = ""
     COHERE_RERANK_MODEL: str = "rerank-v3.5"
 
+    # ── Fallback LLM (e.g. Groq) ─────────────────────────────────────
+    # Used automatically when the PRIMARY LLM errors out (rate limit / quota /
+    # 402 / empty response). OpenAI-compatible. Defaults target Groq; set only
+    # FALLBACK_LLM_API_KEY (legacy alias GROQ_API_KEY) to enable.
+    FALLBACK_LLM_API_KEY: str = Field(
+        default="", validation_alias=AliasChoices("FALLBACK_LLM_API_KEY", "GROQ_API_KEY")
+    )
+    FALLBACK_LLM_BASE_URL: str = "https://api.groq.com/openai/v1"
+    FALLBACK_LLM_MODEL: str = "openai/gpt-oss-120b"
+
     # ── Retrieval tuning ─────────────────────────────────────────────
     RETRIEVAL_TOP_K: int = 20  # broad candidate set from ChromaDB
     RERANK_TOP_N: int = 5     # precise set after Cohere rerank
@@ -94,6 +104,11 @@ class Settings(BaseSettings):
     @property
     def has_llm(self) -> bool:
         return bool(self.LLM_API_KEY)
+
+    @property
+    def has_fallback_llm(self) -> bool:
+        """True if a fallback LLM (e.g. Groq) is configured for automatic failover."""
+        return bool(self.FALLBACK_LLM_API_KEY)
 
     @property
     def has_cohere(self) -> bool:

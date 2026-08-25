@@ -5,6 +5,10 @@
 > Everything here was verified by reading the source, `requirements.txt`, the live `backend/.env`
 > (secrets redacted), installed package versions, and the `Data/` corpus on
 > **2026-08-20**. No production behavior was changed while producing this document.
+>
+> **Update log:** §1–§12 are the original Phase 0 snapshot (2026-08-20, unchanged). For what has
+> changed since — configuration and evaluation progress through Phases 4–7 — see
+> **[§13 Status updates since Phase 0](#13-status-updates-since-phase-0)**.
 
 ---
 
@@ -306,3 +310,49 @@ the eval framework design** (Phase 4) to keep experiments valid and reproducible
   incurring cold-start/cost). Live connectivity + exact indexed chunk count will be captured when the
   **baseline is measured** (Phases 1 & 6).
 - Did not modify any code, config, dependency, or data.
+
+---
+
+## 13. Status updates since Phase 0
+
+> The sections above are frozen as the 2026-08-20 Phase 0 audit. This section tracks material changes
+> since then so the doc stays current. Latest: **2026-08-26**.
+
+### 13.1 Configuration changes (`backend/.env`)
+
+| Field | Phase 0 (2026-08-20) | Now | Why |
+|---|---|---|---|
+| LLM base URL | `https://openrouter.ai/api/v1` | `https://generativelanguage.googleapis.com/v1beta/openai/` | OpenRouter key unfunded (`402`); moved to a Google Gemini key |
+| LLM model | `google/gemini-2.5-flash` | `gemini-3.6-flash` | `gemini-2.5-flash` returns `404` "no longer available to new users" on the Google key |
+| **Fallback LLM** | none | **Groq `openai/gpt-oss-120b`** (`FALLBACK_LLM_*`) | automatic failover when the primary LLM errors / rate-limits / hits its daily cap / returns empty (added 2026-08-26) |
+| Cohere | Trial key (works, 10/min) | unchanged | eval throttles it (`EVAL_COHERE_MIN_INTERVAL_MS`) to avoid `429` |
+
+> ⚠ The Gemini **free tier caps at 20 requests/day** for `gemini-3.6-flash`. With the Groq fallback
+> configured, `/api/query` now **fails over to Groq `openai/gpt-oss-120b`** after the cap instead of
+> degrading to extractive answers (use a paid primary tier for high traffic). `.env` stays gitignored.
+> The primary LLM/base-URL are still set via the legacy `GROK_*` names (via `AliasChoices`); the
+> fallback uses `FALLBACK_LLM_*` (legacy `GROQ_API_KEY`).
+
+### 13.2 Evaluation program progress (Phases 4–7)
+
+The evaluation framework (`evaluation/`, see its README) is built and has produced numbers:
+
+- **Phase 4** — pipeline runs end-to-end; corpus frozen to snapshot `baseline_v1` (14 files → 144
+  pages → **184 chunks**, **raw text** since LLM summaries were unavailable).
+- **Phase 5** — retrieval metrics; MiniLM dense source Recall@5 **0.965**, MRR **0.912** (57 answerable).
+- **Phase 6** — official `evaluation/experiments/results/baseline_v1.json`. Cohere rerank now measured:
+  source Recall@5 **0.982**, MRR **0.953**; page Recall@1 0.63 → **0.90**. LLM answers only **16/63**
+  (free-tier cap); retrieval/rerank are complete and LLM-independent.
+- **Phase 7** — embedding comparison. **`intfloat/e5-base-v2`** wins (source Recall@5 **1.000**, MRR
+  **0.927**; best page-level) over `all-MiniLM-L6-v2` and `BAAI/bge-base-en-v1.5`. Recommended in
+  `evaluation/reports/EMBEDDING_DECISION.md`; **promotion to production is gated on approval** (and on
+  wiring E5's required `query:`/`passage:` prefixes into `embedder.py`/`retriever.py` + a full re-index).
+
+### 13.3 Resolution of Phase 0 audit items
+
+- **Item 2 (dependency pinning):** a lockfile `backend/requirements.lock` is referenced by the frozen
+  baseline config for reproducibility.
+- **Items 3 & 4 (isolation, summary confound):** handled by the eval framework — isolated local Chroma
+  collections per experiment (`evaluation/.chroma/eval_*`) and a single frozen snapshot re-embedded per
+  model. Experiments index **raw text** (a deliberate, documented choice) to stay comparable.
+- Production code (`app/`) remains **unchanged**; all evaluation work lives under `evaluation/`.

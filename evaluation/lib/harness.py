@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import json
 import logging
+import os
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -56,13 +57,20 @@ class ExperimentConfig:
     snapshot: str
     collection: str
     source_path: str
+    query_prefix: str = ""
+    passage_prefix: str = ""
     raw: dict[str, Any] = field(default_factory=dict)
 
     def summary(self) -> dict:
         """Compact, machine-readable description for result artifacts."""
         return {
             "id": self.id,
-            "embedding": {"name": self.embedding_model, "content_indexed": self.content_indexed},
+            "embedding": {
+                "name": self.embedding_model,
+                "content_indexed": self.content_indexed,
+                "query_prefix": self.query_prefix,
+                "passage_prefix": self.passage_prefix,
+            },
             "chunking": {"size": self.chunk_size, "overlap": self.chunk_overlap},
             "retrieval": {"top_k": self.top_k, "min_relevance_score": self.min_relevance_score},
             "reranker": {"name": self.rerank_model, "top_n": self.rerank_top_n, "enabled": self.rerank_enabled},
@@ -98,6 +106,8 @@ def load_config(config_id_or_path: str, snapshot: str | None = None, collection:
         name=cfg.get("name", cfg_id),
         embedding_model=cfg["embedding"]["name"],
         content_indexed=cfg.get("indexing", {}).get("content_indexed", "llm_summary"),
+        query_prefix=cfg["embedding"].get("query_prefix", ""),
+        passage_prefix=cfg["embedding"].get("passage_prefix", ""),
         chunk_size=cfg["chunking"]["size"],
         chunk_overlap=cfg["chunking"]["overlap"],
         top_k=cfg["retrieval"]["top_k"],
@@ -150,6 +160,33 @@ def retrieve_candidates(
     return docs, latency_ms
 
 
+# ── Cohere trial-tier throttle (evaluation-only) ─────────────────────
+# The evaluation Cohere key may be a **Trial** key (10 calls/min). To produce a
+# clean, non-degraded reranked baseline (rather than silent 429 fallbacks to
+# retrieval order), the harness can enforce a minimum interval between rerank
+# calls and retry on 429. Enable it by setting EVAL_COHERE_MIN_INTERVAL_MS, e.g.
+# 7000 (~8.5 calls/min). This is eval-only tooling and never touches the
+# production reranker (app/query/reranker.py). The throttle sleep happens
+# OUTSIDE the timed region so the measured rerank latency stays faithful.
+try:
+    _COHERE_MIN_INTERVAL_S = max(0.0, float(os.environ.get("EVAL_COHERE_MIN_INTERVAL_MS", "0")) / 1000.0)
+except ValueError:
+    logger.warning("Invalid EVAL_COHERE_MIN_INTERVAL_MS (not a number); Cohere throttle disabled.")
+    _COHERE_MIN_INTERVAL_S = 0.0
+_COHERE_LAST_CALL_TS = 0.0
+
+
+def _cohere_throttle() -> None:
+    """Sleep just enough to keep rerank calls under the configured rate."""
+    global _COHERE_LAST_CALL_TS
+    if _COHERE_MIN_INTERVAL_S <= 0:
+        return
+    wait = _COHERE_MIN_INTERVAL_S - (time.monotonic() - _COHERE_LAST_CALL_TS)
+    if wait > 0:
+        time.sleep(wait)
+    _COHERE_LAST_CALL_TS = time.monotonic()
+
+
 # ── Reranking (mirrors app.query.reranker) ───────────────────────────
 def rerank_candidates(
     query: str, documents: list[Document], top_n: int, model: str, enabled: bool
@@ -157,7 +194,9 @@ def rerank_candidates(
     """Cohere cross-encoder rerank. Returns (docs, latency_ms, reranker_used).
 
     Falls back to retrieval order (truncated) when disabled, no key, or on error —
-    exactly like production.
+    exactly like production. Adds an eval-only trial-tier throttle + bounded 429
+    retry (see ``_cohere_throttle``) so a rate-limited Trial key still yields a
+    clean reranked baseline instead of degraded fallbacks.
     """
     if not documents:
         return [], 0.0, False
@@ -165,18 +204,40 @@ def rerank_candidates(
     if not enabled or not settings.has_cohere:
         return documents[:top_n], 0.0, False
 
-    t0 = time.perf_counter()
     try:
         from langchain_cohere import CohereRerank
 
         reranker = CohereRerank(cohere_api_key=settings.COHERE_API_KEY, model=model, top_n=top_n)
-        reranked = list(reranker.compress_documents(documents=documents, query=query))
-        latency_ms = round((time.perf_counter() - t0) * 1000, 2)
-        # CohereRerank writes its score into metadata['relevance_score']; normalise the key.
-        for d in reranked:
-            if "relevance_score" in d.metadata and "rerank_score" not in d.metadata:
-                d.metadata["rerank_score"] = round(float(d.metadata["relevance_score"]), 4)
-        return reranked, latency_ms, True
-    except Exception as e:  # pragma: no cover
-        logger.error("Reranking failed: %s. Falling back to retrieval order.", e)
-        return documents[:top_n], round((time.perf_counter() - t0) * 1000, 2), False
+    except Exception as e:  # pragma: no cover - import/config failure
+        logger.error("Cohere reranker init failed: %s. Falling back to retrieval order.", e)
+        return documents[:top_n], 0.0, False
+
+    max_attempts = 3
+    latency_ms = 0.0
+    for attempt in range(1, max_attempts + 1):
+        _cohere_throttle()  # outside timed region — keeps latency faithful
+        t0 = time.perf_counter()
+        try:
+            reranked = list(reranker.compress_documents(documents=documents, query=query))
+            latency_ms = round((time.perf_counter() - t0) * 1000, 2)
+            # CohereRerank writes its score into metadata['relevance_score']; normalise the key.
+            for d in reranked:
+                if "relevance_score" in d.metadata and "rerank_score" not in d.metadata:
+                    d.metadata["rerank_score"] = round(float(d.metadata["relevance_score"]), 4)
+            return reranked, latency_ms, True
+        except Exception as e:  # pragma: no cover
+            latency_ms = round((time.perf_counter() - t0) * 1000, 2)
+            msg = str(e)
+            is_429 = "429" in msg or "rate limit" in msg.lower() or "too many requests" in msg.lower()
+            if is_429 and attempt < max_attempts:
+                backoff = 20.0 * attempt
+                logger.warning(
+                    "Cohere 429 (attempt %d/%d) — backing off %.0fs then retrying.",
+                    attempt, max_attempts, backoff,
+                )
+                time.sleep(backoff)
+                continue
+            logger.error("Reranking failed: %s. Falling back to retrieval order.", e)
+            return documents[:top_n], latency_ms, False
+
+    return documents[:top_n], latency_ms, False

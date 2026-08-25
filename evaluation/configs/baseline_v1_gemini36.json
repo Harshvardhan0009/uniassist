@@ -1,0 +1,82 @@
+{
+  "id": "baseline_v1_gemini36",
+  "name": "Baseline V1 (retrieval+rerank identical; LLM substituted gemini-2.5-flash -> gemini-3.6-flash)",
+  "status": "variant",
+  "based_on": "baseline_v1",
+  "created": "2026-08-25",
+  "deviation": {
+    "reason": "The frozen Baseline V1 LLM 'google/gemini-2.5-flash' returns HTTP 404 'no longer available to new users' on the available Google Gemini API key (2026). Google's named successor 'gemini-3.6-flash' is used instead so answer-quality/latency (Phases 6/12-14) are unblocked.",
+    "changed_fields": ["generation.llm", "generation.provider", "generation.base_url", "indexing.content_indexed"],
+    "unchanged_vs_baseline": "parser, chunking (2500/300), embedding (all-MiniLM-L6-v2), vector store (Chroma cosine), retrieval (top_k=20), reranker (Cohere rerank-v3.5, top_n=5). Retrieval + rerank are therefore directly comparable to the Phase 5 dense baseline.",
+    "index_note": "Reuses the exact Phase 5 frozen snapshot 'baseline_v1' (RAW chunk text; LLM summaries were unavailable) and the local Chroma collection 'eval_baseline_v1'. content_indexed is honestly recorded as 'raw'. A summary-based index is a separate future experiment (and would need the frozen 2.5-flash for true faithfulness)."
+  },
+  "parser": {
+    "pdf": "pdfplumber (table-aware, tables -> Markdown); PyPDFLoader fallback",
+    "docx": "python-docx (paragraphs + table rows)",
+    "txt_md": "langchain TextLoader (utf-8)",
+    "granularity": "one Document per PDF page; single Document for docx/txt",
+    "images": "not ingested"
+  },
+  "chunking": {
+    "splitter": "RecursiveCharacterTextSplitter",
+    "size": 2500,
+    "overlap": 300,
+    "keep_whole_if_leq_chars": 2500,
+    "separators": ["\n\n", "\n", ". ", " ", ""]
+  },
+  "indexing": {
+    "content_indexed": "raw",
+    "content_indexed_note": "RAW chunk text (reuses the Phase 5 snapshot; summaries were unavailable when it was frozen). Kept raw so retrieval stays directly comparable to the Phase 5 dense baseline (one-variable rule).",
+    "raw_preserved_in": "metadata.raw_content"
+  },
+  "embedding": {
+    "name": "all-MiniLM-L6-v2",
+    "provider": "huggingface-sentence-transformers (in-process)",
+    "dimensions": 384,
+    "normalize_embeddings": true,
+    "similarity": "cosine"
+  },
+  "vector_store": {
+    "engine": "chromadb",
+    "collection": "university_docs",
+    "space": "cosine",
+    "experiment_mode": "local persistent Chroma, collection eval_baseline_v1 (isolated; reused from Phase 5)"
+  },
+  "retrieval": {
+    "method": "similarity_search_with_relevance_scores",
+    "top_k": 20,
+    "min_relevance_score": 0.0
+  },
+  "reranker": {
+    "name": "rerank-v3.5",
+    "provider": "cohere",
+    "top_n": 5,
+    "enabled": true,
+    "eval_note": "Cohere key is Trial-tier (10 calls/min). The eval harness applies a throttle (EVAL_COHERE_MIN_INTERVAL_MS) + bounded 429 retry so reranked metrics are clean, not degraded fallbacks."
+  },
+  "generation": {
+    "llm": "gemini-3.6-flash",
+    "provider": "google-gemini (OpenAI-compatible endpoint)",
+    "base_url": "https://generativelanguage.googleapis.com/v1beta/openai/",
+    "temperature": 0.1,
+    "max_tokens": 1024,
+    "max_history_messages": 6,
+    "context_source": "metadata.raw_content"
+  },
+  "corpus": {
+    "root": "Data/",
+    "ingestible_files": 14,
+    "pdf": 12,
+    "docx": 1,
+    "txt": 1,
+    "ignored_images": 1
+  },
+  "evaluation": {
+    "snapshot": "baseline_v1",
+    "collection": "eval_baseline_v1"
+  },
+  "environment": {
+    "python": "3.13.1",
+    "lockfile": "backend/requirements.lock"
+  }
+}

@@ -1,0 +1,114 @@
+{
+  "experiment": "phase7_embedding_comparison",
+  "dataset": "uniassist_eval_v1 (57 answerable)",
+  "held_constant": "frozen snapshot baseline_v1 (raw text), 2500/300 chunking, top_k=20, cosine; dense retrieval only (no rerank).",
+  "variable": "embedding model",
+  "note": "MiniLM index_seconds may be 0 (reused from Phase 4/5); its original build was ~6s. BGE/E5 built fresh this session.",
+  "models": [
+    {
+      "model": "all-MiniLM-L6-v2 (baseline)",
+      "dimensions": 384,
+      "index_seconds": 0.0,
+      "index_reused": true,
+      "index_size_mb": 4.6,
+      "retrieval_ms_avg": 20.02,
+      "retrieval_ms_p95": 22.61,
+      "source": {
+        "mrr": 0.9121,
+        "recall@1": 0.8772,
+        "precision@1": 0.8772,
+        "recall@5": 0.9649,
+        "precision@5": 0.6316,
+        "recall@10": 0.9825,
+        "precision@10": 0.5175,
+        "recall@20": 0.9825,
+        "precision@20": 0.3904,
+        "set_recall@1": 0.8772,
+        "set_recall@5": 0.9649,
+        "set_recall@10": 0.9825,
+        "set_recall@20": 0.9825
+      },
+      "page": {
+        "mrr": 0.7075,
+        "recall@1": 0.6316,
+        "precision@1": 0.6316,
+        "recall@5": 0.807,
+        "precision@5": 0.2421,
+        "recall@10": 0.8772,
+        "precision@10": 0.1421,
+        "recall@20": 0.9649,
+        "precision@20": 0.0816
+      }
+    },
+    {
+      "model": "BAAI/bge-base-en-v1.5",
+      "dimensions": 768,
+      "index_seconds": 55.15,
+      "index_reused": false,
+      "index_size_mb": 5.0,
+      "retrieval_ms_avg": 65.83,
+      "retrieval_ms_p95": 79.69,
+      "source": {
+        "mrr": 0.9152,
+        "recall@1": 0.8772,
+        "precision@1": 0.8772,
+        "recall@5": 0.9825,
+        "precision@5": 0.6737,
+        "recall@10": 0.9825,
+        "precision@10": 0.5404,
+        "recall@20": 0.9825,
+        "precision@20": 0.4246,
+        "set_recall@1": 0.8772,
+        "set_recall@5": 0.9825,
+        "set_recall@10": 0.9825,
+        "set_recall@20": 0.9825
+      },
+      "page": {
+        "mrr": 0.7132,
+        "recall@1": 0.614,
+        "precision@1": 0.614,
+        "recall@5": 0.8246,
+        "precision@5": 0.2561,
+        "recall@10": 0.8947,
+        "precision@10": 0.1456,
+        "recall@20": 0.9649,
+        "precision@20": 0.0825
+      }
+    },
+    {
+      "model": "intfloat/e5-base-v2",
+      "dimensions": 768,
+      "index_seconds": 56.87,
+      "index_reused": false,
+      "index_size_mb": 5.1,
+      "retrieval_ms_avg": 61.52,
+      "retrieval_ms_p95": 79.52,
+      "source": {
+        "mrr": 0.9269,
+        "recall@1": 0.8772,
+        "precision@1": 0.8772,
+        "recall@5": 1.0,
+        "precision@5": 0.7088,
+        "recall@10": 1.0,
+        "precision@10": 0.5649,
+        "recall@20": 1.0,
+        "precision@20": 0.4272,
+        "set_recall@1": 0.8772,
+        "set_recall@5": 1.0,
+        "set_recall@10": 1.0,
+        "set_recall@20": 1.0
+      },
+      "page": {
+        "mrr": 0.7425,
+        "recall@1": 0.6491,
+        "precision@1": 0.6491,
+        "recall@5": 0.8421,
+        "precision@5": 0.2807,
+        "recall@10": 0.9298,
+        "precision@10": 0.1544,
+        "recall@20": 0.9649,
+        "precision@20": 0.0842
+      }
+    }
+  ]
+}

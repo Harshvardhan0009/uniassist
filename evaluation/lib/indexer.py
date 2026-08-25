@@ -32,6 +32,7 @@ paths.ensure_backend_on_path()
 
 from langchain_chroma import Chroma  # noqa: E402
 from langchain_core.documents import Document  # noqa: E402
+from langchain_core.embeddings import Embeddings  # noqa: E402
 from langchain_huggingface import HuggingFaceEmbeddings  # noqa: E402
 
 # Reuse production helpers so experiment vectors are byte-for-byte faithful.
@@ -46,20 +47,64 @@ def _persist_dir_for(collection: str) -> Path:
     return paths.CHROMA_DIR / collection
 
 
-def make_embedding_function(model_name: str) -> HuggingFaceEmbeddings:
+class _PrefixedEmbeddings(Embeddings):
+    """Wrap an Embeddings backend to prepend instruction prefixes.
+
+    Several retrieval models expect **asymmetric** query/passage prefixes and
+    perform poorly without them:
+
+    * **E5 family** (``intfloat/e5-*``): queries must start with ``"query: "`` and
+      passages with ``"passage: "`` (**required** — omitting them badly degrades E5).
+    * **BGE v1.5** (``BAAI/bge-*-en-v1.5``): queries use the instruction
+      ``"Represent this sentence for searching relevant passages: "``; passages
+      need no prefix.
+
+    Prefixes are applied consistently at index time (``embed_documents`` →
+    passages) and query time (``embed_query`` → queries), so each model is used as
+    its authors intended and the embedding comparison stays fair. MiniLM uses no
+    prefixes and is passed through unchanged.
+    """
+
+    def __init__(self, base: Embeddings, query_prefix: str = "", passage_prefix: str = ""):
+        self._base = base
+        self._query_prefix = query_prefix or ""
+        self._passage_prefix = passage_prefix or ""
+
+    def embed_documents(self, texts: list[str]) -> list[list[float]]:
+        if self._passage_prefix:
+            texts = [self._passage_prefix + t for t in texts]
+        return self._base.embed_documents(texts)
+
+    def embed_query(self, text: str) -> list[float]:
+        return self._base.embed_query(self._query_prefix + text)
+
+
+def make_embedding_function(
+    model_name: str, query_prefix: str = "", passage_prefix: str = ""
+) -> Embeddings:
     """Create a fresh (non-singleton) embedding function for a given model.
 
     Mirrors ``app.ingestion.embedder.get_embedding_function`` (normalised,
     cosine-ready) but is *not* cached globally, so multiple models can coexist
-    within one experiment run.
+    within one experiment run. When ``query_prefix``/``passage_prefix`` are given,
+    the function is wrapped so those instruction prefixes are applied at both
+    index and query time (needed for E5/BGE — see ``_PrefixedEmbeddings``).
     """
     device = _select_device()
-    logger.info("Loading embedding model '%s' (device=%s)", model_name, device)
-    return HuggingFaceEmbeddings(
+    logger.info(
+        "Loading embedding model '%s' (device=%s%s)",
+        model_name, device,
+        f", query_prefix={query_prefix!r}, passage_prefix={passage_prefix!r}"
+        if (query_prefix or passage_prefix) else "",
+    )
+    base = HuggingFaceEmbeddings(
         model_name=model_name,
         model_kwargs={"device": device},
         encode_kwargs={"normalize_embeddings": True},
     )
+    if query_prefix or passage_prefix:
+        return _PrefixedEmbeddings(base, query_prefix=query_prefix, passage_prefix=passage_prefix)
+    return base
 
 
 def _deterministic_ids(docs: list[Document]) -> list[str]:
@@ -76,14 +121,16 @@ def build_index(
     embedding_model: str,
     persist_dir: Path | None = None,
     force: bool = False,
+    query_prefix: str = "",
+    passage_prefix: str = "",
 ) -> tuple[Chroma, dict]:
     """Embed ``snapshot_docs`` into a local, isolated Chroma collection.
 
     Returns ``(store, info)`` where ``info`` records reuse/build stats, timing,
-    dimensions and the embedding model.
+    dimensions, the embedding model, and any query/passage instruction prefixes.
     """
     persist_dir = persist_dir or _persist_dir_for(collection)
-    embedding_fn = make_embedding_function(embedding_model)
+    embedding_fn = make_embedding_function(embedding_model, query_prefix, passage_prefix)
     dimensions = len(embedding_fn.embed_query("dimension probe"))
 
     # Force rebuild: drop the directory *before* opening a client handle.
@@ -117,6 +164,8 @@ def build_index(
             "vectors": existing,
             "index_seconds": 0.0,
             "persist_dir": str(persist_dir),
+            "query_prefix": query_prefix,
+            "passage_prefix": passage_prefix,
         }
 
     if existing and not force:
@@ -150,17 +199,22 @@ def build_index(
         "vectors": stored,
         "index_seconds": index_seconds,
         "persist_dir": str(persist_dir),
+        "query_prefix": query_prefix,
+        "passage_prefix": passage_prefix,
     }
 
 
-def open_index(collection: str, embedding_model: str, persist_dir: Path | None = None) -> Chroma:
+def open_index(
+    collection: str, embedding_model: str, persist_dir: Path | None = None,
+    query_prefix: str = "", passage_prefix: str = "",
+) -> Chroma:
     """Open an already-built local Chroma collection (no writes)."""
     persist_dir = persist_dir or _persist_dir_for(collection)
     if not persist_dir.exists():
         raise FileNotFoundError(f"No index at {persist_dir}. Build it with evaluation.lib.indexer first.")
     return Chroma(
         collection_name=collection,
-        embedding_function=make_embedding_function(embedding_model),
+        embedding_function=make_embedding_function(embedding_model, query_prefix, passage_prefix),
         persist_directory=str(persist_dir),
         collection_metadata={"hnsw:space": "cosine"},
     )
@@ -179,9 +233,14 @@ if __name__ == "__main__":
     parser.add_argument("--snapshot", default="baseline_v1", help="Snapshot name to embed")
     parser.add_argument("--collection", required=True, help="Target local Chroma collection name")
     parser.add_argument("--model", default="all-MiniLM-L6-v2", help="Embedding model name")
+    parser.add_argument("--query-prefix", default="", help="Instruction prefix for queries (E5/BGE)")
+    parser.add_argument("--passage-prefix", default="", help="Instruction prefix for passages (E5)")
     parser.add_argument("--force", action="store_true", help="Rebuild even if vectors already exist")
     args = parser.parse_args()
 
     docs = load_snapshot(args.snapshot)
-    _, info = build_index(docs, collection=args.collection, embedding_model=args.model, force=args.force)
+    _, info = build_index(
+        docs, collection=args.collection, embedding_model=args.model, force=args.force,
+        query_prefix=args.query_prefix, passage_prefix=args.passage_prefix,
+    )
     print(json.dumps(info, indent=2))

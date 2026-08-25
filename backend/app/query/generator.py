@@ -144,68 +144,79 @@ def _to_history_messages(history: list[dict] | None) -> list:
     return messages[-MAX_HISTORY_MESSAGES:]
 
 
+def _clean_answer_text(answer: str) -> str:
+    """Strip leaked <think>…</think> reasoning blocks (and unclosed variants)."""
+    answer = re.sub(r"<think>[\s\S]*?</think>", "", answer).strip()
+    answer = re.sub(r"<think>[\s\S]*$", "", answer).strip()
+    answer = answer.replace("<think>", "").replace("</think>", "").strip()
+    return answer
+
+
+def _invoke_llm(
+    api_key: str, base_url: str, model: str, context: str, query: str, history: list[dict] | None
+) -> str:
+    """Call one OpenAI-compatible LLM and return a cleaned answer (raises on failure)."""
+    llm = ChatOpenAI(
+        api_key=api_key,
+        base_url=base_url,
+        model=model,
+        temperature=0.1,
+        max_tokens=1024,
+    )
+    chain = ANSWER_PROMPT | llm | StrOutputParser()
+    answer = chain.invoke(
+        {"context": context, "query": query, "history": _to_history_messages(history)}
+    )
+    return _clean_answer_text(answer)
+
+
 def generate_answer(
     query: str, documents: list[Document], history: list[dict] | None = None
 ) -> dict:
     """
-    Generate the final answer using the configured LLM.
+    Generate the final answer, with automatic LLM failover.
 
-    Args:
-        query: The user's question.
-        documents: Reranked documents with context.
-        history: Optional prior conversation turns for follow-up context.
+    Tries the **primary** LLM (``LLM_*``) first; on any error or empty response it
+    falls back to the **fallback** LLM (``FALLBACK_LLM_*``, e.g. Groq); if both are
+    unavailable/fail, returns a structured extract of the retrieved passages.
 
-    Returns:
-        Dict with:
-          - answer: the generated text
-          - sources: list of source filenames
-          - has_llm: whether LLM was used
+    Returns a dict with:
+      - ``answer``: the generated (or extracted) text
+      - ``sources``: list of source filenames
+      - ``has_llm``: whether an LLM produced the answer
+      - ``model_used`` / ``llm_role``: which model answered ("primary"/"fallback"), or None
     """
     sources = list(dict.fromkeys(doc.metadata.get("source_file", "Unknown") for doc in documents))
-
-    if not settings.has_llm:
-        logger.warning("LLM_API_KEY not set — generating structured response from context.")
-        return {
-            "answer": _build_clean_answer(query, documents),
-            "sources": sources,
-            "has_llm": False,
-        }
-
-    logger.info(f"Generating answer with {settings.LLM_MODEL}...")
     context = _format_context(documents)
 
-    llm = ChatOpenAI(
-        api_key=settings.LLM_API_KEY,
-        base_url=settings.LLM_BASE_URL,
-        model=settings.LLM_MODEL,
-        temperature=0.1,
-        max_tokens=1024,
-    )
-
-    chain = ANSWER_PROMPT | llm | StrOutputParser()
-
-    has_llm = True
-    try:
-        answer = chain.invoke(
-            {
-                "context": context,
-                "query": query,
-                "history": _to_history_messages(history),
-            }
+    # Ordered failover chain: primary first, then fallback (each only if configured).
+    providers: list[tuple[str, str, str, str]] = []
+    if settings.has_llm:
+        providers.append(("primary", settings.LLM_API_KEY, settings.LLM_BASE_URL, settings.LLM_MODEL))
+    if settings.has_fallback_llm:
+        providers.append(
+            ("fallback", settings.FALLBACK_LLM_API_KEY, settings.FALLBACK_LLM_BASE_URL, settings.FALLBACK_LLM_MODEL)
         )
-        # Strip leaked <think>...</think> blocks from reasoning models (e.g. Qwen)
-        answer = re.sub(r"<think>[\s\S]*?</think>", "", answer).strip()
-        # Handle unclosed <think> tags (model cut off mid-reasoning)
-        answer = re.sub(r"<think>[\s\S]*$", "", answer).strip()
-        # Remove any remaining stray tags
-        answer = answer.replace("<think>", "").replace("</think>", "").strip()
-    except Exception as e:
-        logger.error(f"Generation failed: {e}")
-        answer = _build_clean_answer(query, documents)
-        has_llm = False
 
-    return {
-        "answer": answer,
-        "sources": sources,
-        "has_llm": has_llm,
-    }
+    if not providers:
+        logger.warning("No LLM configured — generating structured response from context.")
+        return {"answer": _build_clean_answer(query, documents), "sources": sources,
+                "has_llm": False, "model_used": None, "llm_role": None}
+
+    last_error: Exception | None = None
+    for role, api_key, base_url, model in providers:
+        try:
+            logger.info("Generating answer with %s LLM (%s)...", role, model)
+            answer = _invoke_llm(api_key, base_url, model, context, query, history)
+            if not answer:
+                raise ValueError("empty answer from LLM (reasoning consumed the token budget?)")
+            return {"answer": answer, "sources": sources, "has_llm": True,
+                    "model_used": model, "llm_role": role}
+        except Exception as e:  # noqa: BLE001 — try the next provider
+            last_error = e
+            logger.error("%s LLM (%s) failed: %s", role, model, str(e)[:200])
+            continue
+
+    logger.error("All LLM providers failed (%s); using extractive fallback.", last_error)
+    return {"answer": _build_clean_answer(query, documents), "sources": sources,
+            "has_llm": False, "model_used": None, "llm_role": None}

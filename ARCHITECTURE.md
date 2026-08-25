@@ -126,21 +126,33 @@ answer + source citations + per-step timings.
 |---|---|---|---|
 | **Text embeddings** | `all-MiniLM-L6-v2` (384-dim, normalized, cosine) | In-process (CPU, auto-CUDA) | `EMBEDDING_MODEL` |
 | **LLM (summarize + generate)** | OpenAI-compatible chat model | External API | `LLM_API_KEY` / `LLM_BASE_URL` / `LLM_MODEL` (legacy `GROK_*` accepted) |
+| **Fallback LLM** | OpenAI-compatible chat model (e.g. Groq `openai/gpt-oss-120b`) | External API | `FALLBACK_LLM_API_KEY` (legacy `GROQ_API_KEY`) / `FALLBACK_LLM_BASE_URL` / `FALLBACK_LLM_MODEL` |
 | **Reranker** | `rerank-v3.5` (cross-encoder) | Cohere API | `COHERE_API_KEY` / `COHERE_RERANK_MODEL` |
 | **Vector store** | ChromaDB (`university_docs`) | Local file **or** remote HTTP | `CHROMA_*` |
 
 ### Currently configured deployment (from `backend/.env`)
-- **LLM provider:** OpenRouter (`LLM_BASE_URL=https://openrouter.ai/api/v1`), **model `google/gemini-2.5-flash`**.
-  *(Code defaults, if unset, are xAI Grok: `https://api.x.ai/v1`, `grok-3-mini`.)*
+- **LLM provider:** Google Gemini via its **OpenAI-compatible** endpoint
+  (`LLM_BASE_URL=https://generativelanguage.googleapis.com/v1beta/openai/`), **model
+  `gemini-3.6-flash`**. *(History: the earlier OpenRouter `gemini-2.5-flash` key became
+  unfunded (`402`), and `gemini-2.5-flash` is now `404` for new Google accounts — see §14.
+  Code defaults, if unset, are xAI Grok: `https://api.x.ai/v1`, `grok-3-mini`.)*
+  > ⚠ The Gemini **free tier caps at 20 requests/day**, so live `/api/query` LLM answers
+  > degrade to extractive fallback after the cap; use a paid tier for production traffic.
 - **Reranker:** **configured and active** — `COHERE_API_KEY` is set, so Cohere `rerank-v3.5`
-  reranks the top‑K candidates down to top‑N (`RERANK_TOP_N`).
+  reranks the top‑K candidates down to top‑N (`RERANK_TOP_N`). *(Trial-tier: 10 calls/min.)*
 - **Vector store:** **client-server mode** against `uniassist-chroma.onrender.com:443` (SSL),
   collection `university_docs`.
-- **Embeddings:** loaded in-process on CPU.
+- **Embeddings:** loaded in-process on CPU (`all-MiniLM-L6-v2`; evaluation recommends
+  `e5-base-v2` — see §14, pending promotion).
+- **Fallback LLM:** **Groq `openai/gpt-oss-120b`** is configured (`FALLBACK_LLM_*`). When the
+  primary LLM errors, rate-limits, hits its quota, or returns empty, generation **automatically
+  fails over** to Groq before resorting to the extractive response. This makes answers resilient
+  to the Gemini free-tier daily cap.
 
-> Both the LLM and Cohere are **optional at runtime**: without an LLM key the backend returns a
-> structured extract of retrieved passages; without a Cohere key it skips reranking. This lets you
-> test retrieval end-to-end with no paid keys.
+> The primary LLM, fallback LLM, and Cohere are all **optional at runtime**: with no LLM at all the
+> backend returns a structured extract of retrieved passages; without a Cohere key it skips
+> reranking. The fallback LLM is used only when the primary fails, so a single funded provider is
+> enough for full answers.
 
 ### Model / retrieval parameters
 | Parameter | Value | Location |
@@ -245,8 +257,10 @@ flowchart LR
    no key; errors fall back to retrieval order.
 3. **Generate** (`generator.py`) — builds context from each doc's **`raw_content`**, injects up to
    `MAX_HISTORY_MESSAGES` (6) prior turns, and calls the LLM with a citation-focused, table-aware
-   system prompt. Leaked `<think>…</think>` reasoning blocks are stripped. Without an LLM key, a
-   structured extract of the passages is returned instead.
+   system prompt. Uses an automatic **failover chain**: **primary LLM → fallback LLM (Groq) →
+   extractive**. On any primary error/quota/empty response it retries with the fallback; only if
+   both fail does it return a structured extract (`has_llm=False`). Leaked `<think>…</think>`
+   reasoning blocks are stripped. The response records which model answered (`model_used`).
 
 ### 6.3 API endpoints (`app/main.py`)
 
@@ -346,6 +360,9 @@ its `.txt` companion for searchable content.
 | `LLM_API_KEY` | *(empty)* | LLM key *(legacy `GROK_API_KEY` accepted)* |
 | `LLM_BASE_URL` | `https://api.x.ai/v1` | OpenAI-compatible base URL *(legacy `GROK_BASE_URL`)* |
 | `LLM_MODEL` | `grok-3-mini` | Chat model *(legacy `GROK_MODEL`)* |
+| `FALLBACK_LLM_API_KEY` | *(empty)* | Fallback LLM key *(legacy `GROQ_API_KEY`)*; enables automatic failover |
+| `FALLBACK_LLM_BASE_URL` | `https://api.groq.com/openai/v1` | Fallback OpenAI-compatible base URL (Groq) |
+| `FALLBACK_LLM_MODEL` | `openai/gpt-oss-120b` | Fallback chat model |
 | `COHERE_API_KEY` | *(empty)* | Enables reranking |
 | `COHERE_RERANK_MODEL` | `rerank-v3.5` | Cohere rerank model |
 | `CHROMA_HOST` | *(empty)* | Empty = local file mode; set = client-server mode |
@@ -477,14 +494,29 @@ flowchart LR
 `page_number` match the dataset's `expected_sources`/`expected_pages` exactly, so
 source- and page-level Recall@K / MRR are directly computable.
 
-**Current status.** The pipeline runs end-to-end (MiniLM retrieval avg ~14 ms;
-expected source in retrieved top-k for 56/57 answerable questions). Two runtime
-blockers prevent a *faithful* Baseline V1 (Phase 6) until resolved:
+**Current status (Phases 4–7 complete).** The pipeline runs end-to-end and has
+produced baseline + embedding-comparison numbers. See
+[`evaluation/reports/latest_report.md`](./evaluation/reports/latest_report.md) for the
+living status and [`evaluation/README.md`](./evaluation/README.md) for usage.
 
-- **LLM (OpenRouter) `402 Payment Required`** → chunk summaries and LLM answers
-  unavailable; the snapshot currently freezes **raw chunk text**
-  (`summarizer.effective = false`) and answers fall back to extractive text.
-- **Cohere Trial key `429` (10/min)** → reranking is rate-limited and falls back
-  to retrieval order for most questions.
+- **Phase 5 (dense baseline, MiniLM):** source Recall@5 0.965 · MRR 0.912 (57 answerable).
+- **Phase 6 (+ Cohere rerank-v3.5):** source Recall@5 **0.982** · MRR **0.953**; page
+  Recall@1 0.63 → **0.90**. Reranking applied on 63/63. Official reference:
+  `evaluation/experiments/results/baseline_v1.json`.
+- **Phase 7 (embedding comparison):** `intfloat/e5-base-v2` wins on all quality metrics
+  (source Recall@5 **1.000**, MRR **0.927**) over MiniLM and `bge-base-en-v1.5`;
+  recommended in [`EMBEDDING_DECISION.md`](./evaluation/reports/EMBEDDING_DECISION.md)
+  (promotion gated on approval + wiring E5's `query:`/`passage:` prefixes into production).
 
-Retrieval-only evaluation is fully functional without either key.
+**Environment notes / blockers.**
+
+- **Cohere Trial `429` (10/min)** — worked around with an eval-only throttle
+  (`EVAL_COHERE_MIN_INTERVAL_MS`) + 429 retry; reranked metrics are clean (63/63).
+- **LLM keys.** OpenRouter key is unfunded (`402`); the frozen `gemini-2.5-flash` is now
+  `404` for new Google accounts, so evaluation uses **`gemini-3.6-flash`** via Google's
+  OpenAI-compatible endpoint. Its **free tier caps at 20 requests/day**, so only 16/63
+  answers were captured with a real LLM in the Phase 6 run (retrieval/rerank are
+  LLM-independent and complete). A **Groq `openai/gpt-oss-120b` fallback** is now configured
+  so subsequent runs fail over automatically instead of degrading to extractive answers.
+
+Retrieval-only evaluation is fully functional without any LLM key.
