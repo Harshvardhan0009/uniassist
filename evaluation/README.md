@@ -132,7 +132,8 @@ retrieval artifact is a smoke-test signal only — **not** the Recall/MRR metric
 | **4** | **evaluation pipeline (this framework)** | **done — runs end-to-end** |
 | **5** | **`metrics/retrieval_metrics.py`** (Recall@1/5/10/20, MRR, Precision@K, HitRate@K, set-recall) | **done — dense baseline scored** |
 | **6** | **official `results/baseline_v1.json`** (retrieval + reranked metrics + latency) | **retrieval+rerank done; generation partial (16/63, Gemini free-tier cap)** |
-| **7** | **embedding comparison** (MiniLM vs BGE vs E5) | **done — `EMBEDDING_DECISION.md` recommends e5-base-v2** |
+| **7** | **embedding comparison** (MiniLM vs BGE vs E5) | **done** |
+| **8** | **embedding selection** (`EMBEDDING_DECISION.md`) | **done — selected `e5-base-v2` (promotion = Phase 22)** |
 
 **Phase 5 dense-retrieval baseline (all-MiniLM-L6-v2, source level):** Recall@1
 0.877 · Recall@5 0.965 · Recall@10 0.983 · MRR 0.912 (57 answerable questions).
@@ -144,11 +145,12 @@ Reranking applied on 63/63 (no fallback). See
 [`reports/retrieval_metrics_baseline_v1_gemini36.md`](./reports/retrieval_metrics_baseline_v1_gemini36.md)
 and `experiments/results/baseline_v1.json`.
 
-**Phase 7 embedding comparison (dense, source level):** `e5-base-v2` Recall@5
-**1.000** / MRR **0.927** beats MiniLM (0.965 / 0.912) and bge-base (0.983 / 0.915),
-and wins page-level too — at 768-dim and ~3× query latency. Recommended (promotion
-gated on approval). See [`reports/EMBEDDING_COMPARISON.md`](./reports/EMBEDDING_COMPARISON.md)
-and [`reports/EMBEDDING_DECISION.md`](./reports/EMBEDDING_DECISION.md).
+**Phases 7–8 embedding selection — `e5-base-v2`.** Dense source Recall@5 **1.000** /
+MRR **0.927** beats MiniLM (0.965 / 0.912) and bge-base (0.983 / 0.915). Confirmed with
+Cohere reranking (E5 reranked source Recall@5 **1.000** / MRR **0.962** vs MiniLM 0.982 / 0.953).
+Cost: 768-dim, ~3× query latency. Promotion to production is Phase 22. See
+[`reports/EMBEDDING_COMPARISON.md`](./reports/EMBEDDING_COMPARISON.md) and
+[`reports/EMBEDDING_DECISION.md`](./reports/EMBEDDING_DECISION.md).
 
 ### ⚠ Runtime blockers — status (updated Phase 6)
 
