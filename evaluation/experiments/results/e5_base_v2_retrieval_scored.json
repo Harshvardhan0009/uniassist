@@ -29,7 +29,7 @@
     "reranker": {
       "name": "rerank-v3.5",
       "top_n": 5,
-      "enabled": false
+      "enabled": true
     },
     "llm": {
       "name": "gemini-3.6-flash"
@@ -42,12 +42,12 @@
     "summarizer_effective": false
   },
   "index": {
-    "reused": false,
+    "reused": true,
     "collection": "eval_e5_base_v2",
     "embedding_model": "intfloat/e5-base-v2",
     "dimensions": 768,
     "vectors": 184,
-    "index_seconds": 56.87,
+    "index_seconds": 0.0,
     "persist_dir": "C:\\Users\\laukik\\Desktop\\uniassist\\uniassist\\evaluation\\.chroma\\eval_e5_base_v2",
     "query_prefix": "query: ",
     "passage_prefix": "passage: "
@@ -57,10 +57,10 @@
     "excluded_unanswerable_or_no_gt": 6
   },
   "rerank_status": {
-    "rerank_enabled": false,
-    "reranker_used_questions": 0,
+    "rerank_enabled": true,
+    "reranker_used_questions": 63,
     "total_questions": 63,
-    "note": "rerank disabled for this run (dense-only)"
+    "note": "if reranker_used < total, some/all reranking fell back to retrieval order (e.g. Cohere rate-limit)"
   },
   "metrics": {
     "retrieved": {
@@ -93,20 +93,20 @@
     },
     "reranked": {
       "source": {
-        "mrr": 0.9269,
-        "recall@1": 0.8772,
-        "precision@1": 0.8772,
+        "mrr": 0.962,
+        "recall@1": 0.9298,
+        "precision@1": 0.9298,
         "recall@5": 1.0,
-        "precision@5": 0.7088,
-        "set_recall@1": 0.8772,
+        "precision@5": 0.7298,
+        "set_recall@1": 0.9298,
         "set_recall@5": 1.0
       },
       "page": {
-        "mrr": 0.7272,
-        "recall@1": 0.6491,
-        "precision@1": 0.6491,
-        "recall@5": 0.8421,
-        "precision@5": 0.2807
+        "mrr": 0.924,
+        "recall@1": 0.8947,
+        "precision@1": 0.8947,
+        "recall@5": 0.9649,
+        "precision@5": 0.2982
       }
     }
   },

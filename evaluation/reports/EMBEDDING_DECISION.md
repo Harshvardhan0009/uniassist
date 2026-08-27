@@ -1,6 +1,6 @@
 # Embedding model decision (Phases 7–8)
 
-**Date:** 2026-08-25 · **Status:** recommendation (production promotion pending approval) · **Dataset:** `uniassist_eval_v1` (57 answerable) · **Method:** dense retrieval on the frozen `baseline_v1` snapshot, `top_k=20`, cosine, no rerank — only the embedding model changes.
+**Date:** 2026-08-27 · **Status:** ✅ **SELECTED — `intfloat/e5-base-v2`** (Phase 8 complete). Production promotion is deferred to **Phase 22** (after the remaining experiments), per the plan. · **Dataset:** `uniassist_eval_v1` (57 answerable) · **Method:** dense retrieval on the frozen `baseline_v1` snapshot, `top_k=20`, cosine — only the embedding model changes; then confirmed with the constant Cohere reranker on top.
 
 Full tables: [`EMBEDDING_COMPARISON.md`](./EMBEDDING_COMPARISON.md). Raw: `experiments/results/embedding_comparison.json`.
 
@@ -21,17 +21,37 @@ Full tables: [`EMBEDDING_COMPARISON.md`](./EMBEDDING_COMPARISON.md). Raw: `exper
 
 ## Recommendation
 
-**Adopt `intfloat/e5-base-v2`** as the embedding model, subject to the two checks below. Rationale for the UniAssist workload:
+**Selected: `intfloat/e5-base-v2`** as the embedding model — confirmed by the reranked comparison
+above (E5 ≥ MiniLM at every level). Rationale for the UniAssist workload:
 
 - Retrieval quality is the embedding's core job, and E5 wins on every quality metric, most importantly **page-level** (better citations) and **perfect source Recall@5**.
 - The latency cost (~40 ms extra per query) is **negligible** next to LLM generation (~5 s) and reranking (~640 ms). Index build time (57 s) is a one-off offline cost.
 - E5 **requires** `query:` / `passage:` prefixes; these are wired into the eval harness and must also be wired into production `retriever.py`/`embedder.py` if promoted (see below).
 
-### Before promoting to production (gated — not done yet)
-1. **Confirm the gain survives reranking + end-to-end.** These are dense-only numbers; re-run the reranked comparison (Cohere on top) for MiniLM vs E5 to confirm E5's better candidates translate to better final top-5. (Dense-only already favors E5, and better candidates can only help the reranker.)
-2. **Wire E5 prefixes into production.** Production `embedder.py`/`retriever.py` currently embed without instruction prefixes; E5 needs `passage:` at index time and `query:` at query time, or quality drops. This is a code change to promote alongside `EMBEDDING_MODEL=intfloat/e5-base-v2`, plus a **full re-index** of the production Chroma collection.
+### Reranked confirmation (done)
 
-Per the plan's rules, production is **not** modified until this decision is approved.
+With the constant Cohere `rerank-v3.5` applied on top (63/63, no fallback), E5 keeps its edge:
+
+| Reranked (top-5) | MiniLM | E5 |
+|---|--:|--:|
+| source Recall@5 | 0.982 | **1.000** |
+| source MRR | 0.953 | **0.962** |
+| source Recall@1 | 0.930 | 0.930 |
+| page R@1 / R@5 / MRR | 0.895 / 0.965 / 0.924 | 0.895 / 0.965 / 0.924 |
+
+E5 ≥ MiniLM at every level (source better, page tied). **The selection is robust to reranking.**
+
+### Production promotion (deferred to Phase 22 — NOT done)
+
+Promoting E5 to the live system will require, as one coordinated migration:
+1. **Wire E5 prefixes into production** `embedder.py`/`retriever.py`: `passage:` at index time and
+   `query:` at query time (omitting them badly degrades E5).
+2. Set `EMBEDDING_MODEL=intfloat/e5-base-v2` and **fully re-index** the production Chroma collection
+   (384-dim → 768-dim; existing MiniLM vectors are dimension-incompatible).
+
+Per the plan (Phase 22), production is **not** modified until all experiments (chunking, parser, LLM,
+hybrid, …) are complete and the full winning configuration is chosen. This document records the
+**embedding selection** only; it does not change production.
 
 ## Honest caveats
 

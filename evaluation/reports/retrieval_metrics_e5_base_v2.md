@@ -2,7 +2,7 @@
 
 - **Embedding:** intfloat/e5-base-v2 (768-dim) · **index:** 184 vectors · **dataset:** uniassist_eval_v1 v1.0.0-phase3
 - **Scored:** 57 answerable questions (excluded 6 unanswerable/no-GT)
-- **Reranking:** disabled for this run (dense-only baseline)
+- **Reranking:** applied on 63/63 questions
 - **Index content:** RAW chunk text (LLM summaries unavailable — 402).
 
 ## Dense retrieval (top-20)
@@ -18,10 +18,8 @@
 
 | Level | Recall@1 | Recall@5 | MRR | P@5 |
 |---|---|---|---|---|
-| source | 0.877 | 1.000 | 0.927 | 0.709 |
-| page | 0.649 | 0.842 | 0.727 | 0.281 |
-
-> Reranking was disabled (`--no-rerank`) for this dense-only baseline, so reranked rows equal the dense top-5. The Cohere reranker's true contribution is measured in Phase 9.
+| source | 0.930 | 1.000 | 0.962 | 0.730 |
+| page | 0.895 | 0.965 | 0.924 | 0.298 |
 
 ## By category (dense retrieval, source level)
 

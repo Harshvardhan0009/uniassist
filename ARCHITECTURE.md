@@ -503,10 +503,12 @@ living status and [`evaluation/README.md`](./evaluation/README.md) for usage.
 - **Phase 6 (+ Cohere rerank-v3.5):** source Recall@5 **0.982** · MRR **0.953**; page
   Recall@1 0.63 → **0.90**. Reranking applied on 63/63. Official reference:
   `evaluation/experiments/results/baseline_v1.json`.
-- **Phase 7 (embedding comparison):** `intfloat/e5-base-v2` wins on all quality metrics
-  (source Recall@5 **1.000**, MRR **0.927**) over MiniLM and `bge-base-en-v1.5`;
-  recommended in [`EMBEDDING_DECISION.md`](./evaluation/reports/EMBEDDING_DECISION.md)
-  (promotion gated on approval + wiring E5's `query:`/`passage:` prefixes into production).
+- **Phases 7–8 (embedding comparison + selection):** **`intfloat/e5-base-v2` selected.** It wins
+  on all dense quality metrics (source Recall@5 **1.000**, MRR **0.927**) over MiniLM and
+  `bge-base-en-v1.5`, and the edge **survives reranking** (E5 reranked source Recall@5 1.000 /
+  MRR 0.962 vs MiniLM 0.982 / 0.953). Decision:
+  [`EMBEDDING_DECISION.md`](./evaluation/reports/EMBEDDING_DECISION.md). Production promotion (wiring
+  E5's `query:`/`passage:` prefixes + 768-dim re-index) is deferred to **Phase 22**.
 
 **Environment notes / blockers.**
 
