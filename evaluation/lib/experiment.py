@@ -49,8 +49,16 @@ def prepare_store(
 ) -> tuple[Chroma, dict, dict, int]:
     """Ensure snapshot + isolated index exist; return (store, manifest, index_info, n_docs)."""
     if rebuild_snapshot or not snap.snapshot_exists(config.snapshot):
-        logger.info("Snapshot '%s' missing or rebuild requested — building it.", config.snapshot)
-        snap.build_snapshot(name=config.snapshot, use_llm=(config.content_indexed == "llm_summary"))
+        logger.info(
+            "Snapshot '%s' missing or rebuild requested — building it (chunk %d/%d).",
+            config.snapshot, config.chunk_size, config.chunk_overlap,
+        )
+        snap.build_snapshot(
+            name=config.snapshot,
+            use_llm=(config.content_indexed == "llm_summary"),
+            chunk_size=config.chunk_size,
+            chunk_overlap=config.chunk_overlap,
+        )
 
     docs = snap.load_snapshot(config.snapshot)
     manifest = snap.load_manifest(config.snapshot)

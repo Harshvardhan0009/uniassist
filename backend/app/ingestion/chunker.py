@@ -17,30 +17,53 @@ logger = logging.getLogger(__name__)
 CHUNK_SIZE = 2500
 CHUNK_OVERLAP = 300
 
-splitter = RecursiveCharacterTextSplitter(
-    chunk_size=CHUNK_SIZE,
-    chunk_overlap=CHUNK_OVERLAP,
-    length_function=len,
-    separators=["\n\n", "\n", ". ", " ", ""],
-    is_separator_regex=False,
-)
+
+def _make_splitter(chunk_size: int, chunk_overlap: int) -> RecursiveCharacterTextSplitter:
+    return RecursiveCharacterTextSplitter(
+        chunk_size=chunk_size,
+        chunk_overlap=chunk_overlap,
+        length_function=len,
+        separators=["\n\n", "\n", ". ", " ", ""],
+        is_separator_regex=False,
+    )
 
 
-def chunk_documents(documents: list[Document], source_file: str = "") -> list[Document]:
+# Default splitter used by production ingestion (2500/300).
+splitter = _make_splitter(CHUNK_SIZE, CHUNK_OVERLAP)
+
+
+def chunk_documents(
+    documents: list[Document],
+    source_file: str = "",
+    chunk_size: int | None = None,
+    chunk_overlap: int | None = None,
+) -> list[Document]:
     """
     Split page-level documents into retrieval-friendly chunks.
     Preserves table markdown and metadata.
+
+    ``chunk_size`` / ``chunk_overlap`` default to the module constants
+    (2500 / 300 — production behaviour). Pass explicit values to experiment with
+    different chunking (used by the evaluation snapshot builder, Phase 10); the
+    keep-whole threshold then follows the provided ``chunk_size``.
     """
     if not documents:
         return []
 
+    size = CHUNK_SIZE if chunk_size is None else chunk_size
+    overlap = CHUNK_OVERLAP if chunk_overlap is None else chunk_overlap
+    # Reuse the cached default splitter for production settings; build a local one otherwise.
+    active_splitter = (
+        splitter if (size == CHUNK_SIZE and overlap == CHUNK_OVERLAP) else _make_splitter(size, overlap)
+    )
+
     # If document already fits within chunk size, keep it whole
     chunks = []
     for doc in documents:
-        if len(doc.page_content) <= CHUNK_SIZE:
+        if len(doc.page_content) <= size:
             chunks.append(doc)
         else:
-            sub_chunks = splitter.split_documents([doc])
+            sub_chunks = active_splitter.split_documents([doc])
             chunks.extend(sub_chunks)
 
     # Enrich metadata

@@ -2,8 +2,8 @@
 
 > Auto/hand-maintained status of the evaluation program. Metric tables
 > (Recall@K, MRR, faithfulness, …) appear here from Phase 5 onward. This file
-> records Phases 4-8 completion, the retrieval + reranked baseline numbers, the
-> embedding-model comparison + selection, and the environment blockers found.
+> records Phases 4-10 completion, the retrieval + reranked baseline numbers, the
+> embedding + reranker + chunking selections, and the environment blockers found.
 
 **Updated:** 2026-08-25 · **Branch:** `laukik-uniassist-branch`
 
@@ -164,6 +164,33 @@ selection only and does not touch production.
 
 ---
 
+## Phase 9 — Reranker A/B ✅ (keep Cohere)
+
+Formalized from existing data (dense top-5 vs Cohere-reranked top-5, both embeddings). Reranking
+gives a large, consistent lift — especially **page-level** (Recall@1 ~0.63–0.65 → **0.895**, page MRR
+→ **0.924** for both MiniLM and E5) and source Recall@1 0.877 → 0.930 — for ~640 ms/query (trivial vs
+LLM latency). **Decision: keep the reranker.** See [`RERANKER_DECISION.md`](./RERANKER_DECISION.md).
+
+## Phase 10 — Chunking experiments ✅ (select 1500/200)
+
+Swept 1000/150 · 1500/200 · 2500/300 (current) · 3500/400 on the selected embedding `e5-base-v2`
+(dense, one fresh snapshot per size). Framework change: `chunker.py`/`snapshot.py` now accept
+`chunk_size`/`chunk_overlap` (backward-compatible; production default 2500/300 unchanged).
+
+| chunk/overlap | #chunks | src R@1 | src MRR | page R@1 | page MRR |
+|---|--:|--:|--:|--:|--:|
+| 1000/150 | 384 | 0.912 | 0.939 | 0.702 | 0.776 |
+| **1500/200** | 285 | **0.930** | **0.952** | **0.789** | **0.819** |
+| 2500/300 (current) | 184 | 0.877 | 0.927 | 0.649 | 0.743 |
+| 3500/400 | 159 | 0.860 | 0.917 | 0.649 | 0.741 |
+
+- **1500/200 selected** — best source R@1/MRR and a big **page-level** jump (R@1 0.649 → 0.789).
+  Larger chunks lose to E5's 512-token (~2000-char) truncation; no category regresses (table/policy/
+  multi-condition stay perfect; exact_terminology/placement/conversational improve). See
+  [`CHUNKING_COMPARISON.md`](./CHUNKING_COMPARISON.md) / [`CHUNKING_DECISION.md`](./CHUNKING_DECISION.md).
+
+---
+
 ## Environment blockers — status
 
 | Blocker | Status | Notes |
@@ -177,11 +204,10 @@ selection only and does not touch production.
 
 ## Next
 
-- **Phase 10 (chunking experiments)** — the next actionable phase; runs on the same
-  harness (new snapshots per chunk size: 1000/150, 1500/200, 2500/300, 3500/400),
-  retrieval-only, no LLM needed. Evaluate on `e5-base-v2` (the selected embedding) and/or MiniLM.
-- **Phase 22 (promotion)** — when the full winning config is chosen, promote `e5-base-v2`
-  (wire prefixes + re-index). Not before.
-- **Answer-quality (Phases 13-14)** — full 63-answer capture now works via the Gemini→Groq
-  failover; can be run on demand (~15 min throttled).
-- **Phase 9 (reranker A/B)** — largely answered in Phase 6 (rerank helps, esp. page-level).
+- **Phase 11 (parser)** — evaluate Unstructured.io vs the current pdfplumber/pypdf parser
+  (parsing quality + RAG impact). Needs a new dependency; retrieval half needs no LLM.
+- **Phase 12–14 (LLM + generation + human eval)** — full 63-answer capture now works via the
+  Gemini→Groq failover; can be run on demand (~15 min throttled), then score faithfulness/correctness.
+- **Phase 22 (promotion)** — pending config so far: embedding `e5-base-v2`, chunk **1500/200**,
+  keep Cohere rerank. Promote (wire E5 prefixes + set chunk size + re-index) only once the suite
+  (parser, LLM) is done.

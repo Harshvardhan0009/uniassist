@@ -78,7 +78,13 @@ def _sha256_of(strings) -> str:
     return h.hexdigest()
 
 
-def build_snapshot(name: str = "baseline_v1", data_dir: Path | None = None, use_llm: bool = True) -> dict:
+def build_snapshot(
+    name: str = "baseline_v1",
+    data_dir: Path | None = None,
+    use_llm: bool = True,
+    chunk_size: int | None = None,
+    chunk_overlap: int | None = None,
+) -> dict:
     """Partition -> chunk -> (summarize) the corpus and freeze it to JSONL.
 
     Args:
@@ -87,6 +93,8 @@ def build_snapshot(name: str = "baseline_v1", data_dir: Path | None = None, use_
         use_llm: When True (default) and an LLM key is configured, freeze the
             production LLM summaries. When False, freeze raw chunk text
             (deterministic; useful as a control).
+        chunk_size / chunk_overlap: Override the chunking (defaults to the
+            production 2500 / 300). Used by Phase 10 chunking experiments.
 
     Returns:
         The manifest dict describing the frozen snapshot.
@@ -95,7 +103,13 @@ def build_snapshot(name: str = "baseline_v1", data_dir: Path | None = None, use_
     paths.ensure_dirs()
     sp = SnapshotPaths.for_name(name)
 
-    logger.info("Building snapshot '%s' from %s", name, data_dir)
+    eff_chunk_size = CHUNK_SIZE if chunk_size is None else chunk_size
+    eff_chunk_overlap = CHUNK_OVERLAP if chunk_overlap is None else chunk_overlap
+
+    logger.info(
+        "Building snapshot '%s' from %s (chunk_size=%d, overlap=%d)",
+        name, data_dir, eff_chunk_size, eff_chunk_overlap,
+    )
 
     # ── Step 3: Partition ────────────────────────────────────────────
     t0 = time.perf_counter()
@@ -108,7 +122,9 @@ def build_snapshot(name: str = "baseline_v1", data_dir: Path | None = None, use_
     all_chunks: list[Document] = []
     per_file_chunks: dict[str, int] = {}
     for filename, elements in all_elements.items():
-        chunks = chunk_documents(elements, source_file=filename)
+        chunks = chunk_documents(
+            elements, source_file=filename, chunk_size=chunk_size, chunk_overlap=chunk_overlap
+        )
         per_file_chunks[filename] = len(chunks)
         all_chunks.extend(chunks)
     partition_chunk_seconds = round(time.perf_counter() - t0, 2)
@@ -160,7 +176,7 @@ def build_snapshot(name: str = "baseline_v1", data_dir: Path | None = None, use_
         "created": time.strftime("%Y-%m-%dT%H:%M:%S%z"),
         "data_dir": str(data_dir.relative_to(paths.PROJECT_ROOT)) if data_dir.is_relative_to(paths.PROJECT_ROOT) else str(data_dir),
         "jsonl": sp.jsonl.name,
-        "chunking": {"splitter": "RecursiveCharacterTextSplitter", "size": CHUNK_SIZE, "overlap": CHUNK_OVERLAP},
+        "chunking": {"splitter": "RecursiveCharacterTextSplitter", "size": eff_chunk_size, "overlap": eff_chunk_overlap},
         "summarizer": {
             "requested_llm": summarize_used_llm,
             "effective": summarization_effective,
@@ -237,6 +253,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Freeze a reproducible corpus snapshot for evaluation.")
     parser.add_argument("--name", default="baseline_v1", help="Snapshot name (default: baseline_v1)")
     parser.add_argument("--no-llm", action="store_true", help="Freeze raw chunk text instead of LLM summaries")
+    parser.add_argument("--chunk-size", type=int, default=None, help="Override chunk size (default 2500)")
+    parser.add_argument("--chunk-overlap", type=int, default=None, help="Override chunk overlap (default 300)")
     parser.add_argument("--force", action="store_true", help="Rebuild even if the snapshot already exists")
     args = parser.parse_args()
 
@@ -245,5 +263,8 @@ if __name__ == "__main__":
         m = load_manifest(args.name)
         print(json.dumps(m.get("counts", {}), indent=2))
     else:
-        manifest = build_snapshot(name=args.name, use_llm=not args.no_llm)
+        manifest = build_snapshot(
+            name=args.name, use_llm=not args.no_llm,
+            chunk_size=args.chunk_size, chunk_overlap=args.chunk_overlap,
+        )
         print(json.dumps(manifest, indent=2, ensure_ascii=False))

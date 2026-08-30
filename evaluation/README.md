@@ -134,6 +134,8 @@ retrieval artifact is a smoke-test signal only — **not** the Recall/MRR metric
 | **6** | **official `results/baseline_v1.json`** (retrieval + reranked metrics + latency) | **retrieval+rerank done; generation partial (16/63, Gemini free-tier cap)** |
 | **7** | **embedding comparison** (MiniLM vs BGE vs E5) | **done** |
 | **8** | **embedding selection** (`EMBEDDING_DECISION.md`) | **done — selected `e5-base-v2` (promotion = Phase 22)** |
+| **9** | **reranker A/B** (`RERANKER_DECISION.md`) | **done — keep Cohere rerank-v3.5** |
+| **10** | **chunking experiments** (`CHUNKING_DECISION.md`) | **done — selected 1500/200** |
 
 **Phase 5 dense-retrieval baseline (all-MiniLM-L6-v2, source level):** Recall@1
 0.877 · Recall@5 0.965 · Recall@10 0.983 · MRR 0.912 (57 answerable questions).
@@ -151,6 +153,12 @@ Cohere reranking (E5 reranked source Recall@5 **1.000** / MRR **0.962** vs MiniL
 Cost: 768-dim, ~3× query latency. Promotion to production is Phase 22. See
 [`reports/EMBEDDING_COMPARISON.md`](./reports/EMBEDDING_COMPARISON.md) and
 [`reports/EMBEDDING_DECISION.md`](./reports/EMBEDDING_DECISION.md).
+
+**Phases 9–10 selections.** Keep **Cohere rerank-v3.5** (page Recall@1 ~0.63 → **0.90**; ~640 ms/query).
+Chunk size **1500/200** beats the current 2500/300 on `e5-base-v2` (source R@1 0.877 → **0.930**,
+page R@1 0.649 → **0.789**) — larger chunks lose to E5's 512-token truncation. See
+[`reports/RERANKER_DECISION.md`](./reports/RERANKER_DECISION.md) and
+[`reports/CHUNKING_DECISION.md`](./reports/CHUNKING_DECISION.md).
 
 ### ⚠ Runtime blockers — status (updated Phase 6)
 
