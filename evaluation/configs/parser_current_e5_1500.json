@@ -1,0 +1,27 @@
+{
+  "id": "parser_current_e5_1500",
+  "name": "Phase 11 parser experiment - current pdfplumber parser (e5-base-v2, 1500/200)",
+  "status": "experiment",
+  "experiment": {
+    "variable_under_test": "parser (control: current pdfplumber/pypdf)",
+    "held_constant": "embedding intfloat/e5-base-v2, chunk 1500/200, same corpus, top_k=20, cosine, dataset uniassist_eval_v1.",
+    "parser": "current"
+  },
+  "evaluation": { "snapshot": "parser_current_1500", "collection": "eval_parser_current_e5_1500" },
+  "parser": {
+    "name": "current",
+    "pdf": "pdfplumber (table-aware, tables -> Markdown); PyPDFLoader fallback",
+    "docx": "python-docx (paragraphs + table rows)",
+    "txt_md": "langchain TextLoader (utf-8)"
+  },
+  "chunking": { "splitter": "RecursiveCharacterTextSplitter", "size": 1500, "overlap": 200 },
+  "indexing": { "content_indexed": "raw" },
+  "embedding": {
+    "name": "intfloat/e5-base-v2", "dimensions": 768, "normalize_embeddings": true, "similarity": "cosine",
+    "query_prefix": "query: ", "passage_prefix": "passage: "
+  },
+  "retrieval": { "method": "similarity_search_with_relevance_scores", "top_k": 20, "min_relevance_score": 0.0 },
+  "reranker": { "name": "rerank-v3.5", "provider": "cohere", "top_n": 5, "enabled": true },
+  "generation": { "llm": "gemini-3.6-flash", "note": "not exercised in the dense parser comparison" },
+  "corpus": { "root": "Data/", "ingestible_files": 14 }
+}

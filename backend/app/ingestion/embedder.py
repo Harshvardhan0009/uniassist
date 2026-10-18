@@ -13,6 +13,7 @@ import logging
 import chromadb
 from langchain_chroma import Chroma
 from langchain_core.documents import Document
+from langchain_core.embeddings import Embeddings
 from langchain_huggingface import HuggingFaceEmbeddings
 
 from app.config import settings
@@ -22,6 +23,27 @@ logger = logging.getLogger(__name__)
 
 _embedding_fn = None
 _vector_store = None
+
+
+class _PrefixedEmbeddings(Embeddings):
+    """Wrap an Embeddings backend to prepend asymmetric instruction prefixes.
+
+    Required by models like E5 ('query: ' and 'passage: ') and BGE to ensure
+    benchmark-optimal retrieval accuracy.
+    """
+
+    def __init__(self, base: Embeddings, query_prefix: str = "", passage_prefix: str = ""):
+        self._base = base
+        self._query_prefix = query_prefix or ""
+        self._passage_prefix = passage_prefix or ""
+
+    def embed_documents(self, texts: list[str]) -> list[list[float]]:
+        if self._passage_prefix:
+            texts = [self._passage_prefix + t for t in texts]
+        return self._base.embed_documents(texts)
+
+    def embed_query(self, text: str) -> list[float]:
+        return self._base.embed_query(self._query_prefix + text)
 
 
 def _select_device() -> str:
@@ -36,27 +58,38 @@ def _select_device() -> str:
     return "cpu"
 
 
-def get_embedding_function() -> HuggingFaceEmbeddings:
+def get_embedding_function() -> Embeddings:
     """
     Create the embedding function used across ingestion and query.
 
-    Uses `all-MiniLM-L6-v2` by default (~80MB, 384-dim).
-    Swap to BGE-M3 later by changing EMBEDDING_MODEL in .env.
+    Uses `intfloat/e5-base-v2` by default (Phase 7 winning model, 768-dim).
+    Automatically wraps E5 and BGE models with required asymmetric instruction prefixes.
     """
     global _embedding_fn
     if _embedding_fn is None:
         device = _select_device()
-        logger.info(f"Loading embedding model: {settings.EMBEDDING_MODEL} (device={device})")
-        _embedding_fn = HuggingFaceEmbeddings(
-            model_name=settings.EMBEDDING_MODEL,
+        model_name = settings.EMBEDDING_MODEL
+        logger.info(f"Loading embedding model: {model_name} (device={device})")
+        base = HuggingFaceEmbeddings(
+            model_name=model_name,
             model_kwargs={"device": device},
             encode_kwargs={"normalize_embeddings": True},
         )
+        # Determine instruction prefixes if applicable
+        lower_name = model_name.lower()
+        if "e5" in lower_name:
+            _embedding_fn = _PrefixedEmbeddings(base, query_prefix="query: ", passage_prefix="passage: ")
+        elif "bge" in lower_name and "v1.5" in lower_name:
+            _embedding_fn = _PrefixedEmbeddings(
+                base, query_prefix="Represent this sentence for searching relevant passages: ", passage_prefix=""
+            )
+        else:
+            _embedding_fn = base
     return _embedding_fn
 
 
 def get_vector_store(
-    embedding_function: HuggingFaceEmbeddings | None = None,
+    embedding_function: Embeddings | None = None,
 ) -> Chroma:
     """
     Get a Chroma vector store instance (Client-Server or Local).

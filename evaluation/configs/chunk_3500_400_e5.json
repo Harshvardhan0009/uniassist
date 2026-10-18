@@ -1,0 +1,20 @@
+{
+  "id": "chunk_3500_400_e5",
+  "name": "Phase 10 chunking experiment - 3500/400 chars (embedding e5-base-v2)",
+  "status": "experiment",
+  "experiment": {
+    "variable_under_test": "chunk size/overlap (2500/300 -> 3500/400)",
+    "held_constant": "embedding intfloat/e5-base-v2, same corpus, top_k=20, cosine, dataset uniassist_eval_v1."
+  },
+  "evaluation": { "snapshot": "chunk_3500_400", "collection": "eval_chunk_3500_400_e5" },
+  "chunking": { "splitter": "RecursiveCharacterTextSplitter", "size": 3500, "overlap": 400 },
+  "indexing": { "content_indexed": "raw" },
+  "embedding": {
+    "name": "intfloat/e5-base-v2", "dimensions": 768, "normalize_embeddings": true, "similarity": "cosine",
+    "query_prefix": "query: ", "passage_prefix": "passage: "
+  },
+  "retrieval": { "method": "similarity_search_with_relevance_scores", "top_k": 20, "min_relevance_score": 0.0 },
+  "reranker": { "name": "rerank-v3.5", "provider": "cohere", "top_n": 5, "enabled": true },
+  "generation": { "llm": "gemini-3.6-flash", "note": "not exercised in the dense chunking sweep" },
+  "corpus": { "root": "Data/", "ingestible_files": 14 }
+}

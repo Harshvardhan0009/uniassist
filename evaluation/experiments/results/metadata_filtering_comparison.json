@@ -1,0 +1,47 @@
+{
+  "summary": {
+    "unfiltered": {
+      "src_r1": 0.9649122807017544,
+      "src_r5": 1,
+      "pg_r1": 0.8421052631578947,
+      "pg_r5": 0.8947368421052632
+    },
+    "oracle_filtered": {
+      "src_r1": 0.9649122807017544,
+      "src_r5": 1,
+      "pg_r1": 0.8421052631578947,
+      "pg_r5": 0.8947368421052632
+    },
+    "automated_filtered": {
+      "src_r1": 0.9473684210526315,
+      "src_r5": 0.9824561403508771,
+      "pg_r1": 0.8245614035087719,
+      "pg_r5": 0.8771929824561403,
+      "router_acc": 0.9649122807017544
+    }
+  },
+  "misclassified_cases": [
+    {
+      "id": "Q035",
+      "query": "Under the Internship-with-PPO academic benefit, which monthly stipend range maps to the Z(D) package category?",
+      "gt_topic": "placement_career",
+      "pred_domain": "ojt",
+      "expected_sources": [
+        "PlacementPloicy/Academic Benefit Plan - Placement and Internship - 2023 and 2024 Batch.pdf"
+      ],
+      "unfiltered_hit": 1,
+      "filtered_hit": 0
+    },
+    {
+      "id": "Q037",
+      "query": "What is the charge (in INR) for the GYM facility without EDB (after 31st March 2026)?",
+      "gt_topic": "residential",
+      "pred_domain": "general_other",
+      "expected_sources": [
+        "ResidentialFacilities/Charges For Residential Facilities.pdf"
+      ],
+      "unfiltered_hit": 1,
+      "filtered_hit": 1
+    }
+  ]
+}

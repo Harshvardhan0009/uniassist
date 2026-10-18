@@ -1,0 +1,25 @@
+{
+  "id": "hybrid_e5_bm25_1500",
+  "name": "Phase 17 hybrid search experiment - Dense E5 + BM25 RRF (1500/200)",
+  "status": "experiment",
+  "experiment": {
+    "variable_under_test": "hybrid search (dense intfloat/e5-base-v2 + rank-bm25 with Reciprocal Rank Fusion k=60, w_dense=0.5, w_bm25=0.5)",
+    "held_constant": "chunk size 1500/200, embedding intfloat/e5-base-v2, query_rewriting=true, same corpus, top_k=20, rerank top_n=5 cohere rerank-v3.5, dataset uniassist_eval_v1.",
+    "query_rewriting": true,
+    "hybrid": true,
+    "hybrid_dense_weight": 0.5,
+    "hybrid_bm25_weight": 0.5,
+    "hybrid_rrf_k": 60
+  },
+  "evaluation": { "snapshot": "chunk_1500_200", "collection": "eval_chunk_1500_200_e5" },
+  "chunking": { "splitter": "RecursiveCharacterTextSplitter", "size": 1500, "overlap": 200 },
+  "indexing": { "content_indexed": "raw" },
+  "embedding": {
+    "name": "intfloat/e5-base-v2", "dimensions": 768, "normalize_embeddings": true, "similarity": "cosine",
+    "query_prefix": "query: ", "passage_prefix": "passage: "
+  },
+  "retrieval": { "method": "hybrid_rrf", "top_k": 20, "min_relevance_score": 0.0 },
+  "reranker": { "name": "rerank-v3.5", "provider": "cohere", "top_n": 5, "enabled": true },
+  "generation": { "llm": "gemini-3.6-flash", "note": "not exercised in the retrieval evaluation" },
+  "corpus": { "root": "Data/", "ingestible_files": 14 }
+}

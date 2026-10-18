@@ -67,6 +67,11 @@ def rerank(
             query=query,
         )
 
+        # Standardize score key in metadata for downstream compression & telemetry
+        for doc in reranked:
+            if "relevance_score" in doc.metadata and "rerank_score" not in doc.metadata:
+                doc.metadata["rerank_score"] = doc.metadata["relevance_score"]
+
         logger.info(f"  Reranked to {len(reranked)} documents")
         return list(reranked)
 

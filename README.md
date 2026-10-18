@@ -2,6 +2,10 @@
 
 An intelligent, modular **Retrieval-Augmented Generation (RAG)** platform for university students and staff to query official policies, placement guidelines, dress codes, academic benefit plans, library rules, and campus maps.
 
+> **Working on the evaluation/improvement program?** Start with **[`docs/PROJECT_HANDOFF.md`](docs/PROJECT_HANDOFF.md)** —
+> it's the single source of truth for project context, what's done (Phases 0–10), what's next, and the
+> current winning configuration. The living status report is [`evaluation/reports/latest_report.md`](evaluation/reports/latest_report.md).
+
 ---
 
 ## 🌟 Highlights

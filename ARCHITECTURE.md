@@ -509,6 +509,12 @@ living status and [`evaluation/README.md`](./evaluation/README.md) for usage.
   MRR 0.962 vs MiniLM 0.982 / 0.953). Decision:
   [`EMBEDDING_DECISION.md`](./evaluation/reports/EMBEDDING_DECISION.md). Production promotion (wiring
   E5's `query:`/`passage:` prefixes + 768-dim re-index) is deferred to **Phase 22**.
+- **Phase 9 (reranker A/B):** **keep Cohere `rerank-v3.5`.** Reranking lifts page Recall@1 ~0.63 →
+  **0.90** and source Recall@1 0.877 → 0.930 for ~640 ms/query. [`RERANKER_DECISION.md`](./evaluation/reports/RERANKER_DECISION.md).
+- **Phase 10 (chunking):** **1500/200 selected** (on `e5-base-v2`). Beats the current 2500/300
+  (source R@1 0.877 → 0.930, **page R@1 0.649 → 0.789**); larger chunks lose to E5's 512-token
+  truncation. `chunker.py`/`snapshot.py` were parametrized (defaults unchanged).
+  [`CHUNKING_DECISION.md`](./evaluation/reports/CHUNKING_DECISION.md). Promotion is Phase 22.
 
 **Environment notes / blockers.**
 

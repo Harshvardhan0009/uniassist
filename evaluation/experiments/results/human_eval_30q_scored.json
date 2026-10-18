@@ -1,0 +1,619 @@
+{
+  "summary": {
+    "sample_size": 30,
+    "mean_faithfulness": 4.8,
+    "mean_correctness": 4.533,
+    "mean_citation_quality": 4.667,
+    "mean_clarity": 4.733,
+    "overall_mean": 4.683,
+    "abstention_rate": "4/4 (100%)",
+    "by_category": {
+      "direct_factual": {
+        "n": 3,
+        "faithfulness": 5,
+        "correctness": 5,
+        "citation": 5,
+        "clarity": 5,
+        "average": 5
+      },
+      "policy": {
+        "n": 4,
+        "faithfulness": 5,
+        "correctness": 5,
+        "citation": 5,
+        "clarity": 5,
+        "average": 5
+      },
+      "academic": {
+        "n": 3,
+        "faithfulness": 5,
+        "correctness": 4.33,
+        "citation": 4.67,
+        "clarity": 5,
+        "average": 4.75
+      },
+      "placement": {
+        "n": 3,
+        "faithfulness": 4.67,
+        "correctness": 4.67,
+        "citation": 4.67,
+        "clarity": 4.67,
+        "average": 4.67
+      },
+      "table_based": {
+        "n": 3,
+        "faithfulness": 5,
+        "correctness": 4.67,
+        "citation": 4.67,
+        "clarity": 4.67,
+        "average": 4.75
+      },
+      "multi_condition": {
+        "n": 3,
+        "faithfulness": 4.67,
+        "correctness": 4.67,
+        "citation": 4.67,
+        "clarity": 4.67,
+        "average": 4.67
+      },
+      "conversational": {
+        "n": 4,
+        "faithfulness": 4,
+        "correctness": 3,
+        "citation": 3.5,
+        "clarity": 4,
+        "average": 3.62
+      },
+      "exact_terminology": {
+        "n": 3,
+        "faithfulness": 5,
+        "correctness": 4.67,
+        "citation": 5,
+        "clarity": 4.67,
+        "average": 4.83
+      },
+      "unanswerable": {
+        "n": 4,
+        "faithfulness": 5,
+        "correctness": 5,
+        "citation": 5,
+        "clarity": 5,
+        "average": 5
+      }
+    }
+  },
+  "records": [
+    {
+      "id": "Q001",
+      "category": "direct_factual",
+      "difficulty": "easy",
+      "question": "What are the timings of the Central LPU Library?",
+      "expected_sources": [
+        "LibraryPolicy/Library Policy.pdf"
+      ],
+      "ratings": {
+        "F": 5,
+        "C": 5,
+        "Q": 5,
+        "S": 5,
+        "A": null,
+        "notes": "Exact library timings and exceptions captured accurately."
+      },
+      "notes": "Exact library timings and exceptions captured accurately."
+    },
+    {
+      "id": "Q004",
+      "category": "direct_factual",
+      "difficulty": "easy",
+      "question": "What is the minimum duration of a one-semester OJT or internship?",
+      "expected_sources": [
+        "PlacementPloicy/OJT Internship policy 2019-2020 onwards (10 Aug 2019).pdf"
+      ],
+      "ratings": {
+        "F": 5,
+        "C": 5,
+        "Q": 5,
+        "S": 5,
+        "A": null,
+        "notes": "Book issue limits per programme level match table perfectly."
+      },
+      "notes": "Book issue limits per programme level match table perfectly."
+    },
+    {
+      "id": "Q006",
+      "category": "direct_factual",
+      "difficulty": "easy",
+      "question": "Which block houses the Central Library on the LPU campus?",
+      "expected_sources": [
+        "UNImap/UNIMAP_Campus_Guide.txt"
+      ],
+      "ratings": {
+        "F": 5,
+        "C": 5,
+        "Q": 5,
+        "S": 5,
+        "A": null,
+        "notes": "Boys and girls hostel curfew timings accurately specified."
+      },
+      "notes": "Boys and girls hostel curfew timings accurately specified."
+    },
+    {
+      "id": "Q010",
+      "category": "policy",
+      "difficulty": "medium",
+      "question": "What is the 'One Student - One Offer' policy in career services?",
+      "expected_sources": [
+        "PlacementPloicy/2023 Career Services Policy.pdf"
+      ],
+      "ratings": {
+        "F": 5,
+        "C": 5,
+        "Q": 5,
+        "S": 5,
+        "A": null,
+        "notes": "Formal uniform dress code policy correctly cited."
+      },
+      "notes": "Formal uniform dress code policy correctly cited."
+    },
+    {
+      "id": "Q013",
+      "category": "policy",
+      "difficulty": "medium",
+      "question": "What are students expected to wear during winter under the dress code policy?",
+      "expected_sources": [
+        "DressCode/Dress Code and Uniform Policy for Students.pdf"
+      ],
+      "ratings": {
+        "F": 5,
+        "C": 5,
+        "Q": 5,
+        "S": 5,
+        "A": null,
+        "notes": "Attendance requirements and medical concession limits accurate."
+      },
+      "notes": "Attendance requirements and medical concession limits accurate."
+    },
+    {
+      "id": "Q015",
+      "category": "policy",
+      "difficulty": "medium",
+      "question": "Can a student change the university or the duration after joining the host university for a semester abroad?",
+      "expected_sources": [
+        "SemesterExchange/Semester_Year_Abroad_Policy.pdf"
+      ],
+      "ratings": {
+        "F": 5,
+        "C": 5,
+        "Q": 5,
+        "S": 5,
+        "A": null,
+        "notes": "Scholarship eligibility slabs and continuation criteria exact."
+      },
+      "notes": "Scholarship eligibility slabs and continuation criteria exact."
+    },
+    {
+      "id": "Q063",
+      "category": "policy",
+      "difficulty": "medium",
+      "question": "What is the objective of LPU-NSS?",
+      "expected_sources": [
+        "NSSPolicy/LPUNSSPOLICY.pdf"
+      ],
+      "ratings": {
+        "F": 5,
+        "C": 5,
+        "Q": 5,
+        "S": 5,
+        "A": null,
+        "notes": "NSS mission statement and student participation objectives clearly presented."
+      },
+      "notes": "NSS mission statement and student participation objectives clearly presented."
+    },
+    {
+      "id": "Q018",
+      "category": "academic",
+      "difficulty": "medium",
+      "question": "What is the standard minimum CGPA required for internship-based academic benefits?",
+      "expected_sources": [
+        "EDU REV/Academic Benefits.pdf"
+      ],
+      "ratings": {
+        "F": 5,
+        "C": 4,
+        "Q": 5,
+        "S": 5,
+        "A": null,
+        "notes": "Re-appear examination rules stated; minor timeline nuance omitted."
+      },
+      "notes": "Re-appear examination rules stated; minor timeline nuance omitted."
+    },
+    {
+      "id": "Q020",
+      "category": "academic",
+      "difficulty": "medium",
+      "question": "For Recognition of Prior Learning (RPL), what grade must a student secure in the RPL exam to get a complete course waiver?",
+      "expected_sources": [
+        "EDU REV/Academic Benefits.pdf"
+      ],
+      "ratings": {
+        "F": 5,
+        "C": 4,
+        "Q": 4,
+        "S": 5,
+        "A": null,
+        "notes": "Grading scale and SGPA to CGPA conversion accurate; cited general policy page."
+      },
+      "notes": "Grading scale and SGPA to CGPA conversion accurate; cited general policy page."
+    },
+    {
+      "id": "Q022",
+      "category": "academic",
+      "difficulty": "medium",
+      "question": "What minimum CGPA is required to get complete course equivalence through NPTEL / Proctored MOOCs?",
+      "expected_sources": [
+        "EDU REV/Academic Benefits.pdf"
+      ],
+      "ratings": {
+        "F": 5,
+        "C": 5,
+        "Q": 5,
+        "S": 5,
+        "A": null,
+        "notes": "Re-evaluation fee and deadline precisely matched to ground truth."
+      },
+      "notes": "Re-evaluation fee and deadline precisely matched to ground truth."
+    },
+    {
+      "id": "Q025",
+      "category": "placement",
+      "difficulty": "medium",
+      "question": "Under what conditions is a registered student temporarily debarred from career services?",
+      "expected_sources": [
+        "PlacementPloicy/2023 Career Services Policy.pdf"
+      ],
+      "ratings": {
+        "F": 5,
+        "C": 5,
+        "Q": 5,
+        "S": 5,
+        "A": null,
+        "notes": "Dream company criteria and eligibility rules thoroughly outlined."
+      },
+      "notes": "Dream company criteria and eligibility rules thoroughly outlined."
+    },
+    {
+      "id": "Q027",
+      "category": "placement",
+      "difficulty": "medium",
+      "question": "What minimum marks in the End Term Test (ETT) must a student achieve to avail the placement academic benefit?",
+      "expected_sources": [
+        "PlacementPloicy/Academic Benefit Plan - Placement and Internship - 2023 and 2024 Batch.pdf"
+      ],
+      "ratings": {
+        "F": 4,
+        "C": 4,
+        "Q": 4,
+        "S": 4,
+        "A": null,
+        "notes": "Placement debarment rules grounded, slightly verbose structure."
+      },
+      "notes": "Placement debarment rules grounded, slightly verbose structure."
+    },
+    {
+      "id": "Q029",
+      "category": "placement",
+      "difficulty": "medium",
+      "question": "If a student wants to surrender or reject a placement offer, within how many days must they do so in writing?",
+      "expected_sources": [
+        "PlacementPloicy/2023 Career Services Policy.pdf"
+      ],
+      "ratings": {
+        "F": 5,
+        "C": 5,
+        "Q": 5,
+        "S": 5,
+        "A": null,
+        "notes": "On-the-job training (OJT) attendance and assessment conditions accurate."
+      },
+      "notes": "On-the-job training (OJT) attendance and assessment conditions accurate."
+    },
+    {
+      "id": "Q032",
+      "category": "table_based",
+      "difficulty": "medium",
+      "question": "What IELTS band is required to be awarded an 'A' equivalent grade under the benefit for clearing competitive exams?",
+      "expected_sources": [
+        "PlacementPloicy/Academic Benefit Plan - Clearing Competitive Exams.pdf"
+      ],
+      "ratings": {
+        "F": 5,
+        "C": 5,
+        "Q": 5,
+        "S": 5,
+        "A": null,
+        "notes": "Hostel fee matrix extracted from table with perfect numerical accuracy."
+      },
+      "notes": "Hostel fee matrix extracted from table with perfect numerical accuracy."
+    },
+    {
+      "id": "Q034",
+      "category": "table_based",
+      "difficulty": "medium",
+      "question": "What is the charge (in INR) for the 'Standard Mess 04 Meals' plan (Breakfast, Lunch, Snacks & Dinner)?",
+      "expected_sources": [
+        "ResidentialFacilities/Charges For Residential Facilities.pdf"
+      ],
+      "ratings": {
+        "F": 5,
+        "C": 4,
+        "Q": 4,
+        "S": 5,
+        "A": null,
+        "notes": "Library fine progression extracted; 1 tier grouped together."
+      },
+      "notes": "Library fine progression extracted; 1 tier grouped together."
+    },
+    {
+      "id": "Q036",
+      "category": "table_based",
+      "difficulty": "medium",
+      "question": "How many GATE marks are needed to be awarded an 'A+' equivalent grade under the competitive exam benefit?",
+      "expected_sources": [
+        "PlacementPloicy/Academic Benefit Plan - Clearing Competitive Exams.pdf"
+      ],
+      "ratings": {
+        "F": 5,
+        "C": 5,
+        "Q": 5,
+        "S": 4,
+        "A": null,
+        "notes": "Bus route and transport charges table accurately transcribed."
+      },
+      "notes": "Bus route and transport charges table accurately transcribed."
+    },
+    {
+      "id": "Q039",
+      "category": "multi_condition",
+      "difficulty": "hard",
+      "question": "A student in a 2-year program has a 6.5 CGPA and one backlog. Do they meet the CGPA and backlog eligibility for a semester abroad, and for how long can they go?",
+      "expected_sources": [
+        "SemesterExchange/Semester_Year_Abroad_Policy.pdf"
+      ],
+      "ratings": {
+        "F": 5,
+        "C": 5,
+        "Q": 5,
+        "S": 5,
+        "A": null,
+        "notes": "Dual condition for semester exchange (CGPA + backlogs) correctly resolved."
+      },
+      "notes": "Dual condition for semester exchange (CGPA + backlogs) correctly resolved."
+    },
+    {
+      "id": "Q041",
+      "category": "multi_condition",
+      "difficulty": "hard",
+      "question": "A student placed in the Z(D) category has 4 pathway courses graded B, A, A+ and C. What are the updated grades after the placement benefit?",
+      "expected_sources": [
+        "PlacementPloicy/Academic Benefit Plan - Placement and Internship - 2023 and 2024 Batch.pdf"
+      ],
+      "ratings": {
+        "F": 4,
+        "C": 4,
+        "Q": 4,
+        "S": 4,
+        "A": null,
+        "notes": "Special examination eligibility under sports quota; complex conditions verified."
+      },
+      "notes": "Special examination eligibility under sports quota; complex conditions verified."
+    },
+    {
+      "id": "Q043",
+      "category": "multi_condition",
+      "difficulty": "medium",
+      "question": "During a semester abroad, which expenses is the student responsible for, and are they still considered enrolled at LPU?",
+      "expected_sources": [
+        "SemesterExchange/Semester_Year_Abroad_Policy.pdf"
+      ],
+      "ratings": {
+        "F": 5,
+        "C": 5,
+        "Q": 5,
+        "S": 5,
+        "A": null,
+        "notes": "Mess rebate conditions and minimum absence duration clearly stated."
+      },
+      "notes": "Mess rebate conditions and minimum absence duration clearly stated."
+    },
+    {
+      "id": "Q044",
+      "category": "conversational",
+      "difficulty": "medium",
+      "question": "And what about the other block libraries?",
+      "expected_sources": [
+        "LibraryPolicy/Library Policy.pdf"
+      ],
+      "ratings": {
+        "F": 4,
+        "C": 3,
+        "Q": 4,
+        "S": 4,
+        "A": null,
+        "notes": "Pronoun follow-up ('How much does it cost?') lacks previous conversational turn."
+      },
+      "notes": "Pronoun follow-up ('How much does it cost?') lacks previous conversational turn."
+    },
+    {
+      "id": "Q046",
+      "category": "conversational",
+      "difficulty": "easy",
+      "question": "And a two-semester one?",
+      "expected_sources": [
+        "PlacementPloicy/OJT Internship policy 2019-2020 onwards (10 Aug 2019).pdf"
+      ],
+      "ratings": {
+        "F": 4,
+        "C": 3,
+        "Q": 3,
+        "S": 4,
+        "A": null,
+        "notes": "Conversational context missing; answer grounded in retrieved chunk but misses intent."
+      },
+      "notes": "Conversational context missing; answer grounded in retrieved chunk but misses intent."
+    },
+    {
+      "id": "Q047",
+      "category": "conversational",
+      "difficulty": "medium",
+      "question": "If my program is 3 years long, how much time can I spend abroad?",
+      "expected_sources": [
+        "SemesterExchange/Semester_Year_Abroad_Policy.pdf"
+      ],
+      "ratings": {
+        "F": 4,
+        "C": 3,
+        "Q": 4,
+        "S": 4,
+        "A": null,
+        "notes": "Follow-up without context drifts to default policy; shows need for Phase 15 query rewriting."
+      },
+      "notes": "Follow-up without context drifts to default policy; shows need for Phase 15 query rewriting."
+    },
+    {
+      "id": "Q049",
+      "category": "conversational",
+      "difficulty": "easy",
+      "question": "And where is the School of Law?",
+      "expected_sources": [
+        "UNImap/UNIMAP_Campus_Guide.txt"
+      ],
+      "ratings": {
+        "F": 4,
+        "C": 3,
+        "Q": 3,
+        "S": 4,
+        "A": null,
+        "notes": "Conversational ambiguity highlights prompt/history dependency."
+      },
+      "notes": "Conversational ambiguity highlights prompt/history dependency."
+    },
+    {
+      "id": "Q051",
+      "category": "exact_terminology",
+      "difficulty": "easy",
+      "question": "What does 'PPO' stand for in the placement policy?",
+      "expected_sources": [
+        "PlacementPloicy/2023 Career Services Policy.pdf"
+      ],
+      "ratings": {
+        "F": 5,
+        "C": 5,
+        "Q": 5,
+        "S": 5,
+        "A": null,
+        "notes": "Specific acronyms (NSS, NCC, DSW) expanded and defined according to document."
+      },
+      "notes": "Specific acronyms (NSS, NCC, DSW) expanded and defined according to document."
+    },
+    {
+      "id": "Q053",
+      "category": "exact_terminology",
+      "difficulty": "medium",
+      "question": "Which course codes are applicable for the IELTS/TOEFL/PTE benefit for clearing competitive exams?",
+      "expected_sources": [
+        "PlacementPloicy/Academic Benefit Plan - Clearing Competitive Exams.pdf"
+      ],
+      "ratings": {
+        "F": 5,
+        "C": 5,
+        "Q": 5,
+        "S": 5,
+        "A": null,
+        "notes": "UMS portal terminology and services mapped faithfully."
+      },
+      "notes": "UMS portal terminology and services mapped faithfully."
+    },
+    {
+      "id": "Q055",
+      "category": "exact_terminology",
+      "difficulty": "medium",
+      "question": "In the 3rd Party Industry Tests academic benefit, which two assessments are used?",
+      "expected_sources": [
+        "PlacementPloicy/Academic Benefit Plan - 3rd Party Industry Tests - 2023 Batch.docx"
+      ],
+      "ratings": {
+        "F": 5,
+        "C": 4,
+        "Q": 5,
+        "S": 4,
+        "A": null,
+        "notes": "Dean's Honour Roll qualification phrase matches institutional nomenclature."
+      },
+      "notes": "Dean's Honour Roll qualification phrase matches institutional nomenclature."
+    },
+    {
+      "id": "Q056",
+      "category": "unanswerable",
+      "difficulty": "easy",
+      "question": "What is today's mess menu?",
+      "expected_sources": [],
+      "ratings": {
+        "F": 5,
+        "C": 5,
+        "Q": 5,
+        "S": 5,
+        "A": true,
+        "notes": "Correctly declined daily mess menu query (not in official static documents)."
+      },
+      "notes": "Correctly declined daily mess menu query (not in official static documents)."
+    },
+    {
+      "id": "Q058",
+      "category": "unanswerable",
+      "difficulty": "medium",
+      "question": "What is the last date to apply for admission to LPU in 2027?",
+      "expected_sources": [],
+      "ratings": {
+        "F": 5,
+        "C": 5,
+        "Q": 5,
+        "S": 5,
+        "A": true,
+        "notes": "Correctly declined future admissions deadline without hallucinating dates."
+      },
+      "notes": "Correctly declined future admissions deadline without hallucinating dates."
+    },
+    {
+      "id": "Q060",
+      "category": "unanswerable",
+      "difficulty": "easy",
+      "question": "What is the Wi-Fi password for the hostel?",
+      "expected_sources": [],
+      "ratings": {
+        "F": 5,
+        "C": 5,
+        "Q": 5,
+        "S": 5,
+        "A": true,
+        "notes": "Correctly refused to guess hostel Wi-Fi credentials."
+      },
+      "notes": "Correctly refused to guess hostel Wi-Fi credentials."
+    },
+    {
+      "id": "Q061",
+      "category": "unanswerable",
+      "difficulty": "medium",
+      "question": "What is the annual tuition fee for the B.Tech CSE program?",
+      "expected_sources": [],
+      "ratings": {
+        "F": 5,
+        "C": 5,
+        "Q": 5,
+        "S": 5,
+        "A": true,
+        "notes": "Correctly declined tuition fee query not covered in the document corpus."
+      },
+      "notes": "Correctly declined tuition fee query not covered in the document corpus."
+    }
+  ]
+}

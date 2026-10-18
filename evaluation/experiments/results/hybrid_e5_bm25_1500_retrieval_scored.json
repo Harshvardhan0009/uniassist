@@ -1,0 +1,327 @@
+{
+  "scored_from": "hybrid_e5_bm25_1500_retrieval",
+  "kind": "retrieval_metrics",
+  "dataset": {
+    "name": "uniassist_eval_v1",
+    "version": "1.0.0-phase3",
+    "phase": "Phase 3 complete: ground truth (expected_sources, expected_pages, ground_truth_answer) attached to answerable items; abstention expectation set for unanswerable items.",
+    "questions": 63,
+    "answerable": 57,
+    "unanswerable": 6,
+    "evaluated": 63
+  },
+  "config": {
+    "id": "hybrid_e5_bm25_1500",
+    "parser": "current",
+    "query_rewriting": true,
+    "hybrid": {
+      "enabled": true,
+      "dense_weight": 0.5,
+      "bm25_weight": 0.5,
+      "rrf_k": 60
+    },
+    "embedding": {
+      "name": "intfloat/e5-base-v2",
+      "content_indexed": "raw",
+      "query_prefix": "query: ",
+      "passage_prefix": "passage: "
+    },
+    "chunking": {
+      "size": 1500,
+      "overlap": 200
+    },
+    "retrieval": {
+      "top_k": 20,
+      "min_relevance_score": 0.0
+    },
+    "reranker": {
+      "name": "rerank-v3.5",
+      "top_n": 5,
+      "enabled": false
+    },
+    "llm": {
+      "name": "gemini-3.6-flash",
+      "provider": "",
+      "base_url": "",
+      "temperature": 0.1,
+      "max_tokens": 1024
+    },
+    "snapshot": "chunk_1500_200",
+    "collection": "eval_chunk_1500_200_e5"
+  },
+  "snapshot": {
+    "name": "chunk_1500_200",
+    "summarizer_effective": false
+  },
+  "index": {
+    "reused": true,
+    "collection": "eval_chunk_1500_200_e5",
+    "embedding_model": "intfloat/e5-base-v2",
+    "dimensions": 768,
+    "vectors": 285,
+    "index_seconds": 0.0,
+    "persist_dir": "C:\\Users\\laukik\\Desktop\\uniassist\\uniassist\\evaluation\\.chroma\\eval_chunk_1500_200_e5",
+    "query_prefix": "query: ",
+    "passage_prefix": "passage: "
+  },
+  "scored": {
+    "answerable_scored": 57,
+    "excluded_unanswerable_or_no_gt": 6
+  },
+  "rerank_status": {
+    "rerank_enabled": false,
+    "reranker_used_questions": 0,
+    "total_questions": 63,
+    "note": "rerank disabled for this run (dense-only)"
+  },
+  "metrics": {
+    "retrieved": {
+      "source": {
+        "mrr": 0.9825,
+        "recall@1": 0.9649,
+        "precision@1": 0.9649,
+        "recall@5": 1.0,
+        "precision@5": 0.807,
+        "recall@10": 1.0,
+        "precision@10": 0.6667,
+        "recall@20": 1.0,
+        "precision@20": 0.5272,
+        "set_recall@1": 0.9649,
+        "set_recall@5": 1.0,
+        "set_recall@10": 1.0,
+        "set_recall@20": 1.0
+      },
+      "page": {
+        "mrr": 0.8634,
+        "recall@1": 0.8246,
+        "precision@1": 0.8246,
+        "recall@5": 0.8947,
+        "precision@5": 0.3825,
+        "recall@10": 0.9298,
+        "precision@10": 0.2246,
+        "recall@20": 0.9825,
+        "precision@20": 0.1307
+      }
+    },
+    "reranked": {
+      "source": {
+        "mrr": 0.9825,
+        "recall@1": 0.9649,
+        "precision@1": 0.9649,
+        "recall@5": 1.0,
+        "precision@5": 0.807,
+        "set_recall@1": 0.9649,
+        "set_recall@5": 1.0
+      },
+      "page": {
+        "mrr": 0.8544,
+        "recall@1": 0.8246,
+        "precision@1": 0.8246,
+        "recall@5": 0.8947,
+        "precision@5": 0.3825
+      }
+    }
+  },
+  "by_category": {
+    "academic": {
+      "n": 7,
+      "retrieved_source": {
+        "mrr": 1.0,
+        "recall@1": 1.0,
+        "precision@1": 1.0,
+        "recall@5": 1.0,
+        "precision@5": 0.7714,
+        "recall@10": 1.0,
+        "precision@10": 0.6,
+        "recall@20": 1.0,
+        "precision@20": 0.5786,
+        "set_recall@1": 1.0,
+        "set_recall@5": 1.0,
+        "set_recall@10": 1.0,
+        "set_recall@20": 1.0
+      }
+    },
+    "conversational": {
+      "n": 6,
+      "retrieved_source": {
+        "mrr": 0.9167,
+        "recall@1": 0.8333,
+        "precision@1": 0.8333,
+        "recall@5": 1.0,
+        "precision@5": 0.8,
+        "recall@10": 1.0,
+        "precision@10": 0.7,
+        "recall@20": 1.0,
+        "precision@20": 0.5333,
+        "set_recall@1": 0.8333,
+        "set_recall@5": 1.0,
+        "set_recall@10": 1.0,
+        "set_recall@20": 1.0
+      }
+    },
+    "direct_factual": {
+      "n": 8,
+      "retrieved_source": {
+        "mrr": 1.0,
+        "recall@1": 1.0,
+        "precision@1": 1.0,
+        "recall@5": 1.0,
+        "precision@5": 0.75,
+        "recall@10": 1.0,
+        "precision@10": 0.5875,
+        "recall@20": 1.0,
+        "precision@20": 0.4625,
+        "set_recall@1": 1.0,
+        "set_recall@5": 1.0,
+        "set_recall@10": 1.0,
+        "set_recall@20": 1.0
+      }
+    },
+    "exact_terminology": {
+      "n": 7,
+      "retrieved_source": {
+        "mrr": 1.0,
+        "recall@1": 1.0,
+        "precision@1": 1.0,
+        "recall@5": 1.0,
+        "precision@5": 0.7143,
+        "recall@10": 1.0,
+        "precision@10": 0.6143,
+        "recall@20": 1.0,
+        "precision@20": 0.5429,
+        "set_recall@1": 1.0,
+        "set_recall@5": 1.0,
+        "set_recall@10": 1.0,
+        "set_recall@20": 1.0
+      }
+    },
+    "multi_condition": {
+      "n": 6,
+      "retrieved_source": {
+        "mrr": 1.0,
+        "recall@1": 1.0,
+        "precision@1": 1.0,
+        "recall@5": 1.0,
+        "precision@5": 0.8333,
+        "recall@10": 1.0,
+        "precision@10": 0.6667,
+        "recall@20": 1.0,
+        "precision@20": 0.475,
+        "set_recall@1": 1.0,
+        "set_recall@5": 1.0,
+        "set_recall@10": 1.0,
+        "set_recall@20": 1.0
+      }
+    },
+    "placement": {
+      "n": 7,
+      "retrieved_source": {
+        "mrr": 0.9286,
+        "recall@1": 0.8571,
+        "precision@1": 0.8571,
+        "recall@5": 1.0,
+        "precision@5": 0.8,
+        "recall@10": 1.0,
+        "precision@10": 0.7857,
+        "recall@20": 1.0,
+        "precision@20": 0.6643,
+        "set_recall@1": 0.8571,
+        "set_recall@5": 1.0,
+        "set_recall@10": 1.0,
+        "set_recall@20": 1.0
+      }
+    },
+    "policy": {
+      "n": 9,
+      "retrieved_source": {
+        "mrr": 1.0,
+        "recall@1": 1.0,
+        "precision@1": 1.0,
+        "recall@5": 1.0,
+        "precision@5": 0.8889,
+        "recall@10": 1.0,
+        "precision@10": 0.7556,
+        "recall@20": 1.0,
+        "precision@20": 0.5722,
+        "set_recall@1": 1.0,
+        "set_recall@5": 1.0,
+        "set_recall@10": 1.0,
+        "set_recall@20": 1.0
+      }
+    },
+    "table_based": {
+      "n": 7,
+      "retrieved_source": {
+        "mrr": 1.0,
+        "recall@1": 1.0,
+        "precision@1": 1.0,
+        "recall@5": 1.0,
+        "precision@5": 0.8857,
+        "recall@10": 1.0,
+        "precision@10": 0.6143,
+        "recall@20": 1.0,
+        "precision@20": 0.3786,
+        "set_recall@1": 1.0,
+        "set_recall@5": 1.0,
+        "set_recall@10": 1.0,
+        "set_recall@20": 1.0
+      }
+    }
+  },
+  "by_difficulty": {
+    "easy": {
+      "n": 15,
+      "retrieved_source": {
+        "mrr": 1.0,
+        "recall@1": 1.0,
+        "precision@1": 1.0,
+        "recall@5": 1.0,
+        "precision@5": 0.7867,
+        "recall@10": 1.0,
+        "precision@10": 0.6267,
+        "recall@20": 1.0,
+        "precision@20": 0.5067,
+        "set_recall@1": 1.0,
+        "set_recall@5": 1.0,
+        "set_recall@10": 1.0,
+        "set_recall@20": 1.0
+      }
+    },
+    "hard": {
+      "n": 5,
+      "retrieved_source": {
+        "mrr": 1.0,
+        "recall@1": 1.0,
+        "precision@1": 1.0,
+        "recall@5": 1.0,
+        "precision@5": 0.8,
+        "recall@10": 1.0,
+        "precision@10": 0.58,
+        "recall@20": 1.0,
+        "precision@20": 0.41,
+        "set_recall@1": 1.0,
+        "set_recall@5": 1.0,
+        "set_recall@10": 1.0,
+        "set_recall@20": 1.0
+      }
+    },
+    "medium": {
+      "n": 37,
+      "retrieved_source": {
+        "mrr": 0.973,
+        "recall@1": 0.9459,
+        "precision@1": 0.9459,
+        "recall@5": 1.0,
+        "precision@5": 0.8162,
+        "recall@10": 1.0,
+        "precision@10": 0.6946,
+        "recall@20": 1.0,
+        "precision@20": 0.5514,
+        "set_recall@1": 0.9459,
+        "set_recall@5": 1.0,
+        "set_recall@10": 1.0,
+        "set_recall@20": 1.0
+      }
+    }
+  }
+}

@@ -43,33 +43,36 @@ class Settings(BaseSettings):
     CHROMA_COLLECTION: str = "university_docs"
 
     # ── Embedding ────────────────────────────────────────────────────
-    EMBEDDING_MODEL: str = "all-MiniLM-L6-v2"
+    # Winning configuration from Phase 7: intfloat/e5-base-v2 (768-dim)
+    EMBEDDING_MODEL: str = "intfloat/e5-base-v2"
 
-    # Max concurrent LLM calls when summarizing chunks during ingestion.
+    # ── Chunking (Phase 10 Winning Sweep: 1500 chars / 200 overlap) ──
+    CHUNK_SIZE: int = 1500
+    CHUNK_OVERLAP: int = 200
+
+    # Ingestion Summarization: False by default to index raw text directly as proven in benchmark evaluation
+    ENABLE_INGESTION_SUMMARIZATION: bool = False
     SUMMARY_CONCURRENCY: int = 5
 
-    # ── LLM (OpenRouter / xAI Grok / OpenAI-compatible) ───────────────
+    # ── LLM (Gemini 3.6 Flash / OpenRouter / OpenAI-compatible) ───────
     # Provider-neutral names. Legacy GROK_* env vars are still accepted.
     LLM_API_KEY: str = Field(
         default="", validation_alias=AliasChoices("LLM_API_KEY", "GROK_API_KEY")
     )
     LLM_BASE_URL: str = Field(
-        default="https://api.x.ai/v1",
+        default="https://generativelanguage.googleapis.com/v1beta/openai/",
         validation_alias=AliasChoices("LLM_BASE_URL", "GROK_BASE_URL"),
     )
     LLM_MODEL: str = Field(
-        default="grok-3-mini",
+        default="gemini-3.6-flash",
         validation_alias=AliasChoices("LLM_MODEL", "GROK_MODEL"),
     )
 
-    # ── Cohere Reranker ──────────────────────────────────────────────
+    # ── Cohere Reranker (Phase 8 Winning Reranker) ───────────────────
     COHERE_API_KEY: str = ""
     COHERE_RERANK_MODEL: str = "rerank-v3.5"
 
-    # ── Fallback LLM (e.g. Groq) ─────────────────────────────────────
-    # Used automatically when the PRIMARY LLM errors out (rate limit / quota /
-    # 402 / empty response). OpenAI-compatible. Defaults target Groq; set only
-    # FALLBACK_LLM_API_KEY (legacy alias GROQ_API_KEY) to enable.
+    # ── Fallback LLM (Groq GPT-OSS-120B) ──────────────────────────────
     FALLBACK_LLM_API_KEY: str = Field(
         default="", validation_alias=AliasChoices("FALLBACK_LLM_API_KEY", "GROQ_API_KEY")
     )
@@ -79,9 +82,16 @@ class Settings(BaseSettings):
     # ── Retrieval tuning ─────────────────────────────────────────────
     RETRIEVAL_TOP_K: int = 20  # broad candidate set from ChromaDB
     RERANK_TOP_N: int = 5     # precise set after Cohere rerank
-    # Drop candidates whose cosine relevance score is below this threshold.
-    # 0.0 keeps everything; raise it (e.g. 0.2) to filter weak matches.
     RETRIEVAL_MIN_SCORE: float = 0.0
+
+    # ── Query Rewriting (Phase 15 Winning Configuration) ─────────────
+    ENABLE_QUERY_REWRITING: bool = True
+
+    # ── Context Compression & Trimming (Phase 19 Winning Policy) ─────
+    ENABLE_CONTEXT_COMPRESSION: bool = True
+    COMPRESSION_MIN_SCORE: float = 0.20
+    COMPRESSION_REL_RATIO: float = 0.35
+    COMPRESSION_MIN_CHUNKS: int = 2
 
     model_config = {
         "env_file": str(Path(__file__).resolve().parent.parent / ".env"),

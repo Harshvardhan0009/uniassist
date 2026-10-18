@@ -16,6 +16,7 @@ from typing import Literal
 
 from fastapi import Depends, FastAPI, Header, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 from rich.logging import RichHandler
 
@@ -119,6 +120,8 @@ class QueryResponse(BaseModel):
     timing: dict
     candidates_retrieved: int
     candidates_reranked: int
+    candidates_compressed: int = 0
+    search_query: str | None = None
 
 
 class IngestResponse(BaseModel):
@@ -163,17 +166,28 @@ async def health_check():
     )
 
 
+@app.get("/api/metrics")
+async def get_metrics():
+    """Retrieve runtime observability metrics and latency percentiles."""
+    from app.telemetry import get_telemetry_summary
+
+    return get_telemetry_summary()
+
+
 @app.post("/api/query", response_model=QueryResponse, dependencies=[Depends(rate_limit)])
-async def ask_question(request: QueryRequest):
+async def ask_question(request_body: QueryRequest, raw_request: Request):
     """
     Ask a question against the university document corpus.
 
-    The pipeline: embed query → retrieve from ChromaDB → rerank → generate answer.
+    The pipeline: embed query → retrieve from ChromaDB → rerank → compress → generate answer.
     """
     from app.query.chain import query
+    from app.telemetry import log_query_trace
 
     try:
-        result = query(request.question, history=[m.model_dump() for m in request.history])
+        result = query(request_body.question, history=[m.model_dump() for m in request_body.history])
+        client_ip = raw_request.client.host if raw_request.client else "unknown"
+        log_query_trace(request_body.question, result, client_ip=client_ip)
         return QueryResponse(**result)
     except Exception as e:
         logger.error(f"Query failed: {e}", exc_info=True)
@@ -181,6 +195,33 @@ async def ask_question(request: QueryRequest):
             status_code=500,
             detail="Failed to process the query. Please try again later.",
         )
+
+
+@app.post("/api/query/stream", dependencies=[Depends(rate_limit)])
+async def ask_question_stream(request_body: QueryRequest, raw_request: Request):
+    """
+    Stream answer tokens in real time using Server-Sent Events (SSE).
+    """
+    from app.query.chain import stream_query
+
+    def event_stream():
+        try:
+            history = [m.model_dump() for m in request_body.history]
+            for event in stream_query(request_body.question, history=history):
+                yield event
+        except Exception as e:
+            logger.error(f"Stream query failed: {e}", exc_info=True)
+            yield f"event: error\ndata: {str(e)}\n\n"
+
+    return StreamingResponse(
+        event_stream(),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            "X-Accel-Buffering": "no",
+        },
+    )
 
 
 @app.post(
