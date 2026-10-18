@@ -17,8 +17,9 @@ build/
 venv/
 .venv/
 
-# Backend secrets
+# Backend secrets and runtime logs
 backend/.env
+backend/logs/
 
 # Vector store (large, regenerated)
 backend/chroma_db/

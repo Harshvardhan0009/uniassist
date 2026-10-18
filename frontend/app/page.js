@@ -449,7 +449,7 @@ export default function Home() {
 function renderInline(text) {
   if (!text) return null;
   // Match bold or citations: [DocName.pdf, Page X] or [DocName.pdf]
-  const regex = /(\*\*.*?\*\*|\[[a-zA-Z0-9_\-\s\/\.]+\.(?:pdf|txt|docx|md)[^\]]*\])/g;
+  const regex = /(\*\*.*?\*\*|\[[^\]\n]+?\.(?:pdf|txt|docx|md)[^\]]*\])/gi;
   const parts = text.split(regex);
   return parts.map((part, i) => {
     if (!part) return null;
