@@ -19,6 +19,7 @@ CLI::
 
     python -m evaluation.lib.snapshot --name baseline_v1
     python -m evaluation.lib.snapshot --name baseline_v1_raw --no-llm   # raw text, deterministic
+    python -m evaluation.lib.snapshot --name parser_unstructured --parser unstructured --no-llm
 """
 
 from __future__ import annotations
@@ -39,8 +40,27 @@ from langchain_core.documents import Document  # noqa: E402
 
 from app.config import settings  # noqa: E402
 from app.ingestion.chunker import CHUNK_OVERLAP, CHUNK_SIZE, chunk_documents  # noqa: E402
-from app.ingestion.partition import partition_directory  # noqa: E402
+from app.ingestion.partition import partition_directory as _partition_current  # noqa: E402
 from app.ingestion.summarizer import _passthrough, summarize_chunks  # noqa: E402
+
+# Parser selection — Phase 11
+_PARSERS = {"current": "_partition_current"}  # populated lazily for optional deps
+
+
+def _get_partition_fn(parser: str):
+    """Return the ``partition_directory`` callable for the named parser."""
+    if parser == "current":
+        return _partition_current
+    if parser == "unstructured":
+        try:
+            from app.ingestion.partition_unstructured import partition_directory as _partition_unstructured
+            return _partition_unstructured
+        except ImportError as e:
+            raise ImportError(
+                "Unstructured parser requested but 'unstructured' is not installed. "
+                "Install with: pip install 'unstructured[pdf,docx]'"
+            ) from e
+    raise ValueError(f"Unknown parser '{parser}'. Choose 'current' or 'unstructured'.")
 
 logger = logging.getLogger(__name__)
 
@@ -84,6 +104,7 @@ def build_snapshot(
     use_llm: bool = True,
     chunk_size: int | None = None,
     chunk_overlap: int | None = None,
+    parser: str = "current",
 ) -> dict:
     """Partition -> chunk -> (summarize) the corpus and freeze it to JSONL.
 
@@ -95,6 +116,9 @@ def build_snapshot(
             (deterministic; useful as a control).
         chunk_size / chunk_overlap: Override the chunking (defaults to the
             production 2500 / 300). Used by Phase 10 chunking experiments.
+        parser: Which partition module to use: ``'current'`` (pdfplumber/pypdf)
+            or ``'unstructured'`` (Unstructured.io). Used by Phase 11 parser
+            experiments. Default is ``'current'`` (production behaviour).
 
     Returns:
         The manifest dict describing the frozen snapshot.
@@ -105,15 +129,16 @@ def build_snapshot(
 
     eff_chunk_size = CHUNK_SIZE if chunk_size is None else chunk_size
     eff_chunk_overlap = CHUNK_OVERLAP if chunk_overlap is None else chunk_overlap
+    partition_fn = _get_partition_fn(parser)
 
     logger.info(
-        "Building snapshot '%s' from %s (chunk_size=%d, overlap=%d)",
-        name, data_dir, eff_chunk_size, eff_chunk_overlap,
+        "Building snapshot '%s' from %s (chunk_size=%d, overlap=%d, parser=%s)",
+        name, data_dir, eff_chunk_size, eff_chunk_overlap, parser,
     )
 
     # ── Step 3: Partition ────────────────────────────────────────────
     t0 = time.perf_counter()
-    all_elements = partition_directory(data_dir)
+    all_elements = partition_fn(data_dir)
     if not all_elements:
         raise RuntimeError(f"No ingestible documents found under {data_dir}")
     n_pages = sum(len(v) for v in all_elements.values())
@@ -176,6 +201,7 @@ def build_snapshot(
         "created": time.strftime("%Y-%m-%dT%H:%M:%S%z"),
         "data_dir": str(data_dir.relative_to(paths.PROJECT_ROOT)) if data_dir.is_relative_to(paths.PROJECT_ROOT) else str(data_dir),
         "jsonl": sp.jsonl.name,
+        "parser": parser,
         "chunking": {"splitter": "RecursiveCharacterTextSplitter", "size": eff_chunk_size, "overlap": eff_chunk_overlap},
         "summarizer": {
             "requested_llm": summarize_used_llm,
@@ -250,13 +276,15 @@ if __name__ == "__main__":
 
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s | %(message)s")
 
-    parser = argparse.ArgumentParser(description="Freeze a reproducible corpus snapshot for evaluation.")
-    parser.add_argument("--name", default="baseline_v1", help="Snapshot name (default: baseline_v1)")
-    parser.add_argument("--no-llm", action="store_true", help="Freeze raw chunk text instead of LLM summaries")
-    parser.add_argument("--chunk-size", type=int, default=None, help="Override chunk size (default 2500)")
-    parser.add_argument("--chunk-overlap", type=int, default=None, help="Override chunk overlap (default 300)")
-    parser.add_argument("--force", action="store_true", help="Rebuild even if the snapshot already exists")
-    args = parser.parse_args()
+    ap = argparse.ArgumentParser(description="Freeze a reproducible corpus snapshot for evaluation.")
+    ap.add_argument("--name", default="baseline_v1", help="Snapshot name (default: baseline_v1)")
+    ap.add_argument("--no-llm", action="store_true", help="Freeze raw chunk text instead of LLM summaries")
+    ap.add_argument("--chunk-size", type=int, default=None, help="Override chunk size (default 2500)")
+    ap.add_argument("--chunk-overlap", type=int, default=None, help="Override chunk overlap (default 300)")
+    ap.add_argument("--parser", choices=["current", "unstructured"], default="current",
+                    help="Parser to use: 'current' (pdfplumber/pypdf) or 'unstructured' (Phase 11)")
+    ap.add_argument("--force", action="store_true", help="Rebuild even if the snapshot already exists")
+    args = ap.parse_args()
 
     if snapshot_exists(args.name) and not args.force:
         print(f"Snapshot '{args.name}' already exists. Use --force to rebuild.")
@@ -266,5 +294,6 @@ if __name__ == "__main__":
         manifest = build_snapshot(
             name=args.name, use_llm=not args.no_llm,
             chunk_size=args.chunk_size, chunk_overlap=args.chunk_overlap,
+            parser=args.parser,
         )
         print(json.dumps(manifest, indent=2, ensure_ascii=False))

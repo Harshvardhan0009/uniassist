@@ -1,0 +1,58 @@
+{
+  "id": "rag_e5_1500_gemini",
+  "name": "Phase 12 LLM experiment - Google Gemini 3.6 Flash on winning retrieval stack",
+  "status": "experiment",
+  "experiment": {
+    "variable_under_test": "generation.llm = gemini-3.6-flash (primary)",
+    "held_constant": "parser current (pdfplumber), chunking 1500/200, embedding intfloat/e5-base-v2, top_k=20, reranker Cohere rerank-v3.5 (top_n=5), dataset uniassist_eval_v1 (63 Qs)",
+    "phase": "Phase 12"
+  },
+  "evaluation": {
+    "snapshot": "parser_current_1500",
+    "collection": "eval_parser_current_e5_1500"
+  },
+  "parser": {
+    "name": "current",
+    "pdf": "pdfplumber (table-aware, tables -> Markdown); PyPDFLoader fallback",
+    "docx": "python-docx (paragraphs + table rows)",
+    "txt_md": "langchain TextLoader (utf-8)"
+  },
+  "chunking": {
+    "splitter": "RecursiveCharacterTextSplitter",
+    "size": 1500,
+    "overlap": 200
+  },
+  "indexing": {
+    "content_indexed": "raw"
+  },
+  "embedding": {
+    "name": "intfloat/e5-base-v2",
+    "dimensions": 768,
+    "normalize_embeddings": true,
+    "similarity": "cosine",
+    "query_prefix": "query: ",
+    "passage_prefix": "passage: "
+  },
+  "retrieval": {
+    "method": "similarity_search_with_relevance_scores",
+    "top_k": 20,
+    "min_relevance_score": 0.0
+  },
+  "reranker": {
+    "name": "rerank-v3.5",
+    "provider": "cohere",
+    "top_n": 5,
+    "enabled": true
+  },
+  "generation": {
+    "llm": "gemini-3.6-flash",
+    "provider": "google-gemini",
+    "base_url": "https://generativelanguage.googleapis.com/v1beta/openai/",
+    "temperature": 0.1,
+    "max_tokens": 1024
+  },
+  "corpus": {
+    "root": "Data/",
+    "ingestible_files": 14
+  }
+}

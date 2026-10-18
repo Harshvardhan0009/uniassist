@@ -1,0 +1,904 @@
+{
+  "summary": {
+    "total_questions": 63,
+    "answerable_questions": 57,
+    "avg_raw_chars": 5799,
+    "avg_compressed_chars": 4878,
+    "overall_savings_pct": 15.87,
+    "chunk_count_distribution": {
+      "1": 0,
+      "2": 15,
+      "3": 9,
+      "4": 7,
+      "5": 32
+    },
+    "raw_source_recall": 1.0,
+    "compressed_source_recall": 1.0,
+    "raw_page_recall": 0.9649,
+    "compressed_page_recall": 0.9474
+  },
+  "per_question": [
+    {
+      "id": "Q001",
+      "question": "What are the timings of the Central LPU Library?",
+      "answerable": true,
+      "stats": {
+        "original_chunks": 5,
+        "kept_chunks": 2,
+        "raw_chars": 6585,
+        "compressed_chars": 2722,
+        "chars_saved": 3863,
+        "savings_pct": 58.66
+      },
+      "top_rerank_score": 0.9202
+    },
+    {
+      "id": "Q002",
+      "question": "How much is the late fee (compounding fee) charged per book per day when a student returns a library book late?",
+      "answerable": true,
+      "stats": {
+        "original_chunks": 5,
+        "kept_chunks": 5,
+        "raw_chars": 6641,
+        "compressed_chars": 7024,
+        "chars_saved": 0,
+        "savings_pct": 0.0
+      },
+      "top_rerank_score": 0.8652
+    },
+    {
+      "id": "Q003",
+      "question": "What is the processing fee to apply for the Semester/Year Abroad program?",
+      "answerable": true,
+      "stats": {
+        "original_chunks": 5,
+        "kept_chunks": 5,
+        "raw_chars": 6785,
+        "compressed_chars": 7248,
+        "chars_saved": 0,
+        "savings_pct": 0.0
+      },
+      "top_rerank_score": 0.5761
+    },
+    {
+      "id": "Q004",
+      "question": "What is the minimum duration of a one-semester OJT or internship?",
+      "answerable": true,
+      "stats": {
+        "original_chunks": 5,
+        "kept_chunks": 5,
+        "raw_chars": 5061,
+        "compressed_chars": 5650,
+        "chars_saved": 0,
+        "savings_pct": 0.0
+      },
+      "top_rerank_score": 0.9214
+    },
+    {
+      "id": "Q005",
+      "question": "How many NSS hours must a volunteer complete and over what period?",
+      "answerable": true,
+      "stats": {
+        "original_chunks": 5,
+        "kept_chunks": 5,
+        "raw_chars": 5690,
+        "compressed_chars": 6045,
+        "chars_saved": 0,
+        "savings_pct": 0.0
+      },
+      "top_rerank_score": 0.8628
+    },
+    {
+      "id": "Q006",
+      "question": "Which block houses the Central Library on the LPU campus?",
+      "answerable": true,
+      "stats": {
+        "original_chunks": 5,
+        "kept_chunks": 3,
+        "raw_chars": 5685,
+        "compressed_chars": 2993,
+        "chars_saved": 2692,
+        "savings_pct": 47.35
+      },
+      "top_rerank_score": 0.8016
+    },
+    {
+      "id": "Q007",
+      "question": "Are jeans allowed under the student dress code?",
+      "answerable": true,
+      "stats": {
+        "original_chunks": 5,
+        "kept_chunks": 4,
+        "raw_chars": 6420,
+        "compressed_chars": 5632,
+        "chars_saved": 788,
+        "savings_pct": 12.27
+      },
+      "top_rerank_score": 0.8771
+    },
+    {
+      "id": "Q008",
+      "question": "What is the annual charge for the laundry facility in the residential facilities charges?",
+      "answerable": true,
+      "stats": {
+        "original_chunks": 5,
+        "kept_chunks": 5,
+        "raw_chars": 5805,
+        "compressed_chars": 6344,
+        "chars_saved": 0,
+        "savings_pct": 0.0
+      },
+      "top_rerank_score": 0.7048
+    },
+    {
+      "id": "Q009",
+      "question": "What rules must students follow while using the LPU libraries?",
+      "answerable": true,
+      "stats": {
+        "original_chunks": 5,
+        "kept_chunks": 5,
+        "raw_chars": 7032,
+        "compressed_chars": 7463,
+        "chars_saved": 0,
+        "savings_pct": 0.0
+      },
+      "top_rerank_score": 0.9379
+    },
+    {
+      "id": "Q010",
+      "question": "What is the 'One Student - One Offer' policy in career services?",
+      "answerable": true,
+      "stats": {
+        "original_chunks": 5,
+        "kept_chunks": 5,
+        "raw_chars": 6177,
+        "compressed_chars": 6637,
+        "chars_saved": 0,
+        "savings_pct": 0.0
+      },
+      "top_rerank_score": 0.8577
+    },
+    {
+      "id": "Q011",
+      "question": "At what point is a student's library membership suspended due to unpaid compounding fees?",
+      "answerable": true,
+      "stats": {
+        "original_chunks": 5,
+        "kept_chunks": 5,
+        "raw_chars": 6641,
+        "compressed_chars": 7024,
+        "chars_saved": 0,
+        "savings_pct": 0.0
+      },
+      "top_rerank_score": 0.79
+    },
+    {
+      "id": "Q012",
+      "question": "Who is not eligible to be selected as an NSS volunteer?",
+      "answerable": true,
+      "stats": {
+        "original_chunks": 5,
+        "kept_chunks": 5,
+        "raw_chars": 4987,
+        "compressed_chars": 5342,
+        "chars_saved": 0,
+        "savings_pct": 0.0
+      },
+      "top_rerank_score": 0.8519
+    },
+    {
+      "id": "Q013",
+      "question": "What are students expected to wear during winter under the dress code policy?",
+      "answerable": true,
+      "stats": {
+        "original_chunks": 5,
+        "kept_chunks": 5,
+        "raw_chars": 5868,
+        "compressed_chars": 6334,
+        "chars_saved": 0,
+        "savings_pct": 0.0
+      },
+      "top_rerank_score": 0.8296
+    },
+    {
+      "id": "Q014",
+      "question": "If a continuing student cancels their hostel facility on or after 1st September, how much refund are they entitled to?",
+      "answerable": true,
+      "stats": {
+        "original_chunks": 5,
+        "kept_chunks": 3,
+        "raw_chars": 6908,
+        "compressed_chars": 4255,
+        "chars_saved": 2653,
+        "savings_pct": 38.4
+      },
+      "top_rerank_score": 0.8811
+    },
+    {
+      "id": "Q015",
+      "question": "Can a student change the university or the duration after joining the host university for a semester abroad?",
+      "answerable": true,
+      "stats": {
+        "original_chunks": 5,
+        "kept_chunks": 5,
+        "raw_chars": 5806,
+        "compressed_chars": 6269,
+        "chars_saved": 0,
+        "savings_pct": 0.0
+      },
+      "top_rerank_score": 0.84
+    },
+    {
+      "id": "Q016",
+      "question": "What is the policy on using mobile phones inside the library?",
+      "answerable": true,
+      "stats": {
+        "original_chunks": 5,
+        "kept_chunks": 3,
+        "raw_chars": 5394,
+        "compressed_chars": 2773,
+        "chars_saved": 2621,
+        "savings_pct": 48.59
+      },
+      "top_rerank_score": 0.8489
+    },
+    {
+      "id": "Q017",
+      "question": "What is the minimum CGPA required to be eligible for the 10% Attendance Benefit?",
+      "answerable": true,
+      "stats": {
+        "original_chunks": 5,
+        "kept_chunks": 5,
+        "raw_chars": 5621,
+        "compressed_chars": 6049,
+        "chars_saved": 0,
+        "savings_pct": 0.0
+      },
+      "top_rerank_score": 0.9404
+    },
+    {
+      "id": "Q018",
+      "question": "What is the standard minimum CGPA required for internship-based academic benefits?",
+      "answerable": true,
+      "stats": {
+        "original_chunks": 5,
+        "kept_chunks": 5,
+        "raw_chars": 6941,
+        "compressed_chars": 7311,
+        "chars_saved": 0,
+        "savings_pct": 0.0
+      },
+      "top_rerank_score": 0.9398
+    },
+    {
+      "id": "Q019",
+      "question": "Is there a minimum CGPA requirement to avail the Grade Upgradation benefit?",
+      "answerable": true,
+      "stats": {
+        "original_chunks": 5,
+        "kept_chunks": 5,
+        "raw_chars": 6634,
+        "compressed_chars": 7000,
+        "chars_saved": 0,
+        "savings_pct": 0.0
+      },
+      "top_rerank_score": 0.9429
+    },
+    {
+      "id": "Q020",
+      "question": "For Recognition of Prior Learning (RPL), what grade must a student secure in the RPL exam to get a complete course waiver?",
+      "answerable": true,
+      "stats": {
+        "original_chunks": 5,
+        "kept_chunks": 3,
+        "raw_chars": 5068,
+        "compressed_chars": 3550,
+        "chars_saved": 1518,
+        "savings_pct": 29.95
+      },
+      "top_rerank_score": 0.9332
+    },
+    {
+      "id": "Q021",
+      "question": "What academic benefit is granted for a patent that has been granted (Stage 3)?",
+      "answerable": true,
+      "stats": {
+        "original_chunks": 5,
+        "kept_chunks": 3,
+        "raw_chars": 6129,
+        "compressed_chars": 3373,
+        "chars_saved": 2756,
+        "savings_pct": 44.97
+      },
+      "top_rerank_score": 0.8048
+    },
+    {
+      "id": "Q022",
+      "question": "What minimum CGPA is required to get complete course equivalence through NPTEL / Proctored MOOCs?",
+      "answerable": true,
+      "stats": {
+        "original_chunks": 5,
+        "kept_chunks": 2,
+        "raw_chars": 5044,
+        "compressed_chars": 2728,
+        "chars_saved": 2316,
+        "savings_pct": 45.92
+      },
+      "top_rerank_score": 0.9468
+    },
+    {
+      "id": "Q023",
+      "question": "How many days of Duty Leave can be granted to a student for a competitive exam?",
+      "answerable": true,
+      "stats": {
+        "original_chunks": 5,
+        "kept_chunks": 4,
+        "raw_chars": 5239,
+        "compressed_chars": 5090,
+        "chars_saved": 149,
+        "savings_pct": 2.84
+      },
+      "top_rerank_score": 0.7643
+    },
+    {
+      "id": "Q024",
+      "question": "What is the minimum current CGPA required to register for Career Services for admission batches 2017 onwards?",
+      "answerable": true,
+      "stats": {
+        "original_chunks": 5,
+        "kept_chunks": 2,
+        "raw_chars": 6322,
+        "compressed_chars": 3079,
+        "chars_saved": 3243,
+        "savings_pct": 51.3
+      },
+      "top_rerank_score": 0.9488
+    },
+    {
+      "id": "Q025",
+      "question": "Under what conditions is a registered student temporarily debarred from career services?",
+      "answerable": true,
+      "stats": {
+        "original_chunks": 5,
+        "kept_chunks": 5,
+        "raw_chars": 5712,
+        "compressed_chars": 6173,
+        "chars_saved": 0,
+        "savings_pct": 0.0
+      },
+      "top_rerank_score": 0.8724
+    },
+    {
+      "id": "Q026",
+      "question": "What are the different types of recruitment / placement drives at LPU?",
+      "answerable": true,
+      "stats": {
+        "original_chunks": 5,
+        "kept_chunks": 5,
+        "raw_chars": 5497,
+        "compressed_chars": 5959,
+        "chars_saved": 0,
+        "savings_pct": 0.0
+      },
+      "top_rerank_score": 0.9053
+    },
+    {
+      "id": "Q027",
+      "question": "What minimum marks in the End Term Test (ETT) must a student achieve to avail the placement academic benefit?",
+      "answerable": true,
+      "stats": {
+        "original_chunks": 5,
+        "kept_chunks": 5,
+        "raw_chars": 6167,
+        "compressed_chars": 6800,
+        "chars_saved": 0,
+        "savings_pct": 0.0
+      },
+      "top_rerank_score": 0.9176
+    },
+    {
+      "id": "Q028",
+      "question": "What is the eligibility CGPA criterion for going on an OJT / internship?",
+      "answerable": true,
+      "stats": {
+        "original_chunks": 5,
+        "kept_chunks": 5,
+        "raw_chars": 6676,
+        "compressed_chars": 7130,
+        "chars_saved": 0,
+        "savings_pct": 0.0
+      },
+      "top_rerank_score": 0.8498
+    },
+    {
+      "id": "Q029",
+      "question": "If a student wants to surrender or reject a placement offer, within how many days must they do so in writing?",
+      "answerable": true,
+      "stats": {
+        "original_chunks": 5,
+        "kept_chunks": 4,
+        "raw_chars": 4712,
+        "compressed_chars": 4280,
+        "chars_saved": 432,
+        "savings_pct": 9.17
+      },
+      "top_rerank_score": 0.9241
+    },
+    {
+      "id": "Q030",
+      "question": "What must a student obtain before going for an independently arranged (self-sourced) OJT or internship offer?",
+      "answerable": true,
+      "stats": {
+        "original_chunks": 5,
+        "kept_chunks": 5,
+        "raw_chars": 6690,
+        "compressed_chars": 7254,
+        "chars_saved": 0,
+        "savings_pct": 0.0
+      },
+      "top_rerank_score": 0.8719
+    },
+    {
+      "id": "Q031",
+      "question": "What is the charge (in INR) for a Standard Air Conditioned 1-Seater hostel room with EDB till 31st March 2026?",
+      "answerable": true,
+      "stats": {
+        "original_chunks": 5,
+        "kept_chunks": 5,
+        "raw_chars": 6208,
+        "compressed_chars": 6730,
+        "chars_saved": 0,
+        "savings_pct": 0.0
+      },
+      "top_rerank_score": 0.9049
+    },
+    {
+      "id": "Q032",
+      "question": "What IELTS band is required to be awarded an 'A' equivalent grade under the benefit for clearing competitive exams?",
+      "answerable": true,
+      "stats": {
+        "original_chunks": 5,
+        "kept_chunks": 2,
+        "raw_chars": 6082,
+        "compressed_chars": 2700,
+        "chars_saved": 3382,
+        "savings_pct": 55.61
+      },
+      "top_rerank_score": 0.7701
+    },
+    {
+      "id": "Q033",
+      "question": "For the placement academic benefit, which package category corresponds to a salary package above 5 LPA and up to 10 LPA?",
+      "answerable": true,
+      "stats": {
+        "original_chunks": 5,
+        "kept_chunks": 5,
+        "raw_chars": 5087,
+        "compressed_chars": 5683,
+        "chars_saved": 0,
+        "savings_pct": 0.0
+      },
+      "top_rerank_score": 0.8365
+    },
+    {
+      "id": "Q034",
+      "question": "What is the charge (in INR) for the 'Standard Mess 04 Meals' plan (Breakfast, Lunch, Snacks & Dinner)?",
+      "answerable": true,
+      "stats": {
+        "original_chunks": 5,
+        "kept_chunks": 3,
+        "raw_chars": 5716,
+        "compressed_chars": 4183,
+        "chars_saved": 1533,
+        "savings_pct": 26.82
+      },
+      "top_rerank_score": 0.9195
+    },
+    {
+      "id": "Q035",
+      "question": "Under the Internship-with-PPO academic benefit, which monthly stipend range maps to the Z(D) package category?",
+      "answerable": true,
+      "stats": {
+        "original_chunks": 5,
+        "kept_chunks": 5,
+        "raw_chars": 5908,
+        "compressed_chars": 6520,
+        "chars_saved": 0,
+        "savings_pct": 0.0
+      },
+      "top_rerank_score": 0.8682
+    },
+    {
+      "id": "Q036",
+      "question": "How many GATE marks are needed to be awarded an 'A+' equivalent grade under the competitive exam benefit?",
+      "answerable": true,
+      "stats": {
+        "original_chunks": 5,
+        "kept_chunks": 4,
+        "raw_chars": 5556,
+        "compressed_chars": 5344,
+        "chars_saved": 212,
+        "savings_pct": 3.82
+      },
+      "top_rerank_score": 0.6917
+    },
+    {
+      "id": "Q037",
+      "question": "What is the charge (in INR) for the GYM facility without EDB (after 31st March 2026)?",
+      "answerable": true,
+      "stats": {
+        "original_chunks": 5,
+        "kept_chunks": 5,
+        "raw_chars": 4564,
+        "compressed_chars": 5085,
+        "chars_saved": 0,
+        "savings_pct": 0.0
+      },
+      "top_rerank_score": 0.8706
+    },
+    {
+      "id": "Q038",
+      "question": "A final-year student with a 7.0 CGPA and 65% attendance cleared GATE. Are they eligible for the 10% Attendance Benefit?",
+      "answerable": true,
+      "stats": {
+        "original_chunks": 5,
+        "kept_chunks": 5,
+        "raw_chars": 3771,
+        "compressed_chars": 4181,
+        "chars_saved": 0,
+        "savings_pct": 0.0
+      },
+      "top_rerank_score": 0.8873
+    },
+    {
+      "id": "Q039",
+      "question": "A student in a 2-year program has a 6.5 CGPA and one backlog. Do they meet the CGPA and backlog eligibility for a semester abroad, and for how long can they go?",
+      "answerable": true,
+      "stats": {
+        "original_chunks": 5,
+        "kept_chunks": 5,
+        "raw_chars": 4908,
+        "compressed_chars": 5371,
+        "chars_saved": 0,
+        "savings_pct": 0.0
+      },
+      "top_rerank_score": 0.7726
+    },
+    {
+      "id": "Q040",
+      "question": "How many books can a student in an honors course borrow, and for how long?",
+      "answerable": true,
+      "stats": {
+        "original_chunks": 5,
+        "kept_chunks": 2,
+        "raw_chars": 6418,
+        "compressed_chars": 2197,
+        "chars_saved": 4221,
+        "savings_pct": 65.77
+      },
+      "top_rerank_score": 0.6783
+    },
+    {
+      "id": "Q041",
+      "question": "A student placed in the Z(D) category has 4 pathway courses graded B, A, A+ and C. What are the updated grades after the placement benefit?",
+      "answerable": true,
+      "stats": {
+        "original_chunks": 5,
+        "kept_chunks": 5,
+        "raw_chars": 5778,
+        "compressed_chars": 6430,
+        "chars_saved": 0,
+        "savings_pct": 0.0
+      },
+      "top_rerank_score": 0.9421
+    },
+    {
+      "id": "Q042",
+      "question": "For an NSS volunteer, how many hours must be completed per academic year and how many special camps are mandatory?",
+      "answerable": true,
+      "stats": {
+        "original_chunks": 5,
+        "kept_chunks": 5,
+        "raw_chars": 5401,
+        "compressed_chars": 5757,
+        "chars_saved": 0,
+        "savings_pct": 0.0
+      },
+      "top_rerank_score": 0.8803
+    },
+    {
+      "id": "Q043",
+      "question": "During a semester abroad, which expenses is the student responsible for, and are they still considered enrolled at LPU?",
+      "answerable": true,
+      "stats": {
+        "original_chunks": 5,
+        "kept_chunks": 5,
+        "raw_chars": 6173,
+        "compressed_chars": 6636,
+        "chars_saved": 0,
+        "savings_pct": 0.0
+      },
+      "top_rerank_score": 0.929
+    },
+    {
+      "id": "Q044",
+      "question": "And what about the other block libraries?",
+      "answerable": true,
+      "stats": {
+        "original_chunks": 5,
+        "kept_chunks": 4,
+        "raw_chars": 6788,
+        "compressed_chars": 5622,
+        "chars_saved": 1166,
+        "savings_pct": 17.18
+      },
+      "top_rerank_score": 0.6405
+    },
+    {
+      "id": "Q045",
+      "question": "What happens if it falls below that after I have registered?",
+      "answerable": true,
+      "stats": {
+        "original_chunks": 5,
+        "kept_chunks": 2,
+        "raw_chars": 5512,
+        "compressed_chars": 2966,
+        "chars_saved": 2546,
+        "savings_pct": 46.19
+      },
+      "top_rerank_score": 0.1856
+    },
+    {
+      "id": "Q046",
+      "question": "And a two-semester one?",
+      "answerable": true,
+      "stats": {
+        "original_chunks": 5,
+        "kept_chunks": 2,
+        "raw_chars": 4484,
+        "compressed_chars": 2183,
+        "chars_saved": 2301,
+        "savings_pct": 51.32
+      },
+      "top_rerank_score": 0.1848
+    },
+    {
+      "id": "Q047",
+      "question": "If my program is 3 years long, how much time can I spend abroad?",
+      "answerable": true,
+      "stats": {
+        "original_chunks": 5,
+        "kept_chunks": 3,
+        "raw_chars": 4053,
+        "compressed_chars": 2518,
+        "chars_saved": 1535,
+        "savings_pct": 37.87
+      },
+      "top_rerank_score": 0.7164
+    },
+    {
+      "id": "Q048",
+      "question": "And for a published patent?",
+      "answerable": true,
+      "stats": {
+        "original_chunks": 5,
+        "kept_chunks": 2,
+        "raw_chars": 5612,
+        "compressed_chars": 1858,
+        "chars_saved": 3754,
+        "savings_pct": 66.89
+      },
+      "top_rerank_score": 0.4101
+    },
+    {
+      "id": "Q049",
+      "question": "And where is the School of Law?",
+      "answerable": true,
+      "stats": {
+        "original_chunks": 5,
+        "kept_chunks": 2,
+        "raw_chars": 6354,
+        "compressed_chars": 3059,
+        "chars_saved": 3295,
+        "savings_pct": 51.86
+      },
+      "top_rerank_score": 0.3629
+    },
+    {
+      "id": "Q050",
+      "question": "What does the abbreviation 'OJT' stand for?",
+      "answerable": true,
+      "stats": {
+        "original_chunks": 5,
+        "kept_chunks": 5,
+        "raw_chars": 6050,
+        "compressed_chars": 6613,
+        "chars_saved": 0,
+        "savings_pct": 0.0
+      },
+      "top_rerank_score": 0.7036
+    },
+    {
+      "id": "Q051",
+      "question": "What does 'PPO' stand for in the placement policy?",
+      "answerable": true,
+      "stats": {
+        "original_chunks": 5,
+        "kept_chunks": 3,
+        "raw_chars": 4939,
+        "compressed_chars": 2654,
+        "chars_saved": 2285,
+        "savings_pct": 46.26
+      },
+      "top_rerank_score": 0.7321
+    },
+    {
+      "id": "Q052",
+      "question": "What does 'PEP' stand for in the career services policy?",
+      "answerable": true,
+      "stats": {
+        "original_chunks": 5,
+        "kept_chunks": 5,
+        "raw_chars": 4474,
+        "compressed_chars": 4933,
+        "chars_saved": 0,
+        "savings_pct": 0.0
+      },
+      "top_rerank_score": 0.7065
+    },
+    {
+      "id": "Q053",
+      "question": "Which course codes are applicable for the IELTS/TOEFL/PTE benefit for clearing competitive exams?",
+      "answerable": true,
+      "stats": {
+        "original_chunks": 5,
+        "kept_chunks": 4,
+        "raw_chars": 6150,
+        "compressed_chars": 5629,
+        "chars_saved": 521,
+        "savings_pct": 8.47
+      },
+      "top_rerank_score": 0.8806
+    },
+    {
+      "id": "Q054",
+      "question": "What does 'LPA' mean in the career services policy?",
+      "answerable": true,
+      "stats": {
+        "original_chunks": 5,
+        "kept_chunks": 2,
+        "raw_chars": 5415,
+        "compressed_chars": 2155,
+        "chars_saved": 3260,
+        "savings_pct": 60.2
+      },
+      "top_rerank_score": 0.74
+    },
+    {
+      "id": "Q055",
+      "question": "In the 3rd Party Industry Tests academic benefit, which two assessments are used?",
+      "answerable": true,
+      "stats": {
+        "original_chunks": 5,
+        "kept_chunks": 4,
+        "raw_chars": 4772,
+        "compressed_chars": 3832,
+        "chars_saved": 940,
+        "savings_pct": 19.7
+      },
+      "top_rerank_score": 0.4228
+    },
+    {
+      "id": "Q056",
+      "question": "What is today's mess menu?",
+      "answerable": false,
+      "stats": {
+        "original_chunks": 5,
+        "kept_chunks": 2,
+        "raw_chars": 6647,
+        "compressed_chars": 3067,
+        "chars_saved": 3580,
+        "savings_pct": 53.86
+      },
+      "top_rerank_score": 0.5487
+    },
+    {
+      "id": "Q057",
+      "question": "Who is the current Vice Chancellor of LPU?",
+      "answerable": false,
+      "stats": {
+        "original_chunks": 5,
+        "kept_chunks": 2,
+        "raw_chars": 7133,
+        "compressed_chars": 3063,
+        "chars_saved": 4070,
+        "savings_pct": 57.06
+      },
+      "top_rerank_score": 0.3093
+    },
+    {
+      "id": "Q058",
+      "question": "What is the last date to apply for admission to LPU in 2027?",
+      "answerable": false,
+      "stats": {
+        "original_chunks": 5,
+        "kept_chunks": 2,
+        "raw_chars": 6178,
+        "compressed_chars": 2616,
+        "chars_saved": 3562,
+        "savings_pct": 57.66
+      },
+      "top_rerank_score": 0.5143
+    },
+    {
+      "id": "Q059",
+      "question": "How many marks are required to pass the Data Structures end-term exam?",
+      "answerable": false,
+      "stats": {
+        "original_chunks": 5,
+        "kept_chunks": 3,
+        "raw_chars": 5032,
+        "compressed_chars": 3576,
+        "chars_saved": 1456,
+        "savings_pct": 28.93
+      },
+      "top_rerank_score": 0.3068
+    },
+    {
+      "id": "Q060",
+      "question": "What is the Wi-Fi password for the hostel?",
+      "answerable": false,
+      "stats": {
+        "original_chunks": 5,
+        "kept_chunks": 2,
+        "raw_chars": 6827,
+        "compressed_chars": 3181,
+        "chars_saved": 3646,
+        "savings_pct": 53.41
+      },
+      "top_rerank_score": 0.0849
+    },
+    {
+      "id": "Q061",
+      "question": "What is the annual tuition fee for the B.Tech CSE program?",
+      "answerable": false,
+      "stats": {
+        "original_chunks": 5,
+        "kept_chunks": 2,
+        "raw_chars": 5541,
+        "compressed_chars": 2776,
+        "chars_saved": 2765,
+        "savings_pct": 49.9
+      },
+      "top_rerank_score": 0.7831
+    },
+    {
+      "id": "Q062",
+      "question": "Which division should a student contact for clarity on Semester/Year Abroad matters?",
+      "answerable": true,
+      "stats": {
+        "original_chunks": 5,
+        "kept_chunks": 5,
+        "raw_chars": 5456,
+        "compressed_chars": 5945,
+        "chars_saved": 0,
+        "savings_pct": 0.0
+      },
+      "top_rerank_score": 0.8763
+    },
+    {
+      "id": "Q063",
+      "question": "What is the objective of LPU-NSS?",
+      "answerable": true,
+      "stats": {
+        "original_chunks": 5,
+        "kept_chunks": 5,
+        "raw_chars": 6417,
+        "compressed_chars": 6772,
+        "chars_saved": 0,
+        "savings_pct": 0.0
+      },
+      "top_rerank_score": 0.9206
+    }
+  ]
+}

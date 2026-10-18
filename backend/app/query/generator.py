@@ -37,14 +37,17 @@ ANSWER_PROMPT = ChatPromptTemplate.from_messages(
             "- Use short bullet points for lists. Keep total response under 150 words unless the question demands detail.\n"
             "- Do NOT include any thinking, reasoning, or internal monologue in your response.\n"
             "- Do NOT wrap your response in <think> tags or any XML-like tags.\n\n"
-            "Critical Instructions for Tables, Numbers, and Ranges:\n"
+            "Critical Grounding & Citation Instructions:\n"
             "1. Pay close attention to table columns, headers, and rows.\n"
             "2. When a user asks about a specific number, package, or stipend (e.g. '6 lakhs', '6 LPA', '15,000 stipend', '7.5 CGPA'):\n"
             "   - Look for range slabs in tables such as 'Above 5 & up to 10 LPA' (which includes 6 lakhs), 'Above 3 & up to 5 LPA', etc.\n"
             "   - Identify the exact category, eligible pathway courses, grade updation levels, and conditions mapped to that range.\n"
             "3. Format table-derived answers in clean, readable bullet points or structured summaries.\n"
-            "4. If the answer is genuinely NOT in the context, state that clearly.\n"
-            "5. Cite the source document(s) used.",
+            "4. Grounded Refusal Rule: If the provided context does NOT contain sufficient factual information to answer the question, "
+            "or if the question asks about policies or facilities outside the provided documents, explicitly refuse and state: "
+            "'I do not have sufficient information in the official university documents to answer this question.' "
+            "Do NOT extrapolate, speculate, or invent facts from outside knowledge.\n"
+            "5. Citations: Explicitly cite the source document name and page number as given in the context headers (e.g. '[Document Name, Page X]').",
         ),
         MessagesPlaceholder("history", optional=True),
         (
@@ -71,15 +74,16 @@ def _extract_raw(doc: Document) -> str:
 
 
 def _format_context(documents: list[Document]) -> str:
-    """Build context string for LLM prompt."""
+    """Build context string for LLM prompt with page-aware attribution."""
     parts = []
     for i, doc in enumerate(documents, 1):
         raw = _extract_raw(doc)
         source = doc.metadata.get("source_file", "Unknown")
-        title = doc.metadata.get("title", "")
-        header = f"[Source {i}: {source}"
-        if title:
-            header += f" — {title}"
+        page = doc.metadata.get("page_number", doc.metadata.get("page", "?"))
+        score = doc.metadata.get("rerank_score")
+        header = f"[Source {i}: {source}, Page {page}"
+        if score is not None:
+            header += f" [relevance: {score:.2f}]"
         header += "]"
         parts.append(f"{header}\n{raw}")
     return "\n\n---\n\n".join(parts)
@@ -220,3 +224,55 @@ def generate_answer(
     logger.error("All LLM providers failed (%s); using extractive fallback.", last_error)
     return {"answer": _build_clean_answer(query, documents), "sources": sources,
             "has_llm": False, "model_used": None, "llm_role": None}
+
+
+def stream_answer_tokens(
+    query: str, documents: list[Document], history: list[dict] | None = None
+):
+    """
+    Yield answer tokens as an iterator for real-time streaming, with automatic LLM failover.
+    """
+    context = _format_context(documents)
+
+    providers: list[tuple[str, str, str, str]] = []
+    if settings.has_llm:
+        providers.append(("primary", settings.LLM_API_KEY, settings.LLM_BASE_URL, settings.LLM_MODEL))
+    if settings.has_fallback_llm:
+        providers.append(
+            ("fallback", settings.FALLBACK_LLM_API_KEY, settings.FALLBACK_LLM_BASE_URL, settings.FALLBACK_LLM_MODEL)
+        )
+
+    if not providers:
+        yield _build_clean_answer(query, documents)
+        return
+
+    for role, api_key, base_url, model in providers:
+        try:
+            logger.info("Streaming answer with %s LLM (%s)...", role, model)
+            llm = ChatOpenAI(
+                api_key=api_key,
+                base_url=base_url,
+                model=model,
+                temperature=0.1,
+                max_tokens=1024,
+                streaming=True,
+            )
+            chain = ANSWER_PROMPT | llm | StrOutputParser()
+            in_think_block = False
+            for chunk in chain.stream(
+                {"context": context, "query": query, "history": _to_history_messages(history)}
+            ):
+                if "<think>" in chunk:
+                    in_think_block = True
+                    chunk = chunk.replace("<think>", "")
+                if "</think>" in chunk:
+                    in_think_block = False
+                    chunk = chunk.replace("</think>", "")
+                if not in_think_block and chunk:
+                    yield chunk
+            return
+        except Exception as e:
+            logger.error("%s LLM (%s) streaming failed: %s", role, model, str(e)[:200])
+            continue
+
+    yield _build_clean_answer(query, documents)

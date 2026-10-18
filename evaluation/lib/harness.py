@@ -59,12 +59,30 @@ class ExperimentConfig:
     source_path: str
     query_prefix: str = ""
     passage_prefix: str = ""
+    parser: str = "current"
+    query_rewriting: bool = False
+    hybrid: bool = False
+    hybrid_dense_weight: float = 0.5
+    hybrid_bm25_weight: float = 0.5
+    hybrid_rrf_k: int = 60
+    llm_provider: str = ""
+    llm_base_url: str = ""
+    llm_temperature: float = 0.1
+    llm_max_tokens: int = 1024
     raw: dict[str, Any] = field(default_factory=dict)
 
     def summary(self) -> dict:
         """Compact, machine-readable description for result artifacts."""
         return {
             "id": self.id,
+            "parser": self.parser,
+            "query_rewriting": self.query_rewriting,
+            "hybrid": {
+                "enabled": self.hybrid,
+                "dense_weight": self.hybrid_dense_weight,
+                "bm25_weight": self.hybrid_bm25_weight,
+                "rrf_k": self.hybrid_rrf_k,
+            },
             "embedding": {
                 "name": self.embedding_model,
                 "content_indexed": self.content_indexed,
@@ -74,7 +92,13 @@ class ExperimentConfig:
             "chunking": {"size": self.chunk_size, "overlap": self.chunk_overlap},
             "retrieval": {"top_k": self.top_k, "min_relevance_score": self.min_relevance_score},
             "reranker": {"name": self.rerank_model, "top_n": self.rerank_top_n, "enabled": self.rerank_enabled},
-            "llm": {"name": self.llm_model},
+            "llm": {
+                "name": self.llm_model,
+                "provider": self.llm_provider,
+                "base_url": self.llm_base_url,
+                "temperature": self.llm_temperature,
+                "max_tokens": self.llm_max_tokens,
+            },
             "snapshot": self.snapshot,
             "collection": self.collection,
         }
@@ -101,6 +125,8 @@ def load_config(config_id_or_path: str, snapshot: str | None = None, collection:
     resolved_snapshot = snapshot or eval_block.get("snapshot") or "baseline_v1"
     resolved_collection = collection or eval_block.get("collection") or f"eval_{cfg_id}"
 
+    gen_block = cfg.get("generation", {})
+    exp_block = cfg.get("experiment", {})
     return ExperimentConfig(
         id=cfg_id,
         name=cfg.get("name", cfg_id),
@@ -115,9 +141,19 @@ def load_config(config_id_or_path: str, snapshot: str | None = None, collection:
         rerank_enabled=cfg["reranker"].get("enabled", True),
         rerank_model=cfg["reranker"]["name"],
         rerank_top_n=cfg["reranker"]["top_n"],
-        llm_model=cfg["generation"]["llm"],
+        llm_model=gen_block.get("llm", "gemini-3.6-flash"),
+        llm_provider=gen_block.get("provider", ""),
+        llm_base_url=gen_block.get("base_url", ""),
+        llm_temperature=float(gen_block.get("temperature", 0.1)),
+        llm_max_tokens=int(gen_block.get("max_tokens", 1024)),
         snapshot=resolved_snapshot,
         collection=resolved_collection,
+        parser=exp_block.get("parser", "current"),
+        query_rewriting=exp_block.get("query_rewriting", False),
+        hybrid=exp_block.get("hybrid", False),
+        hybrid_dense_weight=float(exp_block.get("hybrid_dense_weight", 0.5)),
+        hybrid_bm25_weight=float(exp_block.get("hybrid_bm25_weight", 0.5)),
+        hybrid_rrf_k=int(exp_block.get("hybrid_rrf_k", 60)),
         source_path=str(p.relative_to(paths.PROJECT_ROOT)) if p.is_relative_to(paths.PROJECT_ROOT) else str(p),
         raw=cfg,
     )
@@ -137,6 +173,8 @@ def doc_ref(doc: Document, rank: int) -> dict:
         "page_number": doc.metadata.get("page_number"),
         "chunk_type": doc.metadata.get("chunk_type"),
         "cosine_score": doc.metadata.get("retrieval_cosine_score"),
+        "bm25_score": doc.metadata.get("bm25_score"),
+        "rrf_score": doc.metadata.get("rrf_score"),
         "rerank_score": doc.metadata.get("rerank_score"),
     }
 

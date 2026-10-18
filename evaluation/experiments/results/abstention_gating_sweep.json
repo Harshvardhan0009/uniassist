@@ -1,0 +1,82 @@
+[
+  {
+    "threshold": 0.1,
+    "true_refusals": 1,
+    "false_refusals": 0,
+    "refusal_precision": 1.0,
+    "refusal_recall": 0.1667,
+    "answerable_pass_rate": 1.0
+  },
+  {
+    "threshold": 0.2,
+    "true_refusals": 1,
+    "false_refusals": 2,
+    "refusal_precision": 0.3333,
+    "refusal_recall": 0.1667,
+    "answerable_pass_rate": 0.9649
+  },
+  {
+    "threshold": 0.3,
+    "true_refusals": 1,
+    "false_refusals": 2,
+    "refusal_precision": 0.3333,
+    "refusal_recall": 0.1667,
+    "answerable_pass_rate": 0.9649
+  },
+  {
+    "threshold": 0.4,
+    "true_refusals": 3,
+    "false_refusals": 3,
+    "refusal_precision": 0.5,
+    "refusal_recall": 0.5,
+    "answerable_pass_rate": 0.9474
+  },
+  {
+    "threshold": 0.5,
+    "true_refusals": 3,
+    "false_refusals": 5,
+    "refusal_precision": 0.375,
+    "refusal_recall": 0.5,
+    "answerable_pass_rate": 0.9123
+  },
+  {
+    "threshold": 0.6,
+    "true_refusals": 5,
+    "false_refusals": 6,
+    "refusal_precision": 0.4545,
+    "refusal_recall": 0.8333,
+    "answerable_pass_rate": 0.8947
+  },
+  {
+    "threshold": 0.7,
+    "true_refusals": 5,
+    "false_refusals": 9,
+    "refusal_precision": 0.3571,
+    "refusal_recall": 0.8333,
+    "answerable_pass_rate": 0.8421
+  },
+  {
+    "threshold": 0.75,
+    "true_refusals": 5,
+    "false_refusals": 15,
+    "refusal_precision": 0.25,
+    "refusal_recall": 0.8333,
+    "answerable_pass_rate": 0.7368
+  },
+  {
+    "threshold": 0.8,
+    "true_refusals": 6,
+    "false_refusals": 19,
+    "refusal_precision": 0.24,
+    "refusal_recall": 1.0,
+    "answerable_pass_rate": 0.6667
+  },
+  {
+    "threshold": 0.85,
+    "true_refusals": 6,
+    "false_refusals": 26,
+    "refusal_precision": 0.1875,
+    "refusal_recall": 1.0,
+    "answerable_pass_rate": 0.5439
+  }
+]

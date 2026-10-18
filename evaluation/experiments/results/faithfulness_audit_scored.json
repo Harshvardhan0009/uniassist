@@ -1,0 +1,2793 @@
+{
+  "groq_e5_1500": {
+    "summary": {
+      "audited_file": "rag_e5_1500_groq_gptoss_full_rag_raw.json",
+      "total_evaluated": 63,
+      "answerable_count": 57,
+      "unanswerable_count": 6,
+      "overall_faithfulness_rate": 0.6349,
+      "hallucination_rate": 0.3651,
+      "mean_faithfulness_score": 0.7788,
+      "mean_sentence_groundedness": 0.5257,
+      "mean_numerical_faithfulness": 0.9301,
+      "mean_citation_precision": 0.9825,
+      "classification_breakdown": {
+        "EXTRINSIC_HALLUCINATION": 14,
+        "NUMERICAL_HALLUCINATION": 9,
+        "GROUNDED_WITH_REASONING": 22,
+        "FULLY_GROUNDED": 12,
+        "CLEAN_ABSTENTION": 6
+      },
+      "unanswerable_abstention_accuracy": "6/6",
+      "phantom_citations_found": 0,
+      "phantom_citation_queries": [],
+      "numerical_hallucinations_found": 9,
+      "numerical_hallucination_queries": [
+        "Q002",
+        "Q011",
+        "Q024",
+        "Q026",
+        "Q028",
+        "Q030",
+        "Q039",
+        "Q046",
+        "Q050"
+      ]
+    },
+    "per_question": [
+      {
+        "id": "Q001",
+        "question": "What are the timings of the Central LPU Library?",
+        "answerable": true,
+        "classification": "EXTRINSIC_HALLUCINATION",
+        "is_faithful": false,
+        "has_hallucination": true,
+        "faithfulness_score": 0.6,
+        "sentence_groundedness": 0.0,
+        "numerical_faithfulness": 1.0,
+        "citation_precision": 1.0,
+        "citation_recall": 0.0,
+        "unsupported_numbers": [],
+        "phantom_citations": [],
+        "cited_sources": []
+      },
+      {
+        "id": "Q002",
+        "question": "How much is the late fee (compounding fee) charged per book per day when a student returns a library book late?",
+        "answerable": true,
+        "classification": "NUMERICAL_HALLUCINATION",
+        "is_faithful": false,
+        "has_hallucination": true,
+        "faithfulness_score": 0.4,
+        "sentence_groundedness": 0.0,
+        "numerical_faithfulness": 0.5,
+        "citation_precision": 1.0,
+        "citation_recall": 0.0,
+        "unsupported_numbers": [
+          "1"
+        ],
+        "phantom_citations": [],
+        "cited_sources": []
+      },
+      {
+        "id": "Q003",
+        "question": "What is the processing fee to apply for the Semester/Year Abroad program?",
+        "answerable": true,
+        "classification": "GROUNDED_WITH_REASONING",
+        "is_faithful": true,
+        "has_hallucination": false,
+        "faithfulness_score": 0.8,
+        "sentence_groundedness": 0.5,
+        "numerical_faithfulness": 1.0,
+        "citation_precision": 1.0,
+        "citation_recall": 0.0,
+        "unsupported_numbers": [],
+        "phantom_citations": [],
+        "cited_sources": []
+      },
+      {
+        "id": "Q004",
+        "question": "What is the minimum duration of a one-semester OJT or internship?",
+        "answerable": true,
+        "classification": "EXTRINSIC_HALLUCINATION",
+        "is_faithful": false,
+        "has_hallucination": true,
+        "faithfulness_score": 0.6,
+        "sentence_groundedness": 0.0,
+        "numerical_faithfulness": 1.0,
+        "citation_precision": 1.0,
+        "citation_recall": 0.0,
+        "unsupported_numbers": [],
+        "phantom_citations": [],
+        "cited_sources": []
+      },
+      {
+        "id": "Q005",
+        "question": "How many NSS hours must a volunteer complete and over what period?",
+        "answerable": true,
+        "classification": "GROUNDED_WITH_REASONING",
+        "is_faithful": true,
+        "has_hallucination": false,
+        "faithfulness_score": 0.9,
+        "sentence_groundedness": 0.75,
+        "numerical_faithfulness": 1.0,
+        "citation_precision": 1.0,
+        "citation_recall": 1.0,
+        "unsupported_numbers": [],
+        "phantom_citations": [],
+        "cited_sources": [
+          "NSSPolicy/LPUNSSPOLICY.pdf"
+        ]
+      },
+      {
+        "id": "Q006",
+        "question": "Which block houses the Central Library on the LPU campus?",
+        "answerable": true,
+        "classification": "GROUNDED_WITH_REASONING",
+        "is_faithful": true,
+        "has_hallucination": false,
+        "faithfulness_score": 0.8,
+        "sentence_groundedness": 0.5,
+        "numerical_faithfulness": 1.0,
+        "citation_precision": 1.0,
+        "citation_recall": 1.0,
+        "unsupported_numbers": [],
+        "phantom_citations": [],
+        "cited_sources": [
+          "UNImap/UNIMAP_Campus_Guide.txt"
+        ]
+      },
+      {
+        "id": "Q007",
+        "question": "Are jeans allowed under the student dress code?",
+        "answerable": true,
+        "classification": "GROUNDED_WITH_REASONING",
+        "is_faithful": true,
+        "has_hallucination": false,
+        "faithfulness_score": 0.8667,
+        "sentence_groundedness": 0.6667,
+        "numerical_faithfulness": 1.0,
+        "citation_precision": 1.0,
+        "citation_recall": 0.0,
+        "unsupported_numbers": [],
+        "phantom_citations": [],
+        "cited_sources": []
+      },
+      {
+        "id": "Q008",
+        "question": "What is the annual charge for the laundry facility in the residential facilities charges?",
+        "answerable": true,
+        "classification": "EXTRINSIC_HALLUCINATION",
+        "is_faithful": false,
+        "has_hallucination": true,
+        "faithfulness_score": 0.6,
+        "sentence_groundedness": 0.0,
+        "numerical_faithfulness": 1.0,
+        "citation_precision": 1.0,
+        "citation_recall": 0.0,
+        "unsupported_numbers": [],
+        "phantom_citations": [],
+        "cited_sources": []
+      },
+      {
+        "id": "Q009",
+        "question": "What rules must students follow while using the LPU libraries?",
+        "answerable": true,
+        "classification": "GROUNDED_WITH_REASONING",
+        "is_faithful": true,
+        "has_hallucination": false,
+        "faithfulness_score": 0.9111,
+        "sentence_groundedness": 0.7778,
+        "numerical_faithfulness": 1.0,
+        "citation_precision": 1.0,
+        "citation_recall": 1.0,
+        "unsupported_numbers": [],
+        "phantom_citations": [],
+        "cited_sources": [
+          "LibraryPolicy/Library Policy.pdf"
+        ]
+      },
+      {
+        "id": "Q010",
+        "question": "What is the 'One Student - One Offer' policy in career services?",
+        "answerable": true,
+        "classification": "FULLY_GROUNDED",
+        "is_faithful": true,
+        "has_hallucination": false,
+        "faithfulness_score": 1.0,
+        "sentence_groundedness": 1.0,
+        "numerical_faithfulness": 1.0,
+        "citation_precision": 1.0,
+        "citation_recall": 0.0,
+        "unsupported_numbers": [],
+        "phantom_citations": [],
+        "cited_sources": []
+      },
+      {
+        "id": "Q011",
+        "question": "At what point is a student's library membership suspended due to unpaid compounding fees?",
+        "answerable": true,
+        "classification": "NUMERICAL_HALLUCINATION",
+        "is_faithful": false,
+        "has_hallucination": true,
+        "faithfulness_score": 0.8,
+        "sentence_groundedness": 1.0,
+        "numerical_faithfulness": 0.5,
+        "citation_precision": 1.0,
+        "citation_recall": 0.0,
+        "unsupported_numbers": [
+          "1"
+        ],
+        "phantom_citations": [],
+        "cited_sources": []
+      },
+      {
+        "id": "Q012",
+        "question": "Who is not eligible to be selected as an NSS volunteer?",
+        "answerable": true,
+        "classification": "GROUNDED_WITH_REASONING",
+        "is_faithful": true,
+        "has_hallucination": false,
+        "faithfulness_score": 0.8,
+        "sentence_groundedness": 0.5,
+        "numerical_faithfulness": 1.0,
+        "citation_precision": 1.0,
+        "citation_recall": 0.0,
+        "unsupported_numbers": [],
+        "phantom_citations": [],
+        "cited_sources": []
+      },
+      {
+        "id": "Q013",
+        "question": "What are students expected to wear during winter under the dress code policy?",
+        "answerable": true,
+        "classification": "FULLY_GROUNDED",
+        "is_faithful": true,
+        "has_hallucination": false,
+        "faithfulness_score": 1.0,
+        "sentence_groundedness": 1.0,
+        "numerical_faithfulness": 1.0,
+        "citation_precision": 1.0,
+        "citation_recall": 0.0,
+        "unsupported_numbers": [],
+        "phantom_citations": [],
+        "cited_sources": []
+      },
+      {
+        "id": "Q014",
+        "question": "If a continuing student cancels their hostel facility on or after 1st September, how much refund are they entitled to?",
+        "answerable": true,
+        "classification": "FULLY_GROUNDED",
+        "is_faithful": true,
+        "has_hallucination": false,
+        "faithfulness_score": 1.0,
+        "sentence_groundedness": 1.0,
+        "numerical_faithfulness": 1.0,
+        "citation_precision": 1.0,
+        "citation_recall": 1.0,
+        "unsupported_numbers": [],
+        "phantom_citations": [],
+        "cited_sources": [
+          "ResidentialFacilities/Residential Facilities Refund Guidelines.pdf"
+        ]
+      },
+      {
+        "id": "Q015",
+        "question": "Can a student change the university or the duration after joining the host university for a semester abroad?",
+        "answerable": true,
+        "classification": "GROUNDED_WITH_REASONING",
+        "is_faithful": true,
+        "has_hallucination": false,
+        "faithfulness_score": 0.8,
+        "sentence_groundedness": 0.5,
+        "numerical_faithfulness": 1.0,
+        "citation_precision": 1.0,
+        "citation_recall": 1.0,
+        "unsupported_numbers": [],
+        "phantom_citations": [],
+        "cited_sources": [
+          "SemesterExchange/Semester_Year_Abroad_Policy.pdf"
+        ]
+      },
+      {
+        "id": "Q016",
+        "question": "What is the policy on using mobile phones inside the library?",
+        "answerable": true,
+        "classification": "FULLY_GROUNDED",
+        "is_faithful": true,
+        "has_hallucination": false,
+        "faithfulness_score": 1.0,
+        "sentence_groundedness": 1.0,
+        "numerical_faithfulness": 1.0,
+        "citation_precision": 1.0,
+        "citation_recall": 1.0,
+        "unsupported_numbers": [],
+        "phantom_citations": [],
+        "cited_sources": [
+          "LibraryPolicy/Library Policy.pdf"
+        ]
+      },
+      {
+        "id": "Q017",
+        "question": "What is the minimum CGPA required to be eligible for the 10% Attendance Benefit?",
+        "answerable": true,
+        "classification": "GROUNDED_WITH_REASONING",
+        "is_faithful": true,
+        "has_hallucination": false,
+        "faithfulness_score": 0.8,
+        "sentence_groundedness": 0.5,
+        "numerical_faithfulness": 1.0,
+        "citation_precision": 1.0,
+        "citation_recall": 0.0,
+        "unsupported_numbers": [],
+        "phantom_citations": [],
+        "cited_sources": []
+      },
+      {
+        "id": "Q018",
+        "question": "What is the standard minimum CGPA required for internship-based academic benefits?",
+        "answerable": true,
+        "classification": "EXTRINSIC_HALLUCINATION",
+        "is_faithful": false,
+        "has_hallucination": true,
+        "faithfulness_score": 0.6,
+        "sentence_groundedness": 0.0,
+        "numerical_faithfulness": 1.0,
+        "citation_precision": 1.0,
+        "citation_recall": 1.0,
+        "unsupported_numbers": [],
+        "phantom_citations": [],
+        "cited_sources": [
+          "EDU REV/Academic Benefits.pdf"
+        ]
+      },
+      {
+        "id": "Q019",
+        "question": "Is there a minimum CGPA requirement to avail the Grade Upgradation benefit?",
+        "answerable": true,
+        "classification": "GROUNDED_WITH_REASONING",
+        "is_faithful": true,
+        "has_hallucination": false,
+        "faithfulness_score": 0.8667,
+        "sentence_groundedness": 0.6667,
+        "numerical_faithfulness": 1.0,
+        "citation_precision": 1.0,
+        "citation_recall": 1.0,
+        "unsupported_numbers": [],
+        "phantom_citations": [],
+        "cited_sources": [
+          "EDU REV/Academic Benefits.pdf"
+        ]
+      },
+      {
+        "id": "Q020",
+        "question": "For Recognition of Prior Learning (RPL), what grade must a student secure in the RPL exam to get a complete course waiver?",
+        "answerable": true,
+        "classification": "GROUNDED_WITH_REASONING",
+        "is_faithful": true,
+        "has_hallucination": false,
+        "faithfulness_score": 0.8667,
+        "sentence_groundedness": 0.6667,
+        "numerical_faithfulness": 1.0,
+        "citation_precision": 1.0,
+        "citation_recall": 1.0,
+        "unsupported_numbers": [],
+        "phantom_citations": [],
+        "cited_sources": [
+          "EDU REV/Academic Benefits.pdf"
+        ]
+      },
+      {
+        "id": "Q021",
+        "question": "What academic benefit is granted for a patent that has been granted (Stage 3)?",
+        "answerable": true,
+        "classification": "GROUNDED_WITH_REASONING",
+        "is_faithful": true,
+        "has_hallucination": false,
+        "faithfulness_score": 0.8,
+        "sentence_groundedness": 0.5,
+        "numerical_faithfulness": 1.0,
+        "citation_precision": 1.0,
+        "citation_recall": 0.0,
+        "unsupported_numbers": [],
+        "phantom_citations": [],
+        "cited_sources": []
+      },
+      {
+        "id": "Q022",
+        "question": "What minimum CGPA is required to get complete course equivalence through NPTEL / Proctored MOOCs?",
+        "answerable": true,
+        "classification": "FULLY_GROUNDED",
+        "is_faithful": true,
+        "has_hallucination": false,
+        "faithfulness_score": 1.0,
+        "sentence_groundedness": 1.0,
+        "numerical_faithfulness": 1.0,
+        "citation_precision": 1.0,
+        "citation_recall": 0.0,
+        "unsupported_numbers": [],
+        "phantom_citations": [],
+        "cited_sources": []
+      },
+      {
+        "id": "Q023",
+        "question": "How many days of Duty Leave can be granted to a student for a competitive exam?",
+        "answerable": true,
+        "classification": "GROUNDED_WITH_REASONING",
+        "is_faithful": true,
+        "has_hallucination": false,
+        "faithfulness_score": 0.8667,
+        "sentence_groundedness": 0.6667,
+        "numerical_faithfulness": 1.0,
+        "citation_precision": 1.0,
+        "citation_recall": 1.0,
+        "unsupported_numbers": [],
+        "phantom_citations": [],
+        "cited_sources": [
+          "EDU REV/Academic Benefits.pdf"
+        ]
+      },
+      {
+        "id": "Q024",
+        "question": "What is the minimum current CGPA required to register for Career Services for admission batches 2017 onwards?",
+        "answerable": true,
+        "classification": "NUMERICAL_HALLUCINATION",
+        "is_faithful": false,
+        "has_hallucination": true,
+        "faithfulness_score": 0.9333,
+        "sentence_groundedness": 1.0,
+        "numerical_faithfulness": 0.8333,
+        "citation_precision": 1.0,
+        "citation_recall": 0.0,
+        "unsupported_numbers": [
+          "5.0"
+        ],
+        "phantom_citations": [],
+        "cited_sources": []
+      },
+      {
+        "id": "Q025",
+        "question": "Under what conditions is a registered student temporarily debarred from career services?",
+        "answerable": true,
+        "classification": "GROUNDED_WITH_REASONING",
+        "is_faithful": true,
+        "has_hallucination": false,
+        "faithfulness_score": 0.8857,
+        "sentence_groundedness": 0.7143,
+        "numerical_faithfulness": 1.0,
+        "citation_precision": 1.0,
+        "citation_recall": 0.0,
+        "unsupported_numbers": [],
+        "phantom_citations": [],
+        "cited_sources": []
+      },
+      {
+        "id": "Q026",
+        "question": "What are the different types of recruitment / placement drives at LPU?",
+        "answerable": true,
+        "classification": "NUMERICAL_HALLUCINATION",
+        "is_faithful": false,
+        "has_hallucination": true,
+        "faithfulness_score": 0.7533,
+        "sentence_groundedness": 0.5833,
+        "numerical_faithfulness": 0.8,
+        "citation_precision": 1.0,
+        "citation_recall": 0.0,
+        "unsupported_numbers": [
+          "2023"
+        ],
+        "phantom_citations": [],
+        "cited_sources": []
+      },
+      {
+        "id": "Q027",
+        "question": "What minimum marks in the End Term Test (ETT) must a student achieve to avail the placement academic benefit?",
+        "answerable": true,
+        "classification": "EXTRINSIC_HALLUCINATION",
+        "is_faithful": false,
+        "has_hallucination": true,
+        "faithfulness_score": 0.6,
+        "sentence_groundedness": 0.0,
+        "numerical_faithfulness": 1.0,
+        "citation_precision": 1.0,
+        "citation_recall": 0.0,
+        "unsupported_numbers": [],
+        "phantom_citations": [],
+        "cited_sources": []
+      },
+      {
+        "id": "Q028",
+        "question": "What is the eligibility CGPA criterion for going on an OJT / internship?",
+        "answerable": true,
+        "classification": "NUMERICAL_HALLUCINATION",
+        "is_faithful": false,
+        "has_hallucination": true,
+        "faithfulness_score": 0.4333,
+        "sentence_groundedness": 0.3333,
+        "numerical_faithfulness": 0.75,
+        "citation_precision": 0.0,
+        "citation_recall": 0.0,
+        "unsupported_numbers": [
+          "6.0"
+        ],
+        "phantom_citations": [],
+        "cited_sources": [
+          "EDU REV/Academic Benefits.pdf"
+        ]
+      },
+      {
+        "id": "Q029",
+        "question": "If a student wants to surrender or reject a placement offer, within how many days must they do so in writing?",
+        "answerable": true,
+        "classification": "FULLY_GROUNDED",
+        "is_faithful": true,
+        "has_hallucination": false,
+        "faithfulness_score": 1.0,
+        "sentence_groundedness": 1.0,
+        "numerical_faithfulness": 1.0,
+        "citation_precision": 1.0,
+        "citation_recall": 0.0,
+        "unsupported_numbers": [],
+        "phantom_citations": [],
+        "cited_sources": []
+      },
+      {
+        "id": "Q030",
+        "question": "What must a student obtain before going for an independently arranged (self-sourced) OJT or internship offer?",
+        "answerable": true,
+        "classification": "NUMERICAL_HALLUCINATION",
+        "is_faithful": false,
+        "has_hallucination": true,
+        "faithfulness_score": 0.6,
+        "sentence_groundedness": 0.6667,
+        "numerical_faithfulness": 0.3333,
+        "citation_precision": 1.0,
+        "citation_recall": 0.0,
+        "unsupported_numbers": [
+          "2019",
+          "2020"
+        ],
+        "phantom_citations": [],
+        "cited_sources": []
+      },
+      {
+        "id": "Q031",
+        "question": "What is the charge (in INR) for a Standard Air Conditioned 1-Seater hostel room with EDB till 31st March 2026?",
+        "answerable": true,
+        "classification": "FULLY_GROUNDED",
+        "is_faithful": true,
+        "has_hallucination": false,
+        "faithfulness_score": 1.0,
+        "sentence_groundedness": 1.0,
+        "numerical_faithfulness": 1.0,
+        "citation_precision": 1.0,
+        "citation_recall": 0.0,
+        "unsupported_numbers": [],
+        "phantom_citations": [],
+        "cited_sources": []
+      },
+      {
+        "id": "Q032",
+        "question": "What IELTS band is required to be awarded an 'A' equivalent grade under the benefit for clearing competitive exams?",
+        "answerable": true,
+        "classification": "GROUNDED_WITH_REASONING",
+        "is_faithful": true,
+        "has_hallucination": false,
+        "faithfulness_score": 0.8,
+        "sentence_groundedness": 0.5,
+        "numerical_faithfulness": 1.0,
+        "citation_precision": 1.0,
+        "citation_recall": 0.0,
+        "unsupported_numbers": [],
+        "phantom_citations": [],
+        "cited_sources": []
+      },
+      {
+        "id": "Q033",
+        "question": "For the placement academic benefit, which package category corresponds to a salary package above 5 LPA and up to 10 LPA?",
+        "answerable": true,
+        "classification": "FULLY_GROUNDED",
+        "is_faithful": true,
+        "has_hallucination": false,
+        "faithfulness_score": 1.0,
+        "sentence_groundedness": 1.0,
+        "numerical_faithfulness": 1.0,
+        "citation_precision": 1.0,
+        "citation_recall": 0.0,
+        "unsupported_numbers": [],
+        "phantom_citations": [],
+        "cited_sources": []
+      },
+      {
+        "id": "Q034",
+        "question": "What is the charge (in INR) for the 'Standard Mess 04 Meals' plan (Breakfast, Lunch, Snacks & Dinner)?",
+        "answerable": true,
+        "classification": "FULLY_GROUNDED",
+        "is_faithful": true,
+        "has_hallucination": false,
+        "faithfulness_score": 1.0,
+        "sentence_groundedness": 1.0,
+        "numerical_faithfulness": 1.0,
+        "citation_precision": 1.0,
+        "citation_recall": 0.0,
+        "unsupported_numbers": [],
+        "phantom_citations": [],
+        "cited_sources": []
+      },
+      {
+        "id": "Q035",
+        "question": "Under the Internship-with-PPO academic benefit, which monthly stipend range maps to the Z(D) package category?",
+        "answerable": true,
+        "classification": "EXTRINSIC_HALLUCINATION",
+        "is_faithful": false,
+        "has_hallucination": true,
+        "faithfulness_score": 0.6,
+        "sentence_groundedness": 0.0,
+        "numerical_faithfulness": 1.0,
+        "citation_precision": 1.0,
+        "citation_recall": 0.0,
+        "unsupported_numbers": [],
+        "phantom_citations": [],
+        "cited_sources": []
+      },
+      {
+        "id": "Q036",
+        "question": "How many GATE marks are needed to be awarded an 'A+' equivalent grade under the competitive exam benefit?",
+        "answerable": true,
+        "classification": "EXTRINSIC_HALLUCINATION",
+        "is_faithful": false,
+        "has_hallucination": true,
+        "faithfulness_score": 0.6,
+        "sentence_groundedness": 0.0,
+        "numerical_faithfulness": 1.0,
+        "citation_precision": 1.0,
+        "citation_recall": 0.0,
+        "unsupported_numbers": [],
+        "phantom_citations": [],
+        "cited_sources": []
+      },
+      {
+        "id": "Q037",
+        "question": "What is the charge (in INR) for the GYM facility without EDB (after 31st March 2026)?",
+        "answerable": true,
+        "classification": "EXTRINSIC_HALLUCINATION",
+        "is_faithful": false,
+        "has_hallucination": true,
+        "faithfulness_score": 0.6,
+        "sentence_groundedness": 0.0,
+        "numerical_faithfulness": 1.0,
+        "citation_precision": 1.0,
+        "citation_recall": 0.0,
+        "unsupported_numbers": [],
+        "phantom_citations": [],
+        "cited_sources": []
+      },
+      {
+        "id": "Q038",
+        "question": "A final-year student with a 7.0 CGPA and 65% attendance cleared GATE. Are they eligible for the 10% Attendance Benefit?",
+        "answerable": true,
+        "classification": "GROUNDED_WITH_REASONING",
+        "is_faithful": true,
+        "has_hallucination": false,
+        "faithfulness_score": 0.8667,
+        "sentence_groundedness": 0.6667,
+        "numerical_faithfulness": 1.0,
+        "citation_precision": 1.0,
+        "citation_recall": 0.0,
+        "unsupported_numbers": [],
+        "phantom_citations": [],
+        "cited_sources": []
+      },
+      {
+        "id": "Q039",
+        "question": "A student in a 2-year program has a 6.5 CGPA and one backlog. Do they meet the CGPA and backlog eligibility for a semester abroad, and for how long can they go?",
+        "answerable": true,
+        "classification": "NUMERICAL_HALLUCINATION",
+        "is_faithful": false,
+        "has_hallucination": true,
+        "faithfulness_score": 0.8057,
+        "sentence_groundedness": 0.7143,
+        "numerical_faithfulness": 0.8,
+        "citation_precision": 1.0,
+        "citation_recall": 0.0,
+        "unsupported_numbers": [
+          "4"
+        ],
+        "phantom_citations": [],
+        "cited_sources": []
+      },
+      {
+        "id": "Q040",
+        "question": "How many books can a student in an honors course borrow, and for how long?",
+        "answerable": true,
+        "classification": "FULLY_GROUNDED",
+        "is_faithful": true,
+        "has_hallucination": false,
+        "faithfulness_score": 1.0,
+        "sentence_groundedness": 1.0,
+        "numerical_faithfulness": 1.0,
+        "citation_precision": 1.0,
+        "citation_recall": 1.0,
+        "unsupported_numbers": [],
+        "phantom_citations": [],
+        "cited_sources": [
+          "LibraryPolicy/Library Policy.pdf"
+        ]
+      },
+      {
+        "id": "Q041",
+        "question": "A student placed in the Z(D) category has 4 pathway courses graded B, A, A+ and C. What are the updated grades after the placement benefit?",
+        "answerable": true,
+        "classification": "GROUNDED_WITH_REASONING",
+        "is_faithful": true,
+        "has_hallucination": false,
+        "faithfulness_score": 0.8,
+        "sentence_groundedness": 0.5,
+        "numerical_faithfulness": 1.0,
+        "citation_precision": 1.0,
+        "citation_recall": 0.0,
+        "unsupported_numbers": [],
+        "phantom_citations": [],
+        "cited_sources": []
+      },
+      {
+        "id": "Q042",
+        "question": "For an NSS volunteer, how many hours must be completed per academic year and how many special camps are mandatory?",
+        "answerable": true,
+        "classification": "GROUNDED_WITH_REASONING",
+        "is_faithful": true,
+        "has_hallucination": false,
+        "faithfulness_score": 0.8667,
+        "sentence_groundedness": 0.6667,
+        "numerical_faithfulness": 1.0,
+        "citation_precision": 1.0,
+        "citation_recall": 0.0,
+        "unsupported_numbers": [],
+        "phantom_citations": [],
+        "cited_sources": []
+      },
+      {
+        "id": "Q043",
+        "question": "During a semester abroad, which expenses is the student responsible for, and are they still considered enrolled at LPU?",
+        "answerable": true,
+        "classification": "FULLY_GROUNDED",
+        "is_faithful": true,
+        "has_hallucination": false,
+        "faithfulness_score": 0.9429,
+        "sentence_groundedness": 0.8571,
+        "numerical_faithfulness": 1.0,
+        "citation_precision": 1.0,
+        "citation_recall": 0.0,
+        "unsupported_numbers": [],
+        "phantom_citations": [],
+        "cited_sources": []
+      },
+      {
+        "id": "Q044",
+        "question": "And what about the other block libraries?",
+        "answerable": true,
+        "classification": "GROUNDED_WITH_REASONING",
+        "is_faithful": true,
+        "has_hallucination": false,
+        "faithfulness_score": 0.92,
+        "sentence_groundedness": 0.8,
+        "numerical_faithfulness": 1.0,
+        "citation_precision": 1.0,
+        "citation_recall": 1.0,
+        "unsupported_numbers": [],
+        "phantom_citations": [],
+        "cited_sources": [
+          "LibraryPolicy/Library Policy.pdf"
+        ]
+      },
+      {
+        "id": "Q045",
+        "question": "What happens if it falls below that after I have registered?",
+        "answerable": true,
+        "classification": "GROUNDED_WITH_REASONING",
+        "is_faithful": true,
+        "has_hallucination": false,
+        "faithfulness_score": 0.84,
+        "sentence_groundedness": 0.6,
+        "numerical_faithfulness": 1.0,
+        "citation_precision": 1.0,
+        "citation_recall": 0.0,
+        "unsupported_numbers": [],
+        "phantom_citations": [],
+        "cited_sources": []
+      },
+      {
+        "id": "Q046",
+        "question": "And a two-semester one?",
+        "answerable": true,
+        "classification": "NUMERICAL_HALLUCINATION",
+        "is_faithful": false,
+        "has_hallucination": true,
+        "faithfulness_score": 0.6,
+        "sentence_groundedness": 0.5,
+        "numerical_faithfulness": 0.5,
+        "citation_precision": 1.0,
+        "citation_recall": 0.0,
+        "unsupported_numbers": [
+          "2020",
+          "2019"
+        ],
+        "phantom_citations": [],
+        "cited_sources": []
+      },
+      {
+        "id": "Q047",
+        "question": "If my program is 3 years long, how much time can I spend abroad?",
+        "answerable": true,
+        "classification": "GROUNDED_WITH_REASONING",
+        "is_faithful": true,
+        "has_hallucination": false,
+        "faithfulness_score": 0.8,
+        "sentence_groundedness": 0.5,
+        "numerical_faithfulness": 1.0,
+        "citation_precision": 1.0,
+        "citation_recall": 1.0,
+        "unsupported_numbers": [],
+        "phantom_citations": [],
+        "cited_sources": [
+          "SemesterExchange/Semester_Year_Abroad_Policy.pdf"
+        ]
+      },
+      {
+        "id": "Q048",
+        "question": "And for a published patent?",
+        "answerable": true,
+        "classification": "GROUNDED_WITH_REASONING",
+        "is_faithful": true,
+        "has_hallucination": false,
+        "faithfulness_score": 0.8667,
+        "sentence_groundedness": 0.6667,
+        "numerical_faithfulness": 1.0,
+        "citation_precision": 1.0,
+        "citation_recall": 0.0,
+        "unsupported_numbers": [],
+        "phantom_citations": [],
+        "cited_sources": []
+      },
+      {
+        "id": "Q049",
+        "question": "And where is the School of Law?",
+        "answerable": true,
+        "classification": "EXTRINSIC_HALLUCINATION",
+        "is_faithful": false,
+        "has_hallucination": true,
+        "faithfulness_score": 0.6,
+        "sentence_groundedness": 0.0,
+        "numerical_faithfulness": 1.0,
+        "citation_precision": 1.0,
+        "citation_recall": 0.0,
+        "unsupported_numbers": [],
+        "phantom_citations": [],
+        "cited_sources": []
+      },
+      {
+        "id": "Q050",
+        "question": "What does the abbreviation 'OJT' stand for?",
+        "answerable": true,
+        "classification": "NUMERICAL_HALLUCINATION",
+        "is_faithful": false,
+        "has_hallucination": true,
+        "faithfulness_score": 0.2,
+        "sentence_groundedness": 0.0,
+        "numerical_faithfulness": 0.0,
+        "citation_precision": 1.0,
+        "citation_recall": 0.0,
+        "unsupported_numbers": [
+          "2",
+          "2020",
+          "2019",
+          "10"
+        ],
+        "phantom_citations": [],
+        "cited_sources": []
+      },
+      {
+        "id": "Q051",
+        "question": "What does 'PPO' stand for in the placement policy?",
+        "answerable": true,
+        "classification": "EXTRINSIC_HALLUCINATION",
+        "is_faithful": false,
+        "has_hallucination": true,
+        "faithfulness_score": 0.6,
+        "sentence_groundedness": 0.0,
+        "numerical_faithfulness": 1.0,
+        "citation_precision": 1.0,
+        "citation_recall": 0.0,
+        "unsupported_numbers": [],
+        "phantom_citations": [],
+        "cited_sources": []
+      },
+      {
+        "id": "Q052",
+        "question": "What does 'PEP' stand for in the career services policy?",
+        "answerable": true,
+        "classification": "EXTRINSIC_HALLUCINATION",
+        "is_faithful": false,
+        "has_hallucination": true,
+        "faithfulness_score": 0.6,
+        "sentence_groundedness": 0.0,
+        "numerical_faithfulness": 1.0,
+        "citation_precision": 1.0,
+        "citation_recall": 1.0,
+        "unsupported_numbers": [],
+        "phantom_citations": [],
+        "cited_sources": [
+          "PlacementPloicy/2023 Career Services Policy.pdf"
+        ]
+      },
+      {
+        "id": "Q053",
+        "question": "Which course codes are applicable for the IELTS/TOEFL/PTE benefit for clearing competitive exams?",
+        "answerable": true,
+        "classification": "EXTRINSIC_HALLUCINATION",
+        "is_faithful": false,
+        "has_hallucination": true,
+        "faithfulness_score": 0.6,
+        "sentence_groundedness": 0.0,
+        "numerical_faithfulness": 1.0,
+        "citation_precision": 1.0,
+        "citation_recall": 0.0,
+        "unsupported_numbers": [],
+        "phantom_citations": [],
+        "cited_sources": []
+      },
+      {
+        "id": "Q054",
+        "question": "What does 'LPA' mean in the career services policy?",
+        "answerable": true,
+        "classification": "FULLY_GROUNDED",
+        "is_faithful": true,
+        "has_hallucination": false,
+        "faithfulness_score": 1.0,
+        "sentence_groundedness": 1.0,
+        "numerical_faithfulness": 1.0,
+        "citation_precision": 1.0,
+        "citation_recall": 1.0,
+        "unsupported_numbers": [],
+        "phantom_citations": [],
+        "cited_sources": [
+          "PlacementPloicy/2023 Career Services Policy.pdf"
+        ]
+      },
+      {
+        "id": "Q055",
+        "question": "In the 3rd Party Industry Tests academic benefit, which two assessments are used?",
+        "answerable": true,
+        "classification": "EXTRINSIC_HALLUCINATION",
+        "is_faithful": false,
+        "has_hallucination": true,
+        "faithfulness_score": 0.6,
+        "sentence_groundedness": 0.0,
+        "numerical_faithfulness": 1.0,
+        "citation_precision": 1.0,
+        "citation_recall": 0.0,
+        "unsupported_numbers": [],
+        "phantom_citations": [],
+        "cited_sources": []
+      },
+      {
+        "id": "Q056",
+        "question": "What is today's mess menu?",
+        "answerable": false,
+        "classification": "CLEAN_ABSTENTION",
+        "is_faithful": true,
+        "has_hallucination": false,
+        "phantom_citations": [],
+        "unsupported_numbers": [],
+        "faithfulness_score": 1.0,
+        "details": "Model correctly refused out-of-corpus query"
+      },
+      {
+        "id": "Q057",
+        "question": "Who is the current Vice Chancellor of LPU?",
+        "answerable": false,
+        "classification": "CLEAN_ABSTENTION",
+        "is_faithful": true,
+        "has_hallucination": false,
+        "phantom_citations": [],
+        "unsupported_numbers": [],
+        "faithfulness_score": 1.0,
+        "details": "Model correctly refused out-of-corpus query"
+      },
+      {
+        "id": "Q058",
+        "question": "What is the last date to apply for admission to LPU in 2027?",
+        "answerable": false,
+        "classification": "CLEAN_ABSTENTION",
+        "is_faithful": true,
+        "has_hallucination": false,
+        "phantom_citations": [],
+        "unsupported_numbers": [],
+        "faithfulness_score": 1.0,
+        "details": "Model correctly refused out-of-corpus query"
+      },
+      {
+        "id": "Q059",
+        "question": "How many marks are required to pass the Data Structures end-term exam?",
+        "answerable": false,
+        "classification": "CLEAN_ABSTENTION",
+        "is_faithful": true,
+        "has_hallucination": false,
+        "phantom_citations": [],
+        "unsupported_numbers": [],
+        "faithfulness_score": 1.0,
+        "details": "Model correctly refused out-of-corpus query"
+      },
+      {
+        "id": "Q060",
+        "question": "What is the Wi-Fi password for the hostel?",
+        "answerable": false,
+        "classification": "CLEAN_ABSTENTION",
+        "is_faithful": true,
+        "has_hallucination": false,
+        "phantom_citations": [],
+        "unsupported_numbers": [],
+        "faithfulness_score": 1.0,
+        "details": "Model correctly refused out-of-corpus query"
+      },
+      {
+        "id": "Q061",
+        "question": "What is the annual tuition fee for the B.Tech CSE program?",
+        "answerable": false,
+        "classification": "CLEAN_ABSTENTION",
+        "is_faithful": true,
+        "has_hallucination": false,
+        "phantom_citations": [],
+        "unsupported_numbers": [],
+        "faithfulness_score": 1.0,
+        "details": "Model correctly refused out-of-corpus query"
+      },
+      {
+        "id": "Q062",
+        "question": "Which division should a student contact for clarity on Semester/Year Abroad matters?",
+        "answerable": true,
+        "classification": "EXTRINSIC_HALLUCINATION",
+        "is_faithful": false,
+        "has_hallucination": true,
+        "faithfulness_score": 0.6,
+        "sentence_groundedness": 0.0,
+        "numerical_faithfulness": 1.0,
+        "citation_precision": 1.0,
+        "citation_recall": 0.0,
+        "unsupported_numbers": [],
+        "phantom_citations": [],
+        "cited_sources": []
+      },
+      {
+        "id": "Q063",
+        "question": "What is the objective of LPU-NSS?",
+        "answerable": true,
+        "classification": "GROUNDED_WITH_REASONING",
+        "is_faithful": true,
+        "has_hallucination": false,
+        "faithfulness_score": 0.8,
+        "sentence_groundedness": 0.5,
+        "numerical_faithfulness": 1.0,
+        "citation_precision": 1.0,
+        "citation_recall": 1.0,
+        "unsupported_numbers": [],
+        "phantom_citations": [],
+        "cited_sources": [
+          "NSSPolicy/LPUNSSPOLICY.pdf"
+        ]
+      }
+    ]
+  },
+  "gemini_e5_1500_sample": {
+    "summary": {
+      "audited_file": "rag_e5_1500_gemini_full_rag_raw.json",
+      "total_evaluated": 18,
+      "answerable_count": 18,
+      "unanswerable_count": 0,
+      "overall_faithfulness_rate": 0.8889,
+      "hallucination_rate": 0.1111,
+      "mean_faithfulness_score": 0.8488,
+      "mean_sentence_groundedness": 0.6914,
+      "mean_numerical_faithfulness": 0.9306,
+      "mean_citation_precision": 1.0,
+      "classification_breakdown": {
+        "GROUNDED_WITH_REASONING": 12,
+        "NUMERICAL_HALLUCINATION": 2,
+        "FULLY_GROUNDED": 4
+      },
+      "unanswerable_abstention_accuracy": "0/0",
+      "phantom_citations_found": 0,
+      "phantom_citation_queries": [],
+      "numerical_hallucinations_found": 2,
+      "numerical_hallucination_queries": [
+        "Q004",
+        "Q011"
+      ]
+    },
+    "per_question": [
+      {
+        "id": "Q001",
+        "question": "What are the timings of the Central LPU Library?",
+        "answerable": true,
+        "classification": "GROUNDED_WITH_REASONING",
+        "is_faithful": true,
+        "has_hallucination": false,
+        "faithfulness_score": 0.92,
+        "sentence_groundedness": 0.8,
+        "numerical_faithfulness": 1.0,
+        "citation_precision": 1.0,
+        "citation_recall": 1.0,
+        "unsupported_numbers": [],
+        "phantom_citations": [],
+        "cited_sources": [
+          "LibraryPolicy/Library Policy.pdf"
+        ]
+      },
+      {
+        "id": "Q002",
+        "question": "How much is the late fee (compounding fee) charged per book per day when a student returns a library book late?",
+        "answerable": true,
+        "classification": "GROUNDED_WITH_REASONING",
+        "is_faithful": true,
+        "has_hallucination": false,
+        "faithfulness_score": 0.8,
+        "sentence_groundedness": 0.5,
+        "numerical_faithfulness": 1.0,
+        "citation_precision": 1.0,
+        "citation_recall": 1.0,
+        "unsupported_numbers": [],
+        "phantom_citations": [],
+        "cited_sources": [
+          "LibraryPolicy/Library Policy.pdf"
+        ]
+      },
+      {
+        "id": "Q003",
+        "question": "What is the processing fee to apply for the Semester/Year Abroad program?",
+        "answerable": true,
+        "classification": "GROUNDED_WITH_REASONING",
+        "is_faithful": true,
+        "has_hallucination": false,
+        "faithfulness_score": 0.8,
+        "sentence_groundedness": 0.5,
+        "numerical_faithfulness": 1.0,
+        "citation_precision": 1.0,
+        "citation_recall": 1.0,
+        "unsupported_numbers": [],
+        "phantom_citations": [],
+        "cited_sources": [
+          "SemesterExchange/Semester_Year_Abroad_Policy.pdf"
+        ]
+      },
+      {
+        "id": "Q004",
+        "question": "What is the minimum duration of a one-semester OJT or internship?",
+        "answerable": true,
+        "classification": "NUMERICAL_HALLUCINATION",
+        "is_faithful": false,
+        "has_hallucination": true,
+        "faithfulness_score": 0.3,
+        "sentence_groundedness": 0.0,
+        "numerical_faithfulness": 0.25,
+        "citation_precision": 1.0,
+        "citation_recall": 1.0,
+        "unsupported_numbers": [
+          "2019",
+          "2020",
+          "10"
+        ],
+        "phantom_citations": [],
+        "cited_sources": [
+          "PlacementPloicy/OJT Internship policy 2019-2020 onwards (10 Aug 2019).pdf"
+        ]
+      },
+      {
+        "id": "Q005",
+        "question": "How many NSS hours must a volunteer complete and over what period?",
+        "answerable": true,
+        "classification": "GROUNDED_WITH_REASONING",
+        "is_faithful": true,
+        "has_hallucination": false,
+        "faithfulness_score": 0.84,
+        "sentence_groundedness": 0.6,
+        "numerical_faithfulness": 1.0,
+        "citation_precision": 1.0,
+        "citation_recall": 1.0,
+        "unsupported_numbers": [],
+        "phantom_citations": [],
+        "cited_sources": [
+          "NSSPolicy/LPUNSSPOLICY.pdf"
+        ]
+      },
+      {
+        "id": "Q006",
+        "question": "Which block houses the Central Library on the LPU campus?",
+        "answerable": true,
+        "classification": "GROUNDED_WITH_REASONING",
+        "is_faithful": true,
+        "has_hallucination": false,
+        "faithfulness_score": 0.8,
+        "sentence_groundedness": 0.5,
+        "numerical_faithfulness": 1.0,
+        "citation_precision": 1.0,
+        "citation_recall": 1.0,
+        "unsupported_numbers": [],
+        "phantom_citations": [],
+        "cited_sources": [
+          "UNImap/UNIMAP_Campus_Guide.txt"
+        ]
+      },
+      {
+        "id": "Q007",
+        "question": "Are jeans allowed under the student dress code?",
+        "answerable": true,
+        "classification": "GROUNDED_WITH_REASONING",
+        "is_faithful": true,
+        "has_hallucination": false,
+        "faithfulness_score": 0.8667,
+        "sentence_groundedness": 0.6667,
+        "numerical_faithfulness": 1.0,
+        "citation_precision": 1.0,
+        "citation_recall": 1.0,
+        "unsupported_numbers": [],
+        "phantom_citations": [],
+        "cited_sources": [
+          "DressCode/FAQ's.pdf"
+        ]
+      },
+      {
+        "id": "Q008",
+        "question": "What is the annual charge for the laundry facility in the residential facilities charges?",
+        "answerable": true,
+        "classification": "GROUNDED_WITH_REASONING",
+        "is_faithful": true,
+        "has_hallucination": false,
+        "faithfulness_score": 0.8667,
+        "sentence_groundedness": 0.6667,
+        "numerical_faithfulness": 1.0,
+        "citation_precision": 1.0,
+        "citation_recall": 1.0,
+        "unsupported_numbers": [],
+        "phantom_citations": [],
+        "cited_sources": [
+          "ResidentialFacilities/Charges For Residential Facilities.pdf"
+        ]
+      },
+      {
+        "id": "Q009",
+        "question": "What rules must students follow while using the LPU libraries?",
+        "answerable": true,
+        "classification": "GROUNDED_WITH_REASONING",
+        "is_faithful": true,
+        "has_hallucination": false,
+        "faithfulness_score": 0.8182,
+        "sentence_groundedness": 0.5455,
+        "numerical_faithfulness": 1.0,
+        "citation_precision": 1.0,
+        "citation_recall": 1.0,
+        "unsupported_numbers": [],
+        "phantom_citations": [],
+        "cited_sources": [
+          "LibraryPolicy/Library Policy.pdf"
+        ]
+      },
+      {
+        "id": "Q010",
+        "question": "What is the 'One Student - One Offer' policy in career services?",
+        "answerable": true,
+        "classification": "FULLY_GROUNDED",
+        "is_faithful": true,
+        "has_hallucination": false,
+        "faithfulness_score": 1.0,
+        "sentence_groundedness": 1.0,
+        "numerical_faithfulness": 1.0,
+        "citation_precision": 1.0,
+        "citation_recall": 1.0,
+        "unsupported_numbers": [],
+        "phantom_citations": [],
+        "cited_sources": [
+          "PlacementPloicy/2023 Career Services Policy.pdf"
+        ]
+      },
+      {
+        "id": "Q011",
+        "question": "At what point is a student's library membership suspended due to unpaid compounding fees?",
+        "answerable": true,
+        "classification": "NUMERICAL_HALLUCINATION",
+        "is_faithful": false,
+        "has_hallucination": true,
+        "faithfulness_score": 0.8,
+        "sentence_groundedness": 1.0,
+        "numerical_faithfulness": 0.5,
+        "citation_precision": 1.0,
+        "citation_recall": 1.0,
+        "unsupported_numbers": [
+          "1"
+        ],
+        "phantom_citations": [],
+        "cited_sources": [
+          "LibraryPolicy/Library Policy.pdf"
+        ]
+      },
+      {
+        "id": "Q012",
+        "question": "Who is not eligible to be selected as an NSS volunteer?",
+        "answerable": true,
+        "classification": "GROUNDED_WITH_REASONING",
+        "is_faithful": true,
+        "has_hallucination": false,
+        "faithfulness_score": 0.9,
+        "sentence_groundedness": 0.75,
+        "numerical_faithfulness": 1.0,
+        "citation_precision": 1.0,
+        "citation_recall": 1.0,
+        "unsupported_numbers": [],
+        "phantom_citations": [],
+        "cited_sources": [
+          "NSSPolicy/LPUNSSPOLICY.pdf"
+        ]
+      },
+      {
+        "id": "Q013",
+        "question": "What are students expected to wear during winter under the dress code policy?",
+        "answerable": true,
+        "classification": "FULLY_GROUNDED",
+        "is_faithful": true,
+        "has_hallucination": false,
+        "faithfulness_score": 1.0,
+        "sentence_groundedness": 1.0,
+        "numerical_faithfulness": 1.0,
+        "citation_precision": 1.0,
+        "citation_recall": 1.0,
+        "unsupported_numbers": [],
+        "phantom_citations": [],
+        "cited_sources": [
+          "DressCode/Dress Code and Uniform Policy for Students.pdf"
+        ]
+      },
+      {
+        "id": "Q014",
+        "question": "If a continuing student cancels their hostel facility on or after 1st September, how much refund are they entitled to?",
+        "answerable": true,
+        "classification": "FULLY_GROUNDED",
+        "is_faithful": true,
+        "has_hallucination": false,
+        "faithfulness_score": 1.0,
+        "sentence_groundedness": 1.0,
+        "numerical_faithfulness": 1.0,
+        "citation_precision": 1.0,
+        "citation_recall": 1.0,
+        "unsupported_numbers": [],
+        "phantom_citations": [],
+        "cited_sources": [
+          "ResidentialFacilities/Residential Facilities Refund Guidelines.pdf"
+        ]
+      },
+      {
+        "id": "Q015",
+        "question": "Can a student change the university or the duration after joining the host university for a semester abroad?",
+        "answerable": true,
+        "classification": "GROUNDED_WITH_REASONING",
+        "is_faithful": true,
+        "has_hallucination": false,
+        "faithfulness_score": 0.8,
+        "sentence_groundedness": 0.5,
+        "numerical_faithfulness": 1.0,
+        "citation_precision": 1.0,
+        "citation_recall": 1.0,
+        "unsupported_numbers": [],
+        "phantom_citations": [],
+        "cited_sources": [
+          "SemesterExchange/Semester_Year_Abroad_Policy.pdf"
+        ]
+      },
+      {
+        "id": "Q016",
+        "question": "What is the policy on using mobile phones inside the library?",
+        "answerable": true,
+        "classification": "FULLY_GROUNDED",
+        "is_faithful": true,
+        "has_hallucination": false,
+        "faithfulness_score": 1.0,
+        "sentence_groundedness": 1.0,
+        "numerical_faithfulness": 1.0,
+        "citation_precision": 1.0,
+        "citation_recall": 1.0,
+        "unsupported_numbers": [],
+        "phantom_citations": [],
+        "cited_sources": [
+          "LibraryPolicy/Library Policy.pdf"
+        ]
+      },
+      {
+        "id": "Q017",
+        "question": "What is the minimum CGPA required to be eligible for the 10% Attendance Benefit?",
+        "answerable": true,
+        "classification": "GROUNDED_WITH_REASONING",
+        "is_faithful": true,
+        "has_hallucination": false,
+        "faithfulness_score": 0.8667,
+        "sentence_groundedness": 0.6667,
+        "numerical_faithfulness": 1.0,
+        "citation_precision": 1.0,
+        "citation_recall": 1.0,
+        "unsupported_numbers": [],
+        "phantom_citations": [],
+        "cited_sources": [
+          "EDU REV/Academic Benefits.pdf"
+        ]
+      },
+      {
+        "id": "Q018",
+        "question": "What is the standard minimum CGPA required for internship-based academic benefits?",
+        "answerable": true,
+        "classification": "GROUNDED_WITH_REASONING",
+        "is_faithful": true,
+        "has_hallucination": false,
+        "faithfulness_score": 0.9,
+        "sentence_groundedness": 0.75,
+        "numerical_faithfulness": 1.0,
+        "citation_precision": 1.0,
+        "citation_recall": 1.0,
+        "unsupported_numbers": [],
+        "phantom_citations": [],
+        "cited_sources": [
+          "EDU REV/Academic Benefits.pdf"
+        ]
+      }
+    ]
+  },
+  "gemini_baseline_v1": {
+    "summary": {
+      "audited_file": "baseline_v1_gemini36_full_rag_raw.json",
+      "total_evaluated": 63,
+      "answerable_count": 57,
+      "unanswerable_count": 6,
+      "overall_faithfulness_rate": 0.381,
+      "hallucination_rate": 0.619,
+      "mean_faithfulness_score": 0.6698,
+      "mean_sentence_groundedness": 0.5663,
+      "mean_numerical_faithfulness": 0.7559,
+      "mean_citation_precision": 0.7047,
+      "classification_breakdown": {
+        "GROUNDED_WITH_REASONING": 16,
+        "FULLY_GROUNDED": 6,
+        "NUMERICAL_HALLUCINATION": 28,
+        "EXTRINSIC_HALLUCINATION": 7,
+        "HALLUCINATED_ANSWER": 4,
+        "CLEAN_ABSTENTION": 2
+      },
+      "unanswerable_abstention_accuracy": "2/6",
+      "phantom_citations_found": 0,
+      "phantom_citation_queries": [],
+      "numerical_hallucinations_found": 28,
+      "numerical_hallucination_queries": [
+        "Q004",
+        "Q005",
+        "Q006",
+        "Q008",
+        "Q013",
+        "Q014",
+        "Q015",
+        "Q017",
+        "Q020",
+        "Q022",
+        "Q023",
+        "Q025",
+        "Q028",
+        "Q029",
+        "Q030",
+        "Q033",
+        "Q034",
+        "Q035",
+        "Q036",
+        "Q037",
+        "Q039",
+        "Q041",
+        "Q044",
+        "Q046",
+        "Q048",
+        "Q049",
+        "Q050",
+        "Q051"
+      ]
+    },
+    "per_question": [
+      {
+        "id": "Q001",
+        "question": "What are the timings of the Central LPU Library?",
+        "answerable": true,
+        "classification": "GROUNDED_WITH_REASONING",
+        "is_faithful": true,
+        "has_hallucination": false,
+        "faithfulness_score": 0.92,
+        "sentence_groundedness": 0.8,
+        "numerical_faithfulness": 1.0,
+        "citation_precision": 1.0,
+        "citation_recall": 1.0,
+        "unsupported_numbers": [],
+        "phantom_citations": [],
+        "cited_sources": [
+          "LibraryPolicy/Library Policy.pdf"
+        ]
+      },
+      {
+        "id": "Q002",
+        "question": "How much is the late fee (compounding fee) charged per book per day when a student returns a library book late?",
+        "answerable": true,
+        "classification": "FULLY_GROUNDED",
+        "is_faithful": true,
+        "has_hallucination": false,
+        "faithfulness_score": 1.0,
+        "sentence_groundedness": 1.0,
+        "numerical_faithfulness": 1.0,
+        "citation_precision": 1.0,
+        "citation_recall": 1.0,
+        "unsupported_numbers": [],
+        "phantom_citations": [],
+        "cited_sources": [
+          "LibraryPolicy/Library Policy.pdf"
+        ]
+      },
+      {
+        "id": "Q003",
+        "question": "What is the processing fee to apply for the Semester/Year Abroad program?",
+        "answerable": true,
+        "classification": "GROUNDED_WITH_REASONING",
+        "is_faithful": true,
+        "has_hallucination": false,
+        "faithfulness_score": 0.8,
+        "sentence_groundedness": 0.5,
+        "numerical_faithfulness": 1.0,
+        "citation_precision": 1.0,
+        "citation_recall": 1.0,
+        "unsupported_numbers": [],
+        "phantom_citations": [],
+        "cited_sources": [
+          "SemesterExchange/Semester_Year_Abroad_Policy.pdf"
+        ]
+      },
+      {
+        "id": "Q004",
+        "question": "What is the minimum duration of a one-semester OJT or internship?",
+        "answerable": true,
+        "classification": "NUMERICAL_HALLUCINATION",
+        "is_faithful": false,
+        "has_hallucination": true,
+        "faithfulness_score": 0.2,
+        "sentence_groundedness": 0.0,
+        "numerical_faithfulness": 0.0,
+        "citation_precision": 1.0,
+        "citation_recall": 1.0,
+        "unsupported_numbers": [
+          "2019",
+          "2020",
+          "4",
+          "10"
+        ],
+        "phantom_citations": [],
+        "cited_sources": [
+          "PlacementPloicy/OJT Internship policy 2019-2020 onwards (10 Aug 2019).pdf"
+        ]
+      },
+      {
+        "id": "Q005",
+        "question": "How many NSS hours must a volunteer complete and over what period?",
+        "answerable": true,
+        "classification": "NUMERICAL_HALLUCINATION",
+        "is_faithful": false,
+        "has_hallucination": true,
+        "faithfulness_score": 0.7867,
+        "sentence_groundedness": 0.6667,
+        "numerical_faithfulness": 0.8,
+        "citation_precision": 1.0,
+        "citation_recall": 1.0,
+        "unsupported_numbers": [
+          "120"
+        ],
+        "phantom_citations": [],
+        "cited_sources": [
+          "NSSPolicy/LPUNSSPOLICY.pdf"
+        ]
+      },
+      {
+        "id": "Q006",
+        "question": "Which block houses the Central Library on the LPU campus?",
+        "answerable": true,
+        "classification": "NUMERICAL_HALLUCINATION",
+        "is_faithful": false,
+        "has_hallucination": true,
+        "faithfulness_score": 0.4,
+        "sentence_groundedness": 0.5,
+        "numerical_faithfulness": 0.0,
+        "citation_precision": 1.0,
+        "citation_recall": 1.0,
+        "unsupported_numbers": [
+          "37"
+        ],
+        "phantom_citations": [],
+        "cited_sources": [
+          "UNImap/UNIMAP_Campus_Guide.txt"
+        ]
+      },
+      {
+        "id": "Q007",
+        "question": "Are jeans allowed under the student dress code?",
+        "answerable": true,
+        "classification": "GROUNDED_WITH_REASONING",
+        "is_faithful": true,
+        "has_hallucination": false,
+        "faithfulness_score": 0.8667,
+        "sentence_groundedness": 0.6667,
+        "numerical_faithfulness": 1.0,
+        "citation_precision": 1.0,
+        "citation_recall": 1.0,
+        "unsupported_numbers": [],
+        "phantom_citations": [],
+        "cited_sources": [
+          "DressCode/FAQ's.pdf"
+        ]
+      },
+      {
+        "id": "Q008",
+        "question": "What is the annual charge for the laundry facility in the residential facilities charges?",
+        "answerable": true,
+        "classification": "NUMERICAL_HALLUCINATION",
+        "is_faithful": false,
+        "has_hallucination": true,
+        "faithfulness_score": 0.8,
+        "sentence_groundedness": 1.0,
+        "numerical_faithfulness": 0.5,
+        "citation_precision": 1.0,
+        "citation_recall": 0.0,
+        "unsupported_numbers": [
+          ".5400",
+          "70"
+        ],
+        "phantom_citations": [],
+        "cited_sources": []
+      },
+      {
+        "id": "Q009",
+        "question": "What rules must students follow while using the LPU libraries?",
+        "answerable": true,
+        "classification": "EXTRINSIC_HALLUCINATION",
+        "is_faithful": false,
+        "has_hallucination": true,
+        "faithfulness_score": 0.6333,
+        "sentence_groundedness": 0.0833,
+        "numerical_faithfulness": 1.0,
+        "citation_precision": 1.0,
+        "citation_recall": 1.0,
+        "unsupported_numbers": [],
+        "phantom_citations": [],
+        "cited_sources": [
+          "LibraryPolicy/Library Policy.pdf"
+        ]
+      },
+      {
+        "id": "Q010",
+        "question": "What is the 'One Student - One Offer' policy in career services?",
+        "answerable": true,
+        "classification": "GROUNDED_WITH_REASONING",
+        "is_faithful": true,
+        "has_hallucination": false,
+        "faithfulness_score": 0.8,
+        "sentence_groundedness": 0.5,
+        "numerical_faithfulness": 1.0,
+        "citation_precision": 1.0,
+        "citation_recall": 1.0,
+        "unsupported_numbers": [],
+        "phantom_citations": [],
+        "cited_sources": [
+          "PlacementPloicy/2023 Career Services Policy.pdf"
+        ]
+      },
+      {
+        "id": "Q011",
+        "question": "At what point is a student's library membership suspended due to unpaid compounding fees?",
+        "answerable": true,
+        "classification": "FULLY_GROUNDED",
+        "is_faithful": true,
+        "has_hallucination": false,
+        "faithfulness_score": 1.0,
+        "sentence_groundedness": 1.0,
+        "numerical_faithfulness": 1.0,
+        "citation_precision": 1.0,
+        "citation_recall": 1.0,
+        "unsupported_numbers": [],
+        "phantom_citations": [],
+        "cited_sources": [
+          "LibraryPolicy/Library Policy.pdf"
+        ]
+      },
+      {
+        "id": "Q012",
+        "question": "Who is not eligible to be selected as an NSS volunteer?",
+        "answerable": true,
+        "classification": "EXTRINSIC_HALLUCINATION",
+        "is_faithful": false,
+        "has_hallucination": true,
+        "faithfulness_score": 0.76,
+        "sentence_groundedness": 0.4,
+        "numerical_faithfulness": 1.0,
+        "citation_precision": 1.0,
+        "citation_recall": 1.0,
+        "unsupported_numbers": [],
+        "phantom_citations": [],
+        "cited_sources": [
+          "NSSPolicy/LPUNSSPOLICY.pdf"
+        ]
+      },
+      {
+        "id": "Q013",
+        "question": "What are students expected to wear during winter under the dress code policy?",
+        "answerable": true,
+        "classification": "NUMERICAL_HALLUCINATION",
+        "is_faithful": false,
+        "has_hallucination": true,
+        "faithfulness_score": 0.5167,
+        "sentence_groundedness": 0.7083,
+        "numerical_faithfulness": 0.3333,
+        "citation_precision": 0.5,
+        "citation_recall": 1.0,
+        "unsupported_numbers": [
+          "6",
+          "5"
+        ],
+        "phantom_citations": [],
+        "cited_sources": [
+          "DressCode/Dress Code and Uniform Policy for Students.pdf",
+          "DressCode/FAQ's.pdf"
+        ]
+      },
+      {
+        "id": "Q014",
+        "question": "If a continuing student cancels their hostel facility on or after 1st September, how much refund are they entitled to?",
+        "answerable": true,
+        "classification": "NUMERICAL_HALLUCINATION",
+        "is_faithful": false,
+        "has_hallucination": true,
+        "faithfulness_score": 0.6507,
+        "sentence_groundedness": 0.6744,
+        "numerical_faithfulness": 0.7857,
+        "citation_precision": 0.3333,
+        "citation_recall": 1.0,
+        "unsupported_numbers": [
+          "8",
+          "2020",
+          "2019"
+        ],
+        "phantom_citations": [],
+        "cited_sources": [
+          "ResidentialFacilities/Charges For Residential Facilities.pdf",
+          "PlacementPloicy/OJT Internship policy 2019-2020 onwards (10 Aug 2019).pdf",
+          "ResidentialFacilities/Residential Facilities Refund Guidelines.pdf"
+        ]
+      },
+      {
+        "id": "Q015",
+        "question": "Can a student change the university or the duration after joining the host university for a semester abroad?",
+        "answerable": true,
+        "classification": "NUMERICAL_HALLUCINATION",
+        "is_faithful": false,
+        "has_hallucination": true,
+        "faithfulness_score": 0.3333,
+        "sentence_groundedness": 0.3333,
+        "numerical_faithfulness": 0.0,
+        "citation_precision": 1.0,
+        "citation_recall": 1.0,
+        "unsupported_numbers": [
+          "3.1"
+        ],
+        "phantom_citations": [],
+        "cited_sources": [
+          "SemesterExchange/Semester_Year_Abroad_Policy.pdf"
+        ]
+      },
+      {
+        "id": "Q016",
+        "question": "What is the policy on using mobile phones inside the library?",
+        "answerable": true,
+        "classification": "EXTRINSIC_HALLUCINATION",
+        "is_faithful": false,
+        "has_hallucination": true,
+        "faithfulness_score": 0.68,
+        "sentence_groundedness": 0.2,
+        "numerical_faithfulness": 1.0,
+        "citation_precision": 1.0,
+        "citation_recall": 1.0,
+        "unsupported_numbers": [],
+        "phantom_citations": [],
+        "cited_sources": [
+          "LibraryPolicy/Library Policy.pdf"
+        ]
+      },
+      {
+        "id": "Q017",
+        "question": "What is the minimum CGPA required to be eligible for the 10% Attendance Benefit?",
+        "answerable": true,
+        "classification": "NUMERICAL_HALLUCINATION",
+        "is_faithful": false,
+        "has_hallucination": true,
+        "faithfulness_score": 0.565,
+        "sentence_groundedness": 0.6,
+        "numerical_faithfulness": 0.5625,
+        "citation_precision": 0.5,
+        "citation_recall": 1.0,
+        "unsupported_numbers": [
+          "1000",
+          "1499",
+          "500",
+          "1500",
+          "499",
+          "999",
+          "2000"
+        ],
+        "phantom_citations": [],
+        "cited_sources": [
+          "EDU REV/Academic Benefits.pdf",
+          "PlacementPloicy/Academic Benefit Plan - Clearing Competitive Exams.pdf"
+        ]
+      },
+      {
+        "id": "Q018",
+        "question": "What is the standard minimum CGPA required for internship-based academic benefits?",
+        "answerable": true,
+        "classification": "EXTRINSIC_HALLUCINATION",
+        "is_faithful": false,
+        "has_hallucination": true,
+        "faithfulness_score": 0.68,
+        "sentence_groundedness": 0.2,
+        "numerical_faithfulness": 1.0,
+        "citation_precision": 1.0,
+        "citation_recall": 1.0,
+        "unsupported_numbers": [],
+        "phantom_citations": [],
+        "cited_sources": [
+          "EDU REV/Academic Benefits.pdf"
+        ]
+      },
+      {
+        "id": "Q019",
+        "question": "Is there a minimum CGPA requirement to avail the Grade Upgradation benefit?",
+        "answerable": true,
+        "classification": "FULLY_GROUNDED",
+        "is_faithful": true,
+        "has_hallucination": false,
+        "faithfulness_score": 0.9714,
+        "sentence_groundedness": 0.9286,
+        "numerical_faithfulness": 1.0,
+        "citation_precision": 1.0,
+        "citation_recall": 1.0,
+        "unsupported_numbers": [],
+        "phantom_citations": [],
+        "cited_sources": [
+          "EDU REV/Academic Benefits.pdf"
+        ]
+      },
+      {
+        "id": "Q020",
+        "question": "For Recognition of Prior Learning (RPL), what grade must a student secure in the RPL exam to get a complete course waiver?",
+        "answerable": true,
+        "classification": "NUMERICAL_HALLUCINATION",
+        "is_faithful": false,
+        "has_hallucination": true,
+        "faithfulness_score": 0.4029,
+        "sentence_groundedness": 0.4571,
+        "numerical_faithfulness": 0.3,
+        "citation_precision": 0.5,
+        "citation_recall": 1.0,
+        "unsupported_numbers": [
+          "1000",
+          "1499",
+          "500",
+          "1500",
+          "499",
+          "999",
+          "2000"
+        ],
+        "phantom_citations": [],
+        "cited_sources": [
+          "EDU REV/Academic Benefits.pdf",
+          "PlacementPloicy/Academic Benefit Plan - Clearing Competitive Exams.pdf"
+        ]
+      },
+      {
+        "id": "Q021",
+        "question": "What academic benefit is granted for a patent that has been granted (Stage 3)?",
+        "answerable": true,
+        "classification": "GROUNDED_WITH_REASONING",
+        "is_faithful": true,
+        "has_hallucination": false,
+        "faithfulness_score": 0.9,
+        "sentence_groundedness": 0.75,
+        "numerical_faithfulness": 1.0,
+        "citation_precision": 1.0,
+        "citation_recall": 1.0,
+        "unsupported_numbers": [],
+        "phantom_citations": [],
+        "cited_sources": [
+          "EDU REV/Academic Benefits.pdf"
+        ]
+      },
+      {
+        "id": "Q022",
+        "question": "What minimum CGPA is required to get complete course equivalence through NPTEL / Proctored MOOCs?",
+        "answerable": true,
+        "classification": "NUMERICAL_HALLUCINATION",
+        "is_faithful": false,
+        "has_hallucination": true,
+        "faithfulness_score": 0.3889,
+        "sentence_groundedness": 0.2222,
+        "numerical_faithfulness": 0.25,
+        "citation_precision": 1.0,
+        "citation_recall": 1.0,
+        "unsupported_numbers": [
+          "7.0",
+          "7",
+          "40"
+        ],
+        "phantom_citations": [],
+        "cited_sources": [
+          "EDU REV/Academic Benefits.pdf"
+        ]
+      },
+      {
+        "id": "Q023",
+        "question": "How many days of Duty Leave can be granted to a student for a competitive exam?",
+        "answerable": true,
+        "classification": "NUMERICAL_HALLUCINATION",
+        "is_faithful": false,
+        "has_hallucination": true,
+        "faithfulness_score": 0.6567,
+        "sentence_groundedness": 0.5417,
+        "numerical_faithfulness": 0.9333,
+        "citation_precision": 0.3333,
+        "citation_recall": 1.0,
+        "unsupported_numbers": [
+          "2020",
+          "2019"
+        ],
+        "phantom_citations": [],
+        "cited_sources": [
+          "EDU REV/Academic Benefits.pdf",
+          "PlacementPloicy/OJT Internship policy 2019-2020 onwards (10 Aug 2019).pdf",
+          "PlacementPloicy/Academic Benefit Plan - Clearing Competitive Exams.pdf"
+        ]
+      },
+      {
+        "id": "Q024",
+        "question": "What is the minimum current CGPA required to register for Career Services for admission batches 2017 onwards?",
+        "answerable": true,
+        "classification": "FULLY_GROUNDED",
+        "is_faithful": true,
+        "has_hallucination": false,
+        "faithfulness_score": 0.88,
+        "sentence_groundedness": 0.95,
+        "numerical_faithfulness": 1.0,
+        "citation_precision": 0.5,
+        "citation_recall": 1.0,
+        "unsupported_numbers": [],
+        "phantom_citations": [],
+        "cited_sources": [
+          "EDU REV/Academic Benefits.pdf",
+          "PlacementPloicy/2023 Career Services Policy.pdf"
+        ]
+      },
+      {
+        "id": "Q025",
+        "question": "Under what conditions is a registered student temporarily debarred from career services?",
+        "answerable": true,
+        "classification": "NUMERICAL_HALLUCINATION",
+        "is_faithful": false,
+        "has_hallucination": true,
+        "faithfulness_score": 0.4667,
+        "sentence_groundedness": 0.3333,
+        "numerical_faithfulness": 0.3333,
+        "citation_precision": 1.0,
+        "citation_recall": 1.0,
+        "unsupported_numbers": [
+          "2017",
+          "2.1",
+          "5.5",
+          "5"
+        ],
+        "phantom_citations": [],
+        "cited_sources": [
+          "PlacementPloicy/2023 Career Services Policy.pdf"
+        ]
+      },
+      {
+        "id": "Q026",
+        "question": "What are the different types of recruitment / placement drives at LPU?",
+        "answerable": true,
+        "classification": "GROUNDED_WITH_REASONING",
+        "is_faithful": true,
+        "has_hallucination": false,
+        "faithfulness_score": 0.78,
+        "sentence_groundedness": 0.7,
+        "numerical_faithfulness": 1.0,
+        "citation_precision": 0.5,
+        "citation_recall": 1.0,
+        "unsupported_numbers": [],
+        "phantom_citations": [],
+        "cited_sources": [
+          "PlacementPloicy/2023 Career Services Policy.pdf",
+          "NSSPolicy/LPUNSSPOLICY.pdf"
+        ]
+      },
+      {
+        "id": "Q027",
+        "question": "What minimum marks in the End Term Test (ETT) must a student achieve to avail the placement academic benefit?",
+        "answerable": true,
+        "classification": "GROUNDED_WITH_REASONING",
+        "is_faithful": true,
+        "has_hallucination": false,
+        "faithfulness_score": 0.7769,
+        "sentence_groundedness": 0.6923,
+        "numerical_faithfulness": 1.0,
+        "citation_precision": 0.5,
+        "citation_recall": 1.0,
+        "unsupported_numbers": [],
+        "phantom_citations": [],
+        "cited_sources": [
+          "PlacementPloicy/Academic Benefit Plan - Clearing Competitive Exams.pdf",
+          "PlacementPloicy/Academic Benefit Plan - Placement and Internship - 2023 and 2024 Batch.pdf"
+        ]
+      },
+      {
+        "id": "Q028",
+        "question": "What is the eligibility CGPA criterion for going on an OJT / internship?",
+        "answerable": true,
+        "classification": "NUMERICAL_HALLUCINATION",
+        "is_faithful": false,
+        "has_hallucination": true,
+        "faithfulness_score": 0.4541,
+        "sentence_groundedness": 0.1852,
+        "numerical_faithfulness": 0.7,
+        "citation_precision": 0.5,
+        "citation_recall": 1.0,
+        "unsupported_numbers": [
+          "2020",
+          "10",
+          "2019"
+        ],
+        "phantom_citations": [],
+        "cited_sources": [
+          "EDU REV/Academic Benefits.pdf",
+          "PlacementPloicy/OJT Internship policy 2019-2020 onwards (10 Aug 2019).pdf"
+        ]
+      },
+      {
+        "id": "Q029",
+        "question": "If a student wants to surrender or reject a placement offer, within how many days must they do so in writing?",
+        "answerable": true,
+        "classification": "NUMERICAL_HALLUCINATION",
+        "is_faithful": false,
+        "has_hallucination": true,
+        "faithfulness_score": 0.5667,
+        "sentence_groundedness": 0.5,
+        "numerical_faithfulness": 0.6667,
+        "citation_precision": 0.5,
+        "citation_recall": 1.0,
+        "unsupported_numbers": [
+          "2020",
+          "2019"
+        ],
+        "phantom_citations": [],
+        "cited_sources": [
+          "PlacementPloicy/OJT Internship policy 2019-2020 onwards (10 Aug 2019).pdf",
+          "PlacementPloicy/2023 Career Services Policy.pdf"
+        ]
+      },
+      {
+        "id": "Q030",
+        "question": "What must a student obtain before going for an independently arranged (self-sourced) OJT or internship offer?",
+        "answerable": true,
+        "classification": "NUMERICAL_HALLUCINATION",
+        "is_faithful": false,
+        "has_hallucination": true,
+        "faithfulness_score": 0.3371,
+        "sentence_groundedness": 0.3929,
+        "numerical_faithfulness": 0.2,
+        "citation_precision": 0.5,
+        "citation_recall": 1.0,
+        "unsupported_numbers": [
+          "2020",
+          "2023",
+          "10",
+          "2019"
+        ],
+        "phantom_citations": [],
+        "cited_sources": [
+          "PlacementPloicy/OJT Internship policy 2019-2020 onwards (10 Aug 2019).pdf",
+          "PlacementPloicy/2023 Career Services Policy.pdf"
+        ]
+      },
+      {
+        "id": "Q031",
+        "question": "What is the charge (in INR) for a Standard Air Conditioned 1-Seater hostel room with EDB till 31st March 2026?",
+        "answerable": true,
+        "classification": "FULLY_GROUNDED",
+        "is_faithful": true,
+        "has_hallucination": false,
+        "faithfulness_score": 0.8846,
+        "sentence_groundedness": 0.9615,
+        "numerical_faithfulness": 1.0,
+        "citation_precision": 0.5,
+        "citation_recall": 1.0,
+        "unsupported_numbers": [],
+        "phantom_citations": [],
+        "cited_sources": [
+          "ResidentialFacilities/Charges For Residential Facilities.pdf",
+          "ResidentialFacilities/Residential Facilities Refund Guidelines.pdf"
+        ]
+      },
+      {
+        "id": "Q032",
+        "question": "What IELTS band is required to be awarded an 'A' equivalent grade under the benefit for clearing competitive exams?",
+        "answerable": true,
+        "classification": "GROUNDED_WITH_REASONING",
+        "is_faithful": true,
+        "has_hallucination": false,
+        "faithfulness_score": 0.7476,
+        "sentence_groundedness": 0.619,
+        "numerical_faithfulness": 1.0,
+        "citation_precision": 0.5,
+        "citation_recall": 1.0,
+        "unsupported_numbers": [],
+        "phantom_citations": [],
+        "cited_sources": [
+          "PlacementPloicy/Academic Benefit Plan - Clearing Competitive Exams.pdf",
+          "EDU REV/Academic Benefits.pdf"
+        ]
+      },
+      {
+        "id": "Q033",
+        "question": "For the placement academic benefit, which package category corresponds to a salary package above 5 LPA and up to 10 LPA?",
+        "answerable": true,
+        "classification": "NUMERICAL_HALLUCINATION",
+        "is_faithful": false,
+        "has_hallucination": true,
+        "faithfulness_score": 0.6494,
+        "sentence_groundedness": 0.4643,
+        "numerical_faithfulness": 0.9091,
+        "citation_precision": 0.5,
+        "citation_recall": 1.0,
+        "unsupported_numbers": [
+          "5000"
+        ],
+        "phantom_citations": [],
+        "cited_sources": [
+          "EDU REV/Academic Benefits.pdf",
+          "PlacementPloicy/Academic Benefit Plan - Placement and Internship - 2023 and 2024 Batch.pdf"
+        ]
+      },
+      {
+        "id": "Q034",
+        "question": "What is the charge (in INR) for the 'Standard Mess 04 Meals' plan (Breakfast, Lunch, Snacks & Dinner)?",
+        "answerable": true,
+        "classification": "NUMERICAL_HALLUCINATION",
+        "is_faithful": false,
+        "has_hallucination": true,
+        "faithfulness_score": 0.4556,
+        "sentence_groundedness": 0.4516,
+        "numerical_faithfulness": 0.4375,
+        "citation_precision": 0.5,
+        "citation_recall": 1.0,
+        "unsupported_numbers": [
+          "75000",
+          "20",
+          "15",
+          ".2000",
+          "1155",
+          "50",
+          "890",
+          "108000",
+          "1100",
+          "1275",
+          "88000",
+          "830",
+          "60",
+          "70",
+          ".1000",
+          "40",
+          "28",
+          "950",
+          "05",
+          "25",
+          "83000",
+          "980",
+          ".500",
+          "1215",
+          "16",
+          "1040",
+          "70000"
+        ],
+        "phantom_citations": [],
+        "cited_sources": [
+          "ResidentialFacilities/Charges For Residential Facilities.pdf",
+          "ResidentialFacilities/Residential Facilities Refund Guidelines.pdf"
+        ]
+      },
+      {
+        "id": "Q035",
+        "question": "Under the Internship-with-PPO academic benefit, which monthly stipend range maps to the Z(D) package category?",
+        "answerable": true,
+        "classification": "NUMERICAL_HALLUCINATION",
+        "is_faithful": false,
+        "has_hallucination": true,
+        "faithfulness_score": 0.6494,
+        "sentence_groundedness": 0.4643,
+        "numerical_faithfulness": 0.9091,
+        "citation_precision": 0.5,
+        "citation_recall": 1.0,
+        "unsupported_numbers": [
+          "5000"
+        ],
+        "phantom_citations": [],
+        "cited_sources": [
+          "EDU REV/Academic Benefits.pdf",
+          "PlacementPloicy/Academic Benefit Plan - Placement and Internship - 2023 and 2024 Batch.pdf"
+        ]
+      },
+      {
+        "id": "Q036",
+        "question": "How many GATE marks are needed to be awarded an 'A+' equivalent grade under the competitive exam benefit?",
+        "answerable": true,
+        "classification": "NUMERICAL_HALLUCINATION",
+        "is_faithful": false,
+        "has_hallucination": true,
+        "faithfulness_score": 0.7284,
+        "sentence_groundedness": 0.8788,
+        "numerical_faithfulness": 0.6923,
+        "citation_precision": 0.5,
+        "citation_recall": 1.0,
+        "unsupported_numbers": [
+          "30",
+          "210",
+          "180",
+          "50"
+        ],
+        "phantom_citations": [],
+        "cited_sources": [
+          "PlacementPloicy/Academic Benefit Plan - Clearing Competitive Exams.pdf",
+          "EDU REV/Academic Benefits.pdf"
+        ]
+      },
+      {
+        "id": "Q037",
+        "question": "What is the charge (in INR) for the GYM facility without EDB (after 31st March 2026)?",
+        "answerable": true,
+        "classification": "NUMERICAL_HALLUCINATION",
+        "is_faithful": false,
+        "has_hallucination": true,
+        "faithfulness_score": 0.6752,
+        "sentence_groundedness": 0.8065,
+        "numerical_faithfulness": 0.6316,
+        "citation_precision": 0.5,
+        "citation_recall": 1.0,
+        "unsupported_numbers": [
+          "75000",
+          "1155",
+          "890",
+          "108000",
+          "1100",
+          "1275",
+          "88000",
+          "830",
+          "950",
+          "83000",
+          "980",
+          "1215",
+          "1040",
+          "70000"
+        ],
+        "phantom_citations": [],
+        "cited_sources": [
+          "ResidentialFacilities/Charges For Residential Facilities.pdf",
+          "ResidentialFacilities/Residential Facilities Refund Guidelines.pdf"
+        ]
+      },
+      {
+        "id": "Q038",
+        "question": "A final-year student with a 7.0 CGPA and 65% attendance cleared GATE. Are they eligible for the 10% Attendance Benefit?",
+        "answerable": true,
+        "classification": "GROUNDED_WITH_REASONING",
+        "is_faithful": true,
+        "has_hallucination": false,
+        "faithfulness_score": 0.7957,
+        "sentence_groundedness": 0.7391,
+        "numerical_faithfulness": 1.0,
+        "citation_precision": 0.5,
+        "citation_recall": 1.0,
+        "unsupported_numbers": [],
+        "phantom_citations": [],
+        "cited_sources": [
+          "EDU REV/Academic Benefits.pdf",
+          "PlacementPloicy/Academic Benefit Plan - Clearing Competitive Exams.pdf"
+        ]
+      },
+      {
+        "id": "Q039",
+        "question": "A student in a 2-year program has a 6.5 CGPA and one backlog. Do they meet the CGPA and backlog eligibility for a semester abroad, and for how long can they go?",
+        "answerable": true,
+        "classification": "NUMERICAL_HALLUCINATION",
+        "is_faithful": false,
+        "has_hallucination": true,
+        "faithfulness_score": 0.4857,
+        "sentence_groundedness": 0.2143,
+        "numerical_faithfulness": 0.5,
+        "citation_precision": 1.0,
+        "citation_recall": 1.0,
+        "unsupported_numbers": [
+          "3.2"
+        ],
+        "phantom_citations": [],
+        "cited_sources": [
+          "SemesterExchange/Semester_Year_Abroad_Policy.pdf"
+        ]
+      },
+      {
+        "id": "Q040",
+        "question": "How many books can a student in an honors course borrow, and for how long?",
+        "answerable": true,
+        "classification": "GROUNDED_WITH_REASONING",
+        "is_faithful": true,
+        "has_hallucination": false,
+        "faithfulness_score": 0.7087,
+        "sentence_groundedness": 0.5217,
+        "numerical_faithfulness": 1.0,
+        "citation_precision": 0.5,
+        "citation_recall": 1.0,
+        "unsupported_numbers": [],
+        "phantom_citations": [],
+        "cited_sources": [
+          "EDU REV/Academic Benefits.pdf",
+          "LibraryPolicy/Library Policy.pdf"
+        ]
+      },
+      {
+        "id": "Q041",
+        "question": "A student placed in the Z(D) category has 4 pathway courses graded B, A, A+ and C. What are the updated grades after the placement benefit?",
+        "answerable": true,
+        "classification": "NUMERICAL_HALLUCINATION",
+        "is_faithful": false,
+        "has_hallucination": true,
+        "faithfulness_score": 0.4488,
+        "sentence_groundedness": 0.5641,
+        "numerical_faithfulness": 0.3913,
+        "citation_precision": 0.3333,
+        "citation_recall": 1.0,
+        "unsupported_numbers": [
+          "56",
+          "75",
+          "7",
+          "6.5",
+          "66",
+          "79",
+          "55",
+          "93",
+          "101",
+          "46",
+          "65",
+          "60",
+          "94",
+          "78"
+        ],
+        "phantom_citations": [],
+        "cited_sources": [
+          "PlacementPloicy/Academic Benefit Plan - Clearing Competitive Exams.pdf",
+          "PlacementPloicy/Academic Benefit Plan - Placement and Internship - 2023 and 2024 Batch.pdf",
+          "EDU REV/Academic Benefits.pdf"
+        ]
+      },
+      {
+        "id": "Q042",
+        "question": "For an NSS volunteer, how many hours must be completed per academic year and how many special camps are mandatory?",
+        "answerable": true,
+        "classification": "EXTRINSIC_HALLUCINATION",
+        "is_faithful": false,
+        "has_hallucination": true,
+        "faithfulness_score": 0.7538,
+        "sentence_groundedness": 0.3846,
+        "numerical_faithfulness": 1.0,
+        "citation_precision": 1.0,
+        "citation_recall": 1.0,
+        "unsupported_numbers": [],
+        "phantom_citations": [],
+        "cited_sources": [
+          "NSSPolicy/LPUNSSPOLICY.pdf"
+        ]
+      },
+      {
+        "id": "Q043",
+        "question": "During a semester abroad, which expenses is the student responsible for, and are they still considered enrolled at LPU?",
+        "answerable": true,
+        "classification": "GROUNDED_WITH_REASONING",
+        "is_faithful": true,
+        "has_hallucination": false,
+        "faithfulness_score": 0.9385,
+        "sentence_groundedness": 0.8462,
+        "numerical_faithfulness": 1.0,
+        "citation_precision": 1.0,
+        "citation_recall": 1.0,
+        "unsupported_numbers": [],
+        "phantom_citations": [],
+        "cited_sources": [
+          "SemesterExchange/Semester_Year_Abroad_Policy.pdf"
+        ]
+      },
+      {
+        "id": "Q044",
+        "question": "And what about the other block libraries?",
+        "answerable": true,
+        "classification": "NUMERICAL_HALLUCINATION",
+        "is_faithful": false,
+        "has_hallucination": true,
+        "faithfulness_score": 0.7262,
+        "sentence_groundedness": 0.8571,
+        "numerical_faithfulness": 0.7083,
+        "citation_precision": 0.5,
+        "citation_recall": 1.0,
+        "unsupported_numbers": [
+          "37",
+          "38",
+          "39",
+          "36",
+          "40",
+          "42",
+          "45"
+        ],
+        "phantom_citations": [],
+        "cited_sources": [
+          "UNImap/UNIMAP_Campus_Guide.txt",
+          "LibraryPolicy/Library Policy.pdf"
+        ]
+      },
+      {
+        "id": "Q045",
+        "question": "What happens if it falls below that after I have registered?",
+        "answerable": true,
+        "classification": "FULLY_GROUNDED",
+        "is_faithful": true,
+        "has_hallucination": false,
+        "faithfulness_score": 0.9667,
+        "sentence_groundedness": 0.9167,
+        "numerical_faithfulness": 1.0,
+        "citation_precision": 1.0,
+        "citation_recall": 1.0,
+        "unsupported_numbers": [],
+        "phantom_citations": [],
+        "cited_sources": [
+          "PlacementPloicy/2023 Career Services Policy.pdf"
+        ]
+      },
+      {
+        "id": "Q046",
+        "question": "And a two-semester one?",
+        "answerable": true,
+        "classification": "NUMERICAL_HALLUCINATION",
+        "is_faithful": false,
+        "has_hallucination": true,
+        "faithfulness_score": 0.4899,
+        "sentence_groundedness": 0.6415,
+        "numerical_faithfulness": 0.4167,
+        "citation_precision": 0.3333,
+        "citation_recall": 1.0,
+        "unsupported_numbers": [
+          "2020",
+          "30",
+          "210",
+          "10",
+          "180",
+          "2019",
+          "50"
+        ],
+        "phantom_citations": [],
+        "cited_sources": [
+          "PlacementPloicy/Academic Benefit Plan - Clearing Competitive Exams.pdf",
+          "PlacementPloicy/OJT Internship policy 2019-2020 onwards (10 Aug 2019).pdf",
+          "SemesterExchange/Semester_Year_Abroad_Policy.pdf"
+        ]
+      },
+      {
+        "id": "Q047",
+        "question": "If my program is 3 years long, how much time can I spend abroad?",
+        "answerable": true,
+        "classification": "GROUNDED_WITH_REASONING",
+        "is_faithful": true,
+        "has_hallucination": false,
+        "faithfulness_score": 0.7526,
+        "sentence_groundedness": 0.6316,
+        "numerical_faithfulness": 1.0,
+        "citation_precision": 0.5,
+        "citation_recall": 1.0,
+        "unsupported_numbers": [],
+        "phantom_citations": [],
+        "cited_sources": [
+          "EDU REV/Academic Benefits.pdf",
+          "SemesterExchange/Semester_Year_Abroad_Policy.pdf"
+        ]
+      },
+      {
+        "id": "Q048",
+        "question": "And for a published patent?",
+        "answerable": true,
+        "classification": "NUMERICAL_HALLUCINATION",
+        "is_faithful": false,
+        "has_hallucination": true,
+        "faithfulness_score": 0.4124,
+        "sentence_groundedness": 0.0667,
+        "numerical_faithfulness": 0.7143,
+        "citation_precision": 0.5,
+        "citation_recall": 1.0,
+        "unsupported_numbers": [
+          "2020",
+          "2019"
+        ],
+        "phantom_citations": [],
+        "cited_sources": [
+          "EDU REV/Academic Benefits.pdf",
+          "PlacementPloicy/OJT Internship policy 2019-2020 onwards (10 Aug 2019).pdf"
+        ]
+      },
+      {
+        "id": "Q049",
+        "question": "And where is the School of Law?",
+        "answerable": true,
+        "classification": "NUMERICAL_HALLUCINATION",
+        "is_faithful": false,
+        "has_hallucination": true,
+        "faithfulness_score": 0.3882,
+        "sentence_groundedness": 0.4706,
+        "numerical_faithfulness": 0.5,
+        "citation_precision": 0.0,
+        "citation_recall": 0.0,
+        "unsupported_numbers": [
+          "8",
+          "2020",
+          "10",
+          "2019"
+        ],
+        "phantom_citations": [],
+        "cited_sources": [
+          "PlacementPloicy/OJT Internship policy 2019-2020 onwards (10 Aug 2019).pdf",
+          "DressCode/Dress Code and Uniform Policy for Students.pdf",
+          "DressCode/FAQ's.pdf",
+          "SemesterExchange/Semester_Year_Abroad_Policy.pdf"
+        ]
+      },
+      {
+        "id": "Q050",
+        "question": "What does the abbreviation 'OJT' stand for?",
+        "answerable": true,
+        "classification": "NUMERICAL_HALLUCINATION",
+        "is_faithful": false,
+        "has_hallucination": true,
+        "faithfulness_score": 0.3154,
+        "sentence_groundedness": 0.5385,
+        "numerical_faithfulness": 0.0,
+        "citation_precision": 0.5,
+        "citation_recall": 1.0,
+        "unsupported_numbers": [
+          "10",
+          "2019",
+          "2020",
+          "2023"
+        ],
+        "phantom_citations": [],
+        "cited_sources": [
+          "PlacementPloicy/OJT Internship policy 2019-2020 onwards (10 Aug 2019).pdf",
+          "PlacementPloicy/2023 Career Services Policy.pdf"
+        ]
+      },
+      {
+        "id": "Q051",
+        "question": "What does 'PPO' stand for in the placement policy?",
+        "answerable": true,
+        "classification": "NUMERICAL_HALLUCINATION",
+        "is_faithful": false,
+        "has_hallucination": true,
+        "faithfulness_score": 0.688,
+        "sentence_groundedness": 0.561,
+        "numerical_faithfulness": 0.9091,
+        "citation_precision": 0.5,
+        "citation_recall": 1.0,
+        "unsupported_numbers": [
+          "1.1"
+        ],
+        "phantom_citations": [],
+        "cited_sources": [
+          "PlacementPloicy/Academic Benefit Plan - Placement and Internship - 2023 and 2024 Batch.pdf",
+          "PlacementPloicy/2023 Career Services Policy.pdf"
+        ]
+      },
+      {
+        "id": "Q052",
+        "question": "What does 'PEP' stand for in the career services policy?",
+        "answerable": true,
+        "classification": "EXTRINSIC_HALLUCINATION",
+        "is_faithful": false,
+        "has_hallucination": true,
+        "faithfulness_score": 0.7333,
+        "sentence_groundedness": 0.3333,
+        "numerical_faithfulness": 1.0,
+        "citation_precision": 1.0,
+        "citation_recall": 1.0,
+        "unsupported_numbers": [],
+        "phantom_citations": [],
+        "cited_sources": [
+          "PlacementPloicy/2023 Career Services Policy.pdf"
+        ]
+      },
+      {
+        "id": "Q053",
+        "question": "Which course codes are applicable for the IELTS/TOEFL/PTE benefit for clearing competitive exams?",
+        "answerable": true,
+        "classification": "GROUNDED_WITH_REASONING",
+        "is_faithful": true,
+        "has_hallucination": false,
+        "faithfulness_score": 0.7381,
+        "sentence_groundedness": 0.5952,
+        "numerical_faithfulness": 1.0,
+        "citation_precision": 0.5,
+        "citation_recall": 1.0,
+        "unsupported_numbers": [],
+        "phantom_citations": [],
+        "cited_sources": [
+          "PlacementPloicy/Academic Benefit Plan - Clearing Competitive Exams.pdf",
+          "EDU REV/Academic Benefits.pdf"
+        ]
+      },
+      {
+        "id": "Q054",
+        "question": "What does 'LPA' mean in the career services policy?",
+        "answerable": true,
+        "classification": "GROUNDED_WITH_REASONING",
+        "is_faithful": true,
+        "has_hallucination": false,
+        "faithfulness_score": 0.7146,
+        "sentence_groundedness": 0.5366,
+        "numerical_faithfulness": 1.0,
+        "citation_precision": 0.5,
+        "citation_recall": 1.0,
+        "unsupported_numbers": [],
+        "phantom_citations": [],
+        "cited_sources": [
+          "PlacementPloicy/Academic Benefit Plan - Placement and Internship - 2023 and 2024 Batch.pdf",
+          "PlacementPloicy/2023 Career Services Policy.pdf"
+        ]
+      },
+      {
+        "id": "Q055",
+        "question": "In the 3rd Party Industry Tests academic benefit, which two assessments are used?",
+        "answerable": true,
+        "classification": "GROUNDED_WITH_REASONING",
+        "is_faithful": true,
+        "has_hallucination": false,
+        "faithfulness_score": 0.7984,
+        "sentence_groundedness": 0.8293,
+        "numerical_faithfulness": 1.0,
+        "citation_precision": 0.3333,
+        "citation_recall": 1.0,
+        "unsupported_numbers": [],
+        "phantom_citations": [],
+        "cited_sources": [
+          "EDU REV/Academic Benefits.pdf",
+          "PlacementPloicy/Academic Benefit Plan - 3rd Party Industry Tests - 2023 Batch.docx",
+          "PlacementPloicy/Academic Benefit Plan - Clearing Competitive Exams.pdf"
+        ]
+      },
+      {
+        "id": "Q056",
+        "question": "What is today's mess menu?",
+        "answerable": false,
+        "classification": "HALLUCINATED_ANSWER",
+        "is_faithful": false,
+        "has_hallucination": true,
+        "phantom_citations": [],
+        "unsupported_numbers": [],
+        "faithfulness_score": 0.0,
+        "details": "Model hallucinated answer to unanswerable query"
+      },
+      {
+        "id": "Q057",
+        "question": "Who is the current Vice Chancellor of LPU?",
+        "answerable": false,
+        "classification": "CLEAN_ABSTENTION",
+        "is_faithful": true,
+        "has_hallucination": false,
+        "phantom_citations": [],
+        "unsupported_numbers": [],
+        "faithfulness_score": 1.0,
+        "details": "Model correctly refused out-of-corpus query"
+      },
+      {
+        "id": "Q058",
+        "question": "What is the last date to apply for admission to LPU in 2027?",
+        "answerable": false,
+        "classification": "CLEAN_ABSTENTION",
+        "is_faithful": true,
+        "has_hallucination": false,
+        "phantom_citations": [],
+        "unsupported_numbers": [],
+        "faithfulness_score": 1.0,
+        "details": "Model correctly refused out-of-corpus query"
+      },
+      {
+        "id": "Q059",
+        "question": "How many marks are required to pass the Data Structures end-term exam?",
+        "answerable": false,
+        "classification": "HALLUCINATED_ANSWER",
+        "is_faithful": false,
+        "has_hallucination": true,
+        "phantom_citations": [],
+        "unsupported_numbers": [],
+        "faithfulness_score": 0.0,
+        "details": "Model hallucinated answer to unanswerable query"
+      },
+      {
+        "id": "Q060",
+        "question": "What is the Wi-Fi password for the hostel?",
+        "answerable": false,
+        "classification": "HALLUCINATED_ANSWER",
+        "is_faithful": false,
+        "has_hallucination": true,
+        "phantom_citations": [],
+        "unsupported_numbers": [],
+        "faithfulness_score": 0.0,
+        "details": "Model hallucinated answer to unanswerable query"
+      },
+      {
+        "id": "Q061",
+        "question": "What is the annual tuition fee for the B.Tech CSE program?",
+        "answerable": false,
+        "classification": "HALLUCINATED_ANSWER",
+        "is_faithful": false,
+        "has_hallucination": true,
+        "phantom_citations": [],
+        "unsupported_numbers": [],
+        "faithfulness_score": 0.0,
+        "details": "Model hallucinated answer to unanswerable query"
+      },
+      {
+        "id": "Q062",
+        "question": "Which division should a student contact for clarity on Semester/Year Abroad matters?",
+        "answerable": true,
+        "classification": "EXTRINSIC_HALLUCINATION",
+        "is_faithful": false,
+        "has_hallucination": true,
+        "faithfulness_score": 0.6308,
+        "sentence_groundedness": 0.0769,
+        "numerical_faithfulness": 1.0,
+        "citation_precision": 1.0,
+        "citation_recall": 1.0,
+        "unsupported_numbers": [],
+        "phantom_citations": [],
+        "cited_sources": [
+          "SemesterExchange/Semester_Year_Abroad_Policy.pdf"
+        ]
+      },
+      {
+        "id": "Q063",
+        "question": "What is the objective of LPU-NSS?",
+        "answerable": true,
+        "classification": "GROUNDED_WITH_REASONING",
+        "is_faithful": true,
+        "has_hallucination": false,
+        "faithfulness_score": 0.9294,
+        "sentence_groundedness": 0.8235,
+        "numerical_faithfulness": 1.0,
+        "citation_precision": 1.0,
+        "citation_recall": 1.0,
+        "unsupported_numbers": [],
+        "phantom_citations": [],
+        "cited_sources": [
+          "NSSPolicy/LPUNSSPOLICY.pdf"
+        ]
+      }
+    ]
+  }
+}

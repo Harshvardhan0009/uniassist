@@ -63,6 +63,10 @@ def summarize_chunks(chunks: list[Document]) -> list[Document]:
     Returns:
         List of Documents ready for embedding.
     """
+    if not getattr(settings, "ENABLE_INGESTION_SUMMARIZATION", False):
+        logger.info("Ingestion summarization disabled (using raw text directly as validated in benchmark evaluation).")
+        return _passthrough(chunks)
+
     llm = _get_llm()
 
     if llm is None:

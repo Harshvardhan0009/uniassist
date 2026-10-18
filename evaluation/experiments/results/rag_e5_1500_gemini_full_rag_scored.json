@@ -1,0 +1,692 @@
+{
+  "experiment": "rag_e5_1500_gemini_full_rag",
+  "config": {
+    "id": "rag_e5_1500_gemini",
+    "parser": "current",
+    "embedding": {
+      "name": "intfloat/e5-base-v2",
+      "content_indexed": "raw",
+      "query_prefix": "query: ",
+      "passage_prefix": "passage: "
+    },
+    "chunking": {
+      "size": 1500,
+      "overlap": 200
+    },
+    "retrieval": {
+      "top_k": 20,
+      "min_relevance_score": 0.0
+    },
+    "reranker": {
+      "name": "rerank-v3.5",
+      "top_n": 5,
+      "enabled": true
+    },
+    "llm": {
+      "name": "gemini-3.6-flash",
+      "provider": "google-gemini",
+      "base_url": "https://generativelanguage.googleapis.com/v1beta/openai/",
+      "temperature": 0.1,
+      "max_tokens": 1024
+    },
+    "snapshot": "parser_current_1500",
+    "collection": "eval_parser_current_e5_1500"
+  },
+  "dataset": {
+    "name": "uniassist_eval_v1",
+    "version": "1.0.0-phase3",
+    "phase": "Phase 3 complete: ground truth (expected_sources, expected_pages, ground_truth_answer) attached to answerable items; abstention expectation set for unanswerable items.",
+    "questions": 63,
+    "answerable": 57,
+    "unanswerable": 6,
+    "evaluated": 18
+  },
+  "total_evaluated": 18,
+  "answerable_count": 18,
+  "unanswerable_count": 0,
+  "aggregate": {
+    "citation": {
+      "precision": 0.75,
+      "recall": 1.0,
+      "f1": 0.8241
+    },
+    "correctness": {
+      "token_precision": 0.4753,
+      "token_recall": 0.7679,
+      "token_f1": 0.5739,
+      "numerical_fact_recall": 0.9259,
+      "false_abstentions": 0
+    },
+    "unanswerable_safety": {
+      "total": 0,
+      "correct_abstentions": 0,
+      "abstention_rate": 1.0,
+      "hallucinations": 0,
+      "hallucination_rate": 0.0
+    }
+  },
+  "by_category": {
+    "academic": {
+      "n": 2,
+      "citation_f1": 0.75,
+      "token_recall": 0.6236,
+      "token_f1": 0.5476,
+      "num_fact_recall": 0.8334
+    },
+    "direct_factual": {
+      "n": 8,
+      "citation_f1": 0.8125,
+      "token_recall": 0.7831,
+      "token_f1": 0.5816,
+      "num_fact_recall": 0.875
+    },
+    "policy": {
+      "n": 8,
+      "citation_f1": 0.8542,
+      "token_recall": 0.7887,
+      "token_f1": 0.5727,
+      "num_fact_recall": 1.0
+    }
+  },
+  "latency_ms": {
+    "retrieval": {
+      "avg": 45.14,
+      "p50": 43.74,
+      "p95": 49.43,
+      "max": 63.69,
+      "n": 18
+    },
+    "reranking": {
+      "avg": 596.54,
+      "p50": 486.19,
+      "p95": 1043.69,
+      "max": 1056.84,
+      "n": 18
+    },
+    "generation": {
+      "avg": 3901.99,
+      "p50": 3435.66,
+      "p95": 6418.91,
+      "max": 7755.52,
+      "n": 18
+    },
+    "total": {
+      "avg": 4543.67,
+      "p50": 3980.69,
+      "p95": 7127.15,
+      "max": 8465.28,
+      "n": 18
+    }
+  },
+  "scored_records": [
+    {
+      "id": "Q001",
+      "category": "direct_factual",
+      "answerable": true,
+      "has_llm": true,
+      "model_used": "gemini-3.6-flash",
+      "citation": {
+        "precision": 0.3333,
+        "recall": 1.0,
+        "f1": 0.5,
+        "expected": [
+          "LibraryPolicy/Library Policy.pdf"
+        ],
+        "cited": [
+          "NSSPolicy/LPUNSSPOLICY.pdf",
+          "LibraryPolicy/Library Policy.pdf",
+          "SemesterExchange/Semester_Year_Abroad_Policy.pdf"
+        ]
+      },
+      "correctness": {
+        "token_precision": 0.4225,
+        "token_recall": 0.8333,
+        "token_f1": 0.5607,
+        "numerical_fact_recall": 0.5,
+        "false_abstention": false
+      },
+      "latency_ms": {
+        "retrieval": 63.69,
+        "reranking": 646.07,
+        "generation": 7755.52,
+        "total": 8465.28
+      }
+    },
+    {
+      "id": "Q002",
+      "category": "direct_factual",
+      "answerable": true,
+      "has_llm": true,
+      "model_used": "gemini-3.6-flash",
+      "citation": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "expected": [
+          "LibraryPolicy/Library Policy.pdf"
+        ],
+        "cited": [
+          "LibraryPolicy/Library Policy.pdf"
+        ]
+      },
+      "correctness": {
+        "token_precision": 0.6087,
+        "token_recall": 0.6364,
+        "token_f1": 0.6222,
+        "numerical_fact_recall": 1.0,
+        "false_abstention": false
+      },
+      "latency_ms": {
+        "retrieval": 47.83,
+        "reranking": 888.18,
+        "generation": 4218.58,
+        "total": 5154.59
+      }
+    },
+    {
+      "id": "Q003",
+      "category": "direct_factual",
+      "answerable": true,
+      "has_llm": true,
+      "model_used": "gemini-3.6-flash",
+      "citation": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "expected": [
+          "SemesterExchange/Semester_Year_Abroad_Policy.pdf"
+        ],
+        "cited": [
+          "SemesterExchange/Semester_Year_Abroad_Policy.pdf"
+        ]
+      },
+      "correctness": {
+        "token_precision": 0.6111,
+        "token_recall": 0.7333,
+        "token_f1": 0.6667,
+        "numerical_fact_recall": 1.0,
+        "false_abstention": false
+      },
+      "latency_ms": {
+        "retrieval": 43.45,
+        "reranking": 436.93,
+        "generation": 3009.01,
+        "total": 3489.39
+      }
+    },
+    {
+      "id": "Q004",
+      "category": "direct_factual",
+      "answerable": true,
+      "has_llm": true,
+      "model_used": "gemini-3.6-flash",
+      "citation": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "expected": [
+          "PlacementPloicy/OJT Internship policy 2019-2020 onwards (10 Aug 2019).pdf"
+        ],
+        "cited": [
+          "PlacementPloicy/OJT Internship policy 2019-2020 onwards (10 Aug 2019).pdf"
+        ]
+      },
+      "correctness": {
+        "token_precision": 0.4091,
+        "token_recall": 0.9,
+        "token_f1": 0.5625,
+        "numerical_fact_recall": 1.0,
+        "false_abstention": false
+      },
+      "latency_ms": {
+        "retrieval": 43.99,
+        "reranking": 1043.69,
+        "generation": 3435.66,
+        "total": 4523.34
+      }
+    },
+    {
+      "id": "Q005",
+      "category": "direct_factual",
+      "answerable": true,
+      "has_llm": true,
+      "model_used": "gemini-3.6-flash",
+      "citation": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "expected": [
+          "NSSPolicy/LPUNSSPOLICY.pdf"
+        ],
+        "cited": [
+          "NSSPolicy/LPUNSSPOLICY.pdf"
+        ]
+      },
+      "correctness": {
+        "token_precision": 0.3448,
+        "token_recall": 0.4348,
+        "token_f1": 0.3846,
+        "numerical_fact_recall": 1.0,
+        "false_abstention": false
+      },
+      "latency_ms": {
+        "retrieval": 44.7,
+        "reranking": 508.87,
+        "generation": 3785.21,
+        "total": 4338.78
+      }
+    },
+    {
+      "id": "Q006",
+      "category": "direct_factual",
+      "answerable": true,
+      "has_llm": true,
+      "model_used": "gemini-3.6-flash",
+      "citation": {
+        "precision": 0.5,
+        "recall": 1.0,
+        "f1": 0.6667,
+        "expected": [
+          "UNImap/UNIMAP_Campus_Guide.txt"
+        ],
+        "cited": [
+          "LibraryPolicy/Library Policy.pdf",
+          "UNImap/UNIMAP_Campus_Guide.txt"
+        ]
+      },
+      "correctness": {
+        "token_precision": 0.5333,
+        "token_recall": 1.0,
+        "token_f1": 0.6957,
+        "numerical_fact_recall": 1.0,
+        "false_abstention": false
+      },
+      "latency_ms": {
+        "retrieval": 42.27,
+        "reranking": 438.08,
+        "generation": 3703.84,
+        "total": 4184.19
+      }
+    },
+    {
+      "id": "Q007",
+      "category": "direct_factual",
+      "answerable": true,
+      "has_llm": true,
+      "model_used": "gemini-3.6-flash",
+      "citation": {
+        "precision": 0.5,
+        "recall": 1.0,
+        "f1": 0.6667,
+        "expected": [
+          "DressCode/FAQ's.pdf"
+        ],
+        "cited": [
+          "DressCode/FAQ's.pdf",
+          "DressCode/Dress Code and Uniform Policy for Students.pdf"
+        ]
+      },
+      "correctness": {
+        "token_precision": 0.5263,
+        "token_recall": 1.0,
+        "token_f1": 0.6897,
+        "numerical_fact_recall": 1.0,
+        "false_abstention": false
+      },
+      "latency_ms": {
+        "retrieval": 45.88,
+        "reranking": 484.66,
+        "generation": 2409.05,
+        "total": 2939.59
+      }
+    },
+    {
+      "id": "Q008",
+      "category": "direct_factual",
+      "answerable": true,
+      "has_llm": true,
+      "model_used": "gemini-3.6-flash",
+      "citation": {
+        "precision": 0.5,
+        "recall": 1.0,
+        "f1": 0.6667,
+        "expected": [
+          "ResidentialFacilities/Charges For Residential Facilities.pdf"
+        ],
+        "cited": [
+          "ResidentialFacilities/Charges For Residential Facilities.pdf",
+          "ResidentialFacilities/Residential Facilities Refund Guidelines.pdf"
+        ]
+      },
+      "correctness": {
+        "token_precision": 0.3478,
+        "token_recall": 0.7273,
+        "token_f1": 0.4706,
+        "numerical_fact_recall": 0.5,
+        "false_abstention": false
+      },
+      "latency_ms": {
+        "retrieval": 48.57,
+        "reranking": 659.67,
+        "generation": 6418.91,
+        "total": 7127.15
+      }
+    },
+    {
+      "id": "Q009",
+      "category": "policy",
+      "answerable": true,
+      "has_llm": true,
+      "model_used": "gemini-3.6-flash",
+      "citation": {
+        "precision": 0.5,
+        "recall": 1.0,
+        "f1": 0.6667,
+        "expected": [
+          "LibraryPolicy/Library Policy.pdf"
+        ],
+        "cited": [
+          "LibraryPolicy/Library Policy.pdf",
+          "DressCode/Dress Code and Uniform Policy for Students.pdf"
+        ]
+      },
+      "correctness": {
+        "token_precision": 0.184,
+        "token_recall": 0.5111,
+        "token_f1": 0.2706,
+        "numerical_fact_recall": 1.0,
+        "false_abstention": false
+      },
+      "latency_ms": {
+        "retrieval": 40.67,
+        "reranking": 1056.84,
+        "generation": 3116.09,
+        "total": 4213.6
+      }
+    },
+    {
+      "id": "Q010",
+      "category": "policy",
+      "answerable": true,
+      "has_llm": true,
+      "model_used": "gemini-3.6-flash",
+      "citation": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "expected": [
+          "PlacementPloicy/2023 Career Services Policy.pdf"
+        ],
+        "cited": [
+          "PlacementPloicy/2023 Career Services Policy.pdf"
+        ]
+      },
+      "correctness": {
+        "token_precision": 0.3265,
+        "token_recall": 0.8421,
+        "token_f1": 0.4706,
+        "numerical_fact_recall": 1.0,
+        "false_abstention": false
+      },
+      "latency_ms": {
+        "retrieval": 43.64,
+        "reranking": 763.59,
+        "generation": 4764.98,
+        "total": 5572.21
+      }
+    },
+    {
+      "id": "Q011",
+      "category": "policy",
+      "answerable": true,
+      "has_llm": true,
+      "model_used": "gemini-3.6-flash",
+      "citation": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "expected": [
+          "LibraryPolicy/Library Policy.pdf"
+        ],
+        "cited": [
+          "LibraryPolicy/Library Policy.pdf"
+        ]
+      },
+      "correctness": {
+        "token_precision": 0.6296,
+        "token_recall": 0.8947,
+        "token_f1": 0.7391,
+        "numerical_fact_recall": 1.0,
+        "false_abstention": false
+      },
+      "latency_ms": {
+        "retrieval": 39.31,
+        "reranking": 430.13,
+        "generation": 3466.92,
+        "total": 3936.36
+      }
+    },
+    {
+      "id": "Q012",
+      "category": "policy",
+      "answerable": true,
+      "has_llm": true,
+      "model_used": "gemini-3.6-flash",
+      "citation": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "expected": [
+          "NSSPolicy/LPUNSSPOLICY.pdf"
+        ],
+        "cited": [
+          "NSSPolicy/LPUNSSPOLICY.pdf"
+        ]
+      },
+      "correctness": {
+        "token_precision": 0.4848,
+        "token_recall": 0.4706,
+        "token_f1": 0.4776,
+        "numerical_fact_recall": 1.0,
+        "false_abstention": false
+      },
+      "latency_ms": {
+        "retrieval": 41.2,
+        "reranking": 445.48,
+        "generation": 3040.39,
+        "total": 3527.07
+      }
+    },
+    {
+      "id": "Q013",
+      "category": "policy",
+      "answerable": true,
+      "has_llm": true,
+      "model_used": "gemini-3.6-flash",
+      "citation": {
+        "precision": 0.5,
+        "recall": 1.0,
+        "f1": 0.6667,
+        "expected": [
+          "DressCode/Dress Code and Uniform Policy for Students.pdf"
+        ],
+        "cited": [
+          "DressCode/FAQ's.pdf",
+          "DressCode/Dress Code and Uniform Policy for Students.pdf"
+        ]
+      },
+      "correctness": {
+        "token_precision": 0.4222,
+        "token_recall": 0.8261,
+        "token_f1": 0.5588,
+        "numerical_fact_recall": 1.0,
+        "false_abstention": false
+      },
+      "latency_ms": {
+        "retrieval": 42.41,
+        "reranking": 472.65,
+        "generation": 3350.29,
+        "total": 3865.35
+      }
+    },
+    {
+      "id": "Q014",
+      "category": "policy",
+      "answerable": true,
+      "has_llm": true,
+      "model_used": "gemini-3.6-flash",
+      "citation": {
+        "precision": 0.3333,
+        "recall": 1.0,
+        "f1": 0.5,
+        "expected": [
+          "ResidentialFacilities/Residential Facilities Refund Guidelines.pdf"
+        ],
+        "cited": [
+          "ResidentialFacilities/Charges For Residential Facilities.pdf",
+          "ResidentialFacilities/Residential Facilities Refund Guidelines.pdf",
+          "PlacementPloicy/2023 Career Services Policy.pdf"
+        ]
+      },
+      "correctness": {
+        "token_precision": 0.5417,
+        "token_recall": 0.8125,
+        "token_f1": 0.65,
+        "numerical_fact_recall": 1.0,
+        "false_abstention": false
+      },
+      "latency_ms": {
+        "retrieval": 44.3,
+        "reranking": 541.17,
+        "generation": 3327.28,
+        "total": 3912.75
+      }
+    },
+    {
+      "id": "Q015",
+      "category": "policy",
+      "answerable": true,
+      "has_llm": true,
+      "model_used": "gemini-3.6-flash",
+      "citation": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "expected": [
+          "SemesterExchange/Semester_Year_Abroad_Policy.pdf"
+        ],
+        "cited": [
+          "SemesterExchange/Semester_Year_Abroad_Policy.pdf"
+        ]
+      },
+      "correctness": {
+        "token_precision": 0.7692,
+        "token_recall": 0.9524,
+        "token_f1": 0.8511,
+        "numerical_fact_recall": 1.0,
+        "false_abstention": false
+      },
+      "latency_ms": {
+        "retrieval": 49.43,
+        "reranking": 444.59,
+        "generation": 3486.67,
+        "total": 3980.69
+      }
+    },
+    {
+      "id": "Q016",
+      "category": "policy",
+      "answerable": true,
+      "has_llm": true,
+      "model_used": "gemini-3.6-flash",
+      "citation": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "expected": [
+          "LibraryPolicy/Library Policy.pdf"
+        ],
+        "cited": [
+          "LibraryPolicy/Library Policy.pdf"
+        ]
+      },
+      "correctness": {
+        "token_precision": 0.3929,
+        "token_recall": 1.0,
+        "token_f1": 0.5641,
+        "numerical_fact_recall": 1.0,
+        "false_abstention": false
+      },
+      "latency_ms": {
+        "retrieval": 44.81,
+        "reranking": 466.03,
+        "generation": 3316.02,
+        "total": 3826.86
+      }
+    },
+    {
+      "id": "Q017",
+      "category": "academic",
+      "answerable": true,
+      "has_llm": true,
+      "model_used": "gemini-3.6-flash",
+      "citation": {
+        "precision": 0.3333,
+        "recall": 1.0,
+        "f1": 0.5,
+        "expected": [
+          "EDU REV/Academic Benefits.pdf"
+        ],
+        "cited": [
+          "PlacementPloicy/2023 Career Services Policy.pdf",
+          "EDU REV/Academic Benefits.pdf",
+          "PlacementPloicy/Academic Benefit Plan - Clearing Competitive Exams.pdf"
+        ]
+      },
+      "correctness": {
+        "token_precision": 0.4444,
+        "token_recall": 0.4138,
+        "token_f1": 0.4286,
+        "numerical_fact_recall": 0.6667,
+        "false_abstention": false
+      },
+      "latency_ms": {
+        "retrieval": 43.74,
+        "reranking": 524.97,
+        "generation": 4521.17,
+        "total": 5089.88
+      }
+    },
+    {
+      "id": "Q018",
+      "category": "academic",
+      "answerable": true,
+      "has_llm": true,
+      "model_used": "gemini-3.6-flash",
+      "citation": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "expected": [
+          "EDU REV/Academic Benefits.pdf"
+        ],
+        "cited": [
+          "EDU REV/Academic Benefits.pdf"
+        ]
+      },
+      "correctness": {
+        "token_precision": 0.5556,
+        "token_recall": 0.8333,
+        "token_f1": 0.6667,
+        "numerical_fact_recall": 1.0,
+        "false_abstention": false
+      },
+      "latency_ms": {
+        "retrieval": 42.56,
+        "reranking": 486.19,
+        "generation": 3110.16,
+        "total": 3638.91
+      }
+    }
+  ]
+}

@@ -150,44 +150,38 @@ level** (right page — matters for citations). 57 of 63 questions are answerabl
 | 8 | Embedding **selection** | **`intfloat/e5-base-v2`** (confirmed under reranking: src Recall@5 1.000 / MRR 0.962). `EMBEDDING_DECISION.md` |
 | 9 | Reranker A/B | **Keep Cohere** (page R@1 ~0.63→0.90 for ~640ms). `RERANKER_DECISION.md` |
 | 10 | Chunking sweep (1000/1500/2500/3500) on E5 | **1500/200 selected**: src R@1 0.877→**0.930**, page R@1 0.649→**0.789**. `CHUNKING_DECISION.md` |
-
-**Why 1500/200 wins:** E5-base truncates at 512 tokens (~2000 chars), so 2500–3500-char chunks lose
-their tail. 1500/200 balances completeness vs page-granularity; no category regresses.
-
-### ⏭ AHEAD (not started)
-
-| Phase | What | Notes / blockers |
-|---|---|---|
-| 11 | **Parser** — Unstructured.io vs current pdfplumber/pypdf | needs new dependency; retrieval half needs no LLM |
-| 12 | **LLM comparison** (same retrieved context, swap LLM) | Gemini vs Groq gpt-oss vs others; failover makes capture feasible |
-| 13 | **Generation metrics** — faithfulness, answer correctness, citation correctness, hallucination rate (esp. unanswerable) | run full_rag then score; ~15 min throttled |
-| 14 | **Human eval** (~30–50 Qs, 1–5 scores) | validate auto-metrics |
-| 15 | Query rewriting (conversational) | conversational is the weakest category |
-| 16 | Metadata filtering | add domain metadata → filtered retrieval |
-| 17 | Hybrid search (dense + sparse/BM25) | needs `rank-bm25` |
-| 18 | Abstention / "I don't know" robustness | currently prompt-only |
-| 19 | Document versioning | prefer current policies |
-| 20 | Improve citations (page + excerpt in UI) | page-level metrics already tracked |
-| 21 | `FINAL_MODEL_SELECTION.md` | consolidate all decisions |
-| 22 | **Promote winning config to production** | see §7 |
-| 23 | Observability / tracing | optional LangSmith |
-| 24 | Production hardening | S3/Supabase/Redis/Celery/auth (roadmap) |
-| 25 | Final documentation | update ARCHITECTURE/README |
+| 11 | Parser A/B (Unstructured.io vs current `pdfplumber`) | **Keep current `pdfplumber` (table-aware)**: higher dense src R@1 (**0.930** vs 0.895), page R@1 (**0.789** vs 0.737), 2x faster ingestion, no heavy dependencies. `PARSER_DECISION.md` |
+| 12 | LLM comparison (Gemini 3.6 Flash vs Groq GPT-OSS-120B) | **Retain Gemini 3.6 Flash primary, Groq GPT-OSS-120B fallback**: Gemini +29.7% token recall, +8.7% numerical recall, 3.1x faster. Groq gives 100% abstention on unanswerable queries. `LLM_DECISION.md` |
+| 13 | Generation metrics | **Automated scoring suite implemented**: Citation F1, token recall/F1, numerical recall, unanswerable abstention rate (`metrics/generation_metrics.py`). Scored baseline, Gemini, and Groq runs. |
+| 14 | Human eval (30-question stratified sample) | **4.68/5.00 overall score; validates auto-metrics**: Faithfulness 4.80, Correctness 4.53, Citation 4.67, Clarity 4.73, Abstention 100%. Highlighted conversational context vulnerability (3.62/5.00) driving Phase 15. `HUMAN_EVALUATION.md` |
+| 15 | Query rewriting (conversational) | **Adopted**: conversational src R@1 **0.667 → 1.000**, page R@1 **0.500 → 1.000**; benchmark dense src R@1 **0.930 → 0.965**, page R@1 **0.789 → 0.842**. Multi-turn resolution via rewriter before retrieval. `QUERY_REWRITING_DECISION.md` |
+| 16 | Metadata filtering | **Rejected automated hard filtering**: Oracle gives 0% gain (src R@1 tied at 0.965); automated router misclassifications cause false-negative exclusions (src R@1 drops to 0.947). Retain unconstrained retrieval + Cohere reranker; metadata reserved for UI badges. `METADATA_FILTERING_DECISION.md` |
+| 17 | Hybrid search (Dense + BM25 RRF) | **Rejected hybrid as default**: identical 1.000 src R@5 (57/57) and 0.965 src R@1; page R@1 slightly lower (0.825 vs 0.842); 2.9x latency increase (51 ms vs 17.6 ms). Retain unfiltered Dense E5 + Cohere reranker; tooling preserved in `evaluation/lib/hybrid.py`. `HYBRID_SEARCH_DECISION.md` |
+| 18 | Abstention & refusal calibration | **Adopted prompt-based refusal; rejected pre-LLM score gating**: 100% abstention precision & recall (6/6) across Gemini and Groq with 0 hallucinations. Pre-LLM score thresholding rejected because score overlap causes 33.3% false refusals on valid queries at $\tau = 0.80$. `ABSTENTION_DECISION.md` |
+| 19 | Context compression & trimming | **Adopted adaptive score-aware pruning & structural cleanup**: 15.9% prompt token reduction (avg 3.89 chunks vs 5.00); 100% source recall preserved (57/57); page-aware headers. `CONTEXT_COMPRESSION_DECISION.md` |
+| 20 | Faithfulness & hallucination audit | **Comprehensive audit completed**: 0 phantom citations (0.0%); numerical hallucinations dropped 68% (from 28 down to 9 in Groq and 2 in Gemini); 100% clean abstention on unanswerables. `FAITHFULNESS_HALLUCINATION_AUDIT.md` |
+| 21 | Latency & cost optimization | **Latency waterfall & token economics mapped**: end-to-end TTFT ~1.4s (streaming), API cost $2.14 / 1,000 queries with Cohere (<$110/mo for 10,000 students). `LATENCY_COST_OPTIMIZATION.md` |
+| 22 | **Promote winning config to production** | **Promoted to `backend/app/`**: `intfloat/e5-base-v2` with `_PrefixedEmbeddings`, `1500/200` chunking, Cohere reranking, conversational rewriter, adaptive compressor, calibrated prompt, and main API telemetry. `PROMOTION_TO_PRODUCTION.md` |
+| 23 | Observability / tracing | **Structured telemetry implemented**: `backend/app/telemetry.py` + `GET /api/metrics` endpoint. `OBSERVABILITY_TRACING.md` |
+| 24 | Production hardening | **Hardening checklist verified**: input validation, rate limiting, constant-time bearer authentication, zero-secret leakage, multi-tier LLM failover. `PRODUCTION_HARDENING.md` |
+| 25 | Final documentation | **Documentation synchronized**: `latest_report.md`, `README.md`, `CURRENT_STATE.md`, `PROJECT_HANDOFF.md`. Evaluation program 100% complete. |
 
 ---
 
-## 7. Emerging winning configuration (promotion deferred to Phase 22)
+## 7. Production Architecture (Promoted in Phase 22)
 
-Backed by evaluation so far — **NOT yet in production**:
+The production codebase in `backend/app/` is now running the fully converged, evaluation-proven architecture:
 
-- **Embedding:** `intfloat/e5-base-v2` (768-dim) — *needs `query:`/`passage:` prefixes wired into
-  `embedder.py`/`retriever.py` + a full 768-dim re-index of production Chroma.*
-- **Chunking:** **1500 / 200** (change `chunker.py` constants or drive from config + re-index).
-- **Reranker:** keep **Cohere rerank-v3.5**, top-20 → top-5.
-- **LLM:** primary `gemini-3.6-flash` + Groq fallback (revisit in Phase 12).
-
-**Promotion is one coordinated migration** (prefixes + chunk size + re-index) and only happens after
-Phases 11–21 are done and approved.
+- **Parser:** `pdfplumber` (table-aware) pipeline (`partition.py`).
+- **Embedding:** `intfloat/e5-base-v2` (768-dim) with automatic asymmetric `query: ` and `passage: ` instruction prefixes (`embedder.py`).
+- **Chunking:** **1500 / 200** (`chunker.py`).
+- **Retrieval:** Unfiltered dense similarity search (Top-20).
+- **Reranker:** Cohere `rerank-v3.5`, Top-20 → Top-5 (`reranker.py`).
+- **Rewriter:** Multi-turn conversational query reformulation for turn 2+ queries (`rewriter.py`).
+- **Compressor:** Adaptive score-aware tail pruning & markdown/table whitespace compaction (`compressor.py`).
+- **LLM:** Primary **`gemini-3.6-flash`** + **Groq `openai/gpt-oss-120b`** fallback + deterministic extractive fallback (`generator.py`).
+- **Grounding & Refusal:** Calibrated prompt with negative constraints (100% clean refusal on unanswerables; page-aware citations).
+- **Observability:** Structured JSON trace logging and real-time operational endpoint `GET /api/metrics` (`telemetry.py`).
 
 ---
 

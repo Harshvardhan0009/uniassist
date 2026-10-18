@@ -117,32 +117,124 @@ export default function Home() {
     const controller = new AbortController();
     abortRef.current = controller;
 
+    const assistantMsgId = genId();
+    let streamedContent = "";
+    let sources = [];
+    let searchQuery = null;
+    let timing = null;
+
     try {
-      const res = await fetch(`${API_BASE}/api/query`, {
+      // 1. Try real-time streaming endpoint first
+      const res = await fetch(`${API_BASE}/api/query/stream`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ question, history }),
         signal: controller.signal,
       });
-      if (!res.ok) throw new Error(`Server error (${res.status})`);
-      const data = await res.json();
 
-      setMessages((prev) => [...prev, {
-        role: "assistant",
-        content: data.answer,
-        sources: data.sources,
-        id: genId(),
-      }]);
+      if (res.ok && res.body) {
+        // Create initial streaming assistant placeholder
+        setMessages((prev) => [
+          ...prev,
+          {
+            role: "assistant",
+            content: "",
+            isStreaming: true,
+            sources: [],
+            id: assistantMsgId,
+          },
+        ]);
+
+        const reader = res.body.getReader();
+        const decoder = new TextDecoder("utf-8");
+        let buffer = "";
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          buffer += decoder.decode(value, { stream: true });
+          const blocks = buffer.split("\n\n");
+          buffer = blocks.pop(); // keep uncompleted tail
+
+          for (const block of blocks) {
+            if (!block.trim()) continue;
+            const eventMatch = block.match(/^event:\s*(\w+)/m);
+            const dataMatch = block.match(/^data:\s*([\s\S]*)$/m);
+            if (!dataMatch) continue;
+            const eventType = eventMatch ? eventMatch[1] : "token";
+            const dataStr = dataMatch[1].trim();
+
+            if (eventType === "metadata") {
+              try {
+                const meta = JSON.parse(dataStr);
+                sources = meta.sources || [];
+                searchQuery = meta.search_query || null;
+              } catch (e) {}
+            } else if (eventType === "token") {
+              try {
+                const parsed = JSON.parse(dataStr);
+                streamedContent += parsed.token || "";
+              } catch (e) {
+                streamedContent += dataStr;
+              }
+              setMessages((prev) =>
+                prev.map((m) =>
+                  m.id === assistantMsgId
+                    ? { ...m, content: streamedContent, sources, searchQuery }
+                    : m
+                )
+              );
+            } else if (eventType === "done") {
+              try {
+                const doneObj = JSON.parse(dataStr);
+                timing = doneObj.timing || null;
+              } catch (e) {}
+            }
+          }
+        }
+
+        // Finalize streaming message
+        setMessages((prev) =>
+          prev.map((m) =>
+            m.id === assistantMsgId
+              ? { ...m, content: streamedContent, isStreaming: false, sources, searchQuery, timing }
+              : m
+          )
+        );
+      } else {
+        // Fallback to standard endpoint
+        const standardRes = await fetch(`${API_BASE}/api/query`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ question, history }),
+          signal: controller.signal,
+        });
+        if (!standardRes.ok) throw new Error(`Server error (${standardRes.status})`);
+        const data = await standardRes.json();
+        setMessages((prev) => [
+          ...prev,
+          {
+            role: "assistant",
+            content: data.answer,
+            sources: data.sources,
+            searchQuery: data.search_query,
+            timing: data.timing,
+            id: genId(),
+          },
+        ]);
+      }
     } catch (err) {
-      // Ignore aborts (navigation / superseded request).
       if (err.name === "AbortError") return;
-      setMessages((prev) => [...prev, {
-        role: "assistant",
-        content: `Something went wrong: ${err.message}. Please make sure the backend server is running.`,
-        isError: true,
-        retryQuestion: question,
-        id: genId(),
-      }]);
+      setMessages((prev) => [
+        ...prev.filter((m) => m.id !== assistantMsgId),
+        {
+          role: "assistant",
+          content: `Something went wrong: ${err.message}. Please make sure the backend server is running.`,
+          isError: true,
+          retryQuestion: question,
+          id: genId(),
+        },
+      ]);
     } finally {
       if (abortRef.current === controller) abortRef.current = null;
       setIsLoading(false);
@@ -260,8 +352,14 @@ export default function Home() {
                   )}
                   <div className={`${styles.msgContent} ${msg.role === "user" ? styles.msgContentUser : ""}`}>
                     {msg.role === "assistant" && <div className={styles.msgLabel}>LPUAssist</div>}
+                    {msg.searchQuery && (
+                      <div className={styles.contextPill} title="Follow-up contextualized for document search">
+                        🔍 <span>Understood as: <em>&ldquo;{msg.searchQuery}&rdquo;</em></span>
+                      </div>
+                    )}
                     <div className={`${styles.msgText} ${msg.isError ? styles.msgError : ""}`}>
                       <FormattedText text={msg.content} />
+                      {msg.isStreaming && <span className={styles.cursor} />}
                     </div>
                     {msg.isError && msg.retryQuestion && (
                       <button
@@ -275,16 +373,21 @@ export default function Home() {
                     {msg.sources && msg.sources.length > 0 && (
                       <div className={styles.srcRow}>
                         {msg.sources.map((s) => (
-                          <span key={s} className={styles.srcBadge}>
+                          <span key={s} className={styles.srcBadge} title={s}>
                             📄 {s.split("/").pop().replace(/\.(pdf|docx|txt|md)$/i, "")}
                           </span>
                         ))}
+                        {msg.timing?.total && (
+                          <span className={styles.timingBadge} title="End-to-end response time">
+                            ⚡ {msg.timing.total}s
+                          </span>
+                        )}
                       </div>
                     )}
                   </div>
                 </div>
               ))}
-              {isLoading && (
+              {isLoading && !messages.some((m) => m.isStreaming && m.content) && (
                 <div className={styles.msgRow}>
                   <div className={styles.avatar}>
                     <Image src="/lpu-logo.webp" alt="LPU" width={28} height={28} />
@@ -342,11 +445,28 @@ export default function Home() {
 
 /* ── Text Formatter ──────────────────────────────────────────────── */
 
-// Render inline **bold** spans within a line of text.
+// Render inline **bold** spans and [Document.pdf, Page X] citation badges.
 function renderInline(text) {
-  return text.split(/\*\*(.+?)\*\*/g).map((part, i) =>
-    i % 2 === 1 ? <strong key={i}>{part}</strong> : part
-  );
+  if (!text) return null;
+  // Match bold or citations: [DocName.pdf, Page X] or [DocName.pdf]
+  const regex = /(\*\*.*?\*\*|\[[a-zA-Z0-9_\-\s\/\.]+\.(?:pdf|txt|docx|md)[^\]]*\])/g;
+  const parts = text.split(regex);
+  return parts.map((part, i) => {
+    if (!part) return null;
+    if (part.startsWith("**") && part.endsWith("**") && part.length >= 4) {
+      return <strong key={i}>{part.slice(2, -2)}</strong>;
+    }
+    if (part.startsWith("[") && part.endsWith("]")) {
+      const citeText = part.slice(1, -1).trim();
+      const cleanName = citeText.split("/").pop();
+      return (
+        <span key={i} className={styles.inlineCitation} title="Verified Official University Document">
+          📄 {cleanName}
+        </span>
+      );
+    }
+    return part;
+  });
 }
 
 const isTableRow = (line) => /^\|.*\|$/.test(line.trim());

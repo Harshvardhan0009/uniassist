@@ -333,10 +333,11 @@
   margin: 10px 0;
 }
 
-/* Sources */
+/* Sources & Inline Citations */
 .srcRow {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   gap: 6px;
   margin-top: 10px;
 }
@@ -349,6 +350,56 @@
   padding: 3px 10px;
   border-radius: var(--radius-full);
   white-space: nowrap;
+}
+
+.inlineCitation {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.76rem;
+  font-weight: 500;
+  color: var(--accent-light);
+  background: rgba(249, 115, 22, 0.1);
+  border: 1px solid rgba(249, 115, 22, 0.25);
+  padding: 1px 7px;
+  border-radius: var(--radius-sm);
+  margin: 0 3px;
+  vertical-align: baseline;
+}
+
+.contextPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  padding: 3px 10px;
+  border-radius: var(--radius-sm);
+  margin-bottom: 8px;
+}
+
+.timingBadge {
+  font-size: 0.70rem;
+  color: var(--text-muted);
+  margin-left: auto;
+}
+
+.cursor {
+  display: inline-block;
+  width: 7px;
+  height: 15px;
+  background: var(--accent);
+  margin-left: 2px;
+  vertical-align: middle;
+  border-radius: 1px;
+  animation: blink 0.8s infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
 }
 
 /* Thinking dots */

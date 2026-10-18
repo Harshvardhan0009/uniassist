@@ -30,6 +30,8 @@ evaluation/.chroma/
 evaluation/snapshots/
 # Evaluation caches
 evaluation/**/__pycache__/
+# Evaluation: raw query/retrieval dumps (large prompt contexts, keep scored results only)
+evaluation/experiments/results/*_raw.json
 
 # Node
 node_modules/

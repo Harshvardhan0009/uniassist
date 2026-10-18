@@ -13,9 +13,9 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 logger = logging.getLogger(__name__)
 
 # ── Splitter configuration ───────────────────────────────────────────
-# Larger chunk size so full tables (often 1000-2000 chars) remain together
-CHUNK_SIZE = 2500
-CHUNK_OVERLAP = 300
+# Optimal semantic chunk size (Phase 10 winning sweep: 1500 chars / 200 overlap)
+CHUNK_SIZE = 1500
+CHUNK_OVERLAP = 200
 
 
 def _make_splitter(chunk_size: int, chunk_overlap: int) -> RecursiveCharacterTextSplitter:
@@ -28,7 +28,7 @@ def _make_splitter(chunk_size: int, chunk_overlap: int) -> RecursiveCharacterTex
     )
 
 
-# Default splitter used by production ingestion (2500/300).
+# Default splitter used by production ingestion (1500/200).
 splitter = _make_splitter(CHUNK_SIZE, CHUNK_OVERLAP)
 
 

@@ -1,0 +1,2067 @@
+{
+  "experiment": "baseline_v1_gemini36_full_rag",
+  "config": {
+    "id": "baseline_v1_gemini36",
+    "embedding": {
+      "name": "all-MiniLM-L6-v2",
+      "content_indexed": "raw"
+    },
+    "chunking": {
+      "size": 2500,
+      "overlap": 300
+    },
+    "retrieval": {
+      "top_k": 20,
+      "min_relevance_score": 0.0
+    },
+    "reranker": {
+      "name": "rerank-v3.5",
+      "top_n": 5,
+      "enabled": true
+    },
+    "llm": {
+      "name": "gemini-3.6-flash"
+    },
+    "snapshot": "baseline_v1",
+    "collection": "eval_baseline_v1"
+  },
+  "dataset": {
+    "name": "uniassist_eval_v1",
+    "version": "1.0.0-phase3",
+    "phase": "Phase 3 complete: ground truth (expected_sources, expected_pages, ground_truth_answer) attached to answerable items; abstention expectation set for unanswerable items.",
+    "questions": 63,
+    "answerable": 57,
+    "unanswerable": 6,
+    "evaluated": 63
+  },
+  "total_evaluated": 63,
+  "answerable_count": 57,
+  "unanswerable_count": 6,
+  "aggregate": {
+    "citation": {
+      "precision": 0.6374,
+      "recall": 0.9825,
+      "f1": 0.7456
+    },
+    "correctness": {
+      "token_precision": 0.1733,
+      "token_recall": 0.7558,
+      "token_f1": 0.2408,
+      "numerical_fact_recall": 0.7737,
+      "false_abstentions": 0
+    },
+    "unanswerable_safety": {
+      "total": 6,
+      "correct_abstentions": 2,
+      "abstention_rate": 0.3333,
+      "hallucinations": 4,
+      "hallucination_rate": 0.6667
+    }
+  },
+  "by_category": {
+    "academic": {
+      "n": 7,
+      "citation_f1": 0.8333,
+      "token_recall": 0.8233,
+      "token_f1": 0.2487,
+      "num_fact_recall": 1.0
+    },
+    "conversational": {
+      "n": 6,
+      "citation_f1": 0.5834,
+      "token_recall": 0.797,
+      "token_f1": 0.0975,
+      "num_fact_recall": 0.6667
+    },
+    "direct_factual": {
+      "n": 8,
+      "citation_f1": 0.75,
+      "token_recall": 0.8128,
+      "token_f1": 0.5937,
+      "num_fact_recall": 0.75
+    },
+    "exact_terminology": {
+      "n": 7,
+      "citation_f1": 0.7381,
+      "token_recall": 0.7819,
+      "token_f1": 0.0564,
+      "num_fact_recall": 1.0
+    },
+    "multi_condition": {
+      "n": 6,
+      "citation_f1": 0.8056,
+      "token_recall": 0.569,
+      "token_f1": 0.1492,
+      "num_fact_recall": 0.5555
+    },
+    "placement": {
+      "n": 7,
+      "citation_f1": 0.7143,
+      "token_recall": 0.7553,
+      "token_f1": 0.1427,
+      "num_fact_recall": 0.7143
+    },
+    "policy": {
+      "n": 9,
+      "citation_f1": 0.8333,
+      "token_recall": 0.851,
+      "token_f1": 0.4254,
+      "num_fact_recall": 1.0
+    },
+    "table_based": {
+      "n": 7,
+      "citation_f1": 0.6667,
+      "token_recall": 0.5999,
+      "token_f1": 0.0765,
+      "num_fact_recall": 0.3952
+    }
+  },
+  "latency_ms": {
+    "retrieval": {
+      "avg": 31.64,
+      "p50": 34.49,
+      "p95": 40.13,
+      "max": 54.44,
+      "n": 63
+    },
+    "reranking": {
+      "avg": 640.47,
+      "p50": 565.47,
+      "p95": 1005.46,
+      "max": 1824.14,
+      "n": 63
+    },
+    "generation": {
+      "avg": 2726.5,
+      "p50": 2024.11,
+      "p95": 6387.42,
+      "max": 8079.65,
+      "n": 63
+    },
+    "total": {
+      "avg": 3398.62,
+      "p50": 2677.03,
+      "p95": 7251.14,
+      "max": 8635.97,
+      "n": 63
+    }
+  },
+  "scored_records": [
+    {
+      "id": "Q001",
+      "category": "direct_factual",
+      "answerable": true,
+      "has_llm": true,
+      "model_used": null,
+      "citation": {
+        "precision": 0.3333,
+        "recall": 1.0,
+        "f1": 0.5,
+        "expected": [
+          "LibraryPolicy/Library Policy.pdf"
+        ],
+        "cited": [
+          "SemesterExchange/Semester_Year_Abroad_Policy.pdf",
+          "LibraryPolicy/Library Policy.pdf",
+          "NSSPolicy/LPUNSSPOLICY.pdf"
+        ]
+      },
+      "correctness": {
+        "token_precision": 0.4516,
+        "token_recall": 0.7778,
+        "token_f1": 0.5714,
+        "numerical_fact_recall": 0.5,
+        "false_abstention": false
+      },
+      "latency_ms": {
+        "retrieval": 20.17,
+        "reranking": 566.93,
+        "generation": 5866.76,
+        "total": 6453.86
+      }
+    },
+    {
+      "id": "Q002",
+      "category": "direct_factual",
+      "answerable": true,
+      "has_llm": true,
+      "model_used": null,
+      "citation": {
+        "precision": 0.5,
+        "recall": 1.0,
+        "f1": 0.6667,
+        "expected": [
+          "LibraryPolicy/Library Policy.pdf"
+        ],
+        "cited": [
+          "LibraryPolicy/Library Policy.pdf",
+          "PlacementPloicy/2023 Career Services Policy.pdf"
+        ]
+      },
+      "correctness": {
+        "token_precision": 0.6667,
+        "token_recall": 0.8182,
+        "token_f1": 0.7347,
+        "numerical_fact_recall": 1.0,
+        "false_abstention": false
+      },
+      "latency_ms": {
+        "retrieval": 21.06,
+        "reranking": 669.44,
+        "generation": 3397.1,
+        "total": 4087.6
+      }
+    },
+    {
+      "id": "Q003",
+      "category": "direct_factual",
+      "answerable": true,
+      "has_llm": true,
+      "model_used": null,
+      "citation": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "expected": [
+          "SemesterExchange/Semester_Year_Abroad_Policy.pdf"
+        ],
+        "cited": [
+          "SemesterExchange/Semester_Year_Abroad_Policy.pdf"
+        ]
+      },
+      "correctness": {
+        "token_precision": 0.5263,
+        "token_recall": 0.6667,
+        "token_f1": 0.5882,
+        "numerical_fact_recall": 0.0,
+        "false_abstention": false
+      },
+      "latency_ms": {
+        "retrieval": 20.29,
+        "reranking": 843.43,
+        "generation": 6387.42,
+        "total": 7251.14
+      }
+    },
+    {
+      "id": "Q004",
+      "category": "direct_factual",
+      "answerable": true,
+      "has_llm": true,
+      "model_used": null,
+      "citation": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "expected": [
+          "PlacementPloicy/OJT Internship policy 2019-2020 onwards (10 Aug 2019).pdf"
+        ],
+        "cited": [
+          "PlacementPloicy/OJT Internship policy 2019-2020 onwards (10 Aug 2019).pdf"
+        ]
+      },
+      "correctness": {
+        "token_precision": 0.4091,
+        "token_recall": 0.9,
+        "token_f1": 0.5625,
+        "numerical_fact_recall": 1.0,
+        "false_abstention": false
+      },
+      "latency_ms": {
+        "retrieval": 39.43,
+        "reranking": 1012.45,
+        "generation": 2855.16,
+        "total": 3907.04
+      }
+    },
+    {
+      "id": "Q005",
+      "category": "direct_factual",
+      "answerable": true,
+      "has_llm": true,
+      "model_used": null,
+      "citation": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "expected": [
+          "NSSPolicy/LPUNSSPOLICY.pdf"
+        ],
+        "cited": [
+          "NSSPolicy/LPUNSSPOLICY.pdf"
+        ]
+      },
+      "correctness": {
+        "token_precision": 0.375,
+        "token_recall": 0.5217,
+        "token_f1": 0.4364,
+        "numerical_fact_recall": 1.0,
+        "false_abstention": false
+      },
+      "latency_ms": {
+        "retrieval": 35.26,
+        "reranking": 431.27,
+        "generation": 3676.47,
+        "total": 4143.0
+      }
+    },
+    {
+      "id": "Q006",
+      "category": "direct_factual",
+      "answerable": true,
+      "has_llm": true,
+      "model_used": null,
+      "citation": {
+        "precision": 0.3333,
+        "recall": 1.0,
+        "f1": 0.5,
+        "expected": [
+          "UNImap/UNIMAP_Campus_Guide.txt"
+        ],
+        "cited": [
+          "UNImap/UNIMAP_Campus_Guide.txt",
+          "LibraryPolicy/Library Policy.pdf",
+          "DressCode/Dress Code and Uniform Policy for Students.pdf"
+        ]
+      },
+      "correctness": {
+        "token_precision": 0.5,
+        "token_recall": 1.0,
+        "token_f1": 0.6667,
+        "numerical_fact_recall": 1.0,
+        "false_abstention": false
+      },
+      "latency_ms": {
+        "retrieval": 35.63,
+        "reranking": 615.72,
+        "generation": 3985.39,
+        "total": 4636.74
+      }
+    },
+    {
+      "id": "Q007",
+      "category": "direct_factual",
+      "answerable": true,
+      "has_llm": true,
+      "model_used": null,
+      "citation": {
+        "precision": 0.5,
+        "recall": 1.0,
+        "f1": 0.6667,
+        "expected": [
+          "DressCode/FAQ's.pdf"
+        ],
+        "cited": [
+          "DressCode/FAQ's.pdf",
+          "DressCode/Dress Code and Uniform Policy for Students.pdf"
+        ]
+      },
+      "correctness": {
+        "token_precision": 0.5263,
+        "token_recall": 1.0,
+        "token_f1": 0.6897,
+        "numerical_fact_recall": 1.0,
+        "false_abstention": false
+      },
+      "latency_ms": {
+        "retrieval": 37.47,
+        "reranking": 535.56,
+        "generation": 4041.35,
+        "total": 4614.38
+      }
+    },
+    {
+      "id": "Q008",
+      "category": "direct_factual",
+      "answerable": true,
+      "has_llm": true,
+      "model_used": null,
+      "citation": {
+        "precision": 0.5,
+        "recall": 1.0,
+        "f1": 0.6667,
+        "expected": [
+          "ResidentialFacilities/Charges For Residential Facilities.pdf"
+        ],
+        "cited": [
+          "ResidentialFacilities/Charges For Residential Facilities.pdf",
+          "ResidentialFacilities/Residential Facilities Refund Guidelines.pdf"
+        ]
+      },
+      "correctness": {
+        "token_precision": 0.36,
+        "token_recall": 0.8182,
+        "token_f1": 0.5,
+        "numerical_fact_recall": 0.5,
+        "false_abstention": false
+      },
+      "latency_ms": {
+        "retrieval": 37.7,
+        "reranking": 452.11,
+        "generation": 4970.41,
+        "total": 5460.22
+      }
+    },
+    {
+      "id": "Q009",
+      "category": "policy",
+      "answerable": true,
+      "has_llm": true,
+      "model_used": null,
+      "citation": {
+        "precision": 0.5,
+        "recall": 1.0,
+        "f1": 0.6667,
+        "expected": [
+          "LibraryPolicy/Library Policy.pdf"
+        ],
+        "cited": [
+          "LibraryPolicy/Library Policy.pdf",
+          "DressCode/Dress Code and Uniform Policy for Students.pdf"
+        ]
+      },
+      "correctness": {
+        "token_precision": 0.2636,
+        "token_recall": 0.7556,
+        "token_f1": 0.3908,
+        "numerical_fact_recall": 1.0,
+        "false_abstention": false
+      },
+      "latency_ms": {
+        "retrieval": 30.26,
+        "reranking": 460.93,
+        "generation": 5651.93,
+        "total": 6143.12
+      }
+    },
+    {
+      "id": "Q010",
+      "category": "policy",
+      "answerable": true,
+      "has_llm": true,
+      "model_used": null,
+      "citation": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "expected": [
+          "PlacementPloicy/2023 Career Services Policy.pdf"
+        ],
+        "cited": [
+          "PlacementPloicy/2023 Career Services Policy.pdf"
+        ]
+      },
+      "correctness": {
+        "token_precision": 0.3301,
+        "token_recall": 0.8947,
+        "token_f1": 0.4823,
+        "numerical_fact_recall": 1.0,
+        "false_abstention": false
+      },
+      "latency_ms": {
+        "retrieval": 54.44,
+        "reranking": 501.88,
+        "generation": 8079.65,
+        "total": 8635.97
+      }
+    },
+    {
+      "id": "Q011",
+      "category": "policy",
+      "answerable": true,
+      "has_llm": true,
+      "model_used": null,
+      "citation": {
+        "precision": 0.5,
+        "recall": 1.0,
+        "f1": 0.6667,
+        "expected": [
+          "LibraryPolicy/Library Policy.pdf"
+        ],
+        "cited": [
+          "LibraryPolicy/Library Policy.pdf",
+          "PlacementPloicy/2023 Career Services Policy.pdf"
+        ]
+      },
+      "correctness": {
+        "token_precision": 0.6071,
+        "token_recall": 0.8947,
+        "token_f1": 0.7234,
+        "numerical_fact_recall": 1.0,
+        "false_abstention": false
+      },
+      "latency_ms": {
+        "retrieval": 37.43,
+        "reranking": 606.69,
+        "generation": 3639.61,
+        "total": 4283.73
+      }
+    },
+    {
+      "id": "Q012",
+      "category": "policy",
+      "answerable": true,
+      "has_llm": true,
+      "model_used": null,
+      "citation": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "expected": [
+          "NSSPolicy/LPUNSSPOLICY.pdf"
+        ],
+        "cited": [
+          "NSSPolicy/LPUNSSPOLICY.pdf"
+        ]
+      },
+      "correctness": {
+        "token_precision": 0.5333,
+        "token_recall": 0.4706,
+        "token_f1": 0.5,
+        "numerical_fact_recall": 1.0,
+        "false_abstention": false
+      },
+      "latency_ms": {
+        "retrieval": 34.88,
+        "reranking": 534.5,
+        "generation": 3556.25,
+        "total": 4125.63
+      }
+    },
+    {
+      "id": "Q013",
+      "category": "policy",
+      "answerable": true,
+      "has_llm": false,
+      "model_used": null,
+      "citation": {
+        "precision": 0.5,
+        "recall": 1.0,
+        "f1": 0.6667,
+        "expected": [
+          "DressCode/Dress Code and Uniform Policy for Students.pdf"
+        ],
+        "cited": [
+          "DressCode/FAQ's.pdf",
+          "DressCode/Dress Code and Uniform Policy for Students.pdf"
+        ]
+      },
+      "correctness": {
+        "token_precision": 0.0979,
+        "token_recall": 1.0,
+        "token_f1": 0.1783,
+        "numerical_fact_recall": 1.0,
+        "false_abstention": false
+      },
+      "latency_ms": {
+        "retrieval": 23.09,
+        "reranking": 609.96,
+        "generation": 2024.11,
+        "total": 2657.16
+      }
+    },
+    {
+      "id": "Q014",
+      "category": "policy",
+      "answerable": true,
+      "has_llm": false,
+      "model_used": null,
+      "citation": {
+        "precision": 0.3333,
+        "recall": 1.0,
+        "f1": 0.5,
+        "expected": [
+          "ResidentialFacilities/Residential Facilities Refund Guidelines.pdf"
+        ],
+        "cited": [
+          "ResidentialFacilities/Charges For Residential Facilities.pdf",
+          "PlacementPloicy/OJT Internship policy 2019-2020 onwards (10 Aug 2019).pdf",
+          "ResidentialFacilities/Residential Facilities Refund Guidelines.pdf"
+        ]
+      },
+      "correctness": {
+        "token_precision": 0.0336,
+        "token_recall": 0.75,
+        "token_f1": 0.0643,
+        "numerical_fact_recall": 1.0,
+        "false_abstention": false
+      },
+      "latency_ms": {
+        "retrieval": 38.18,
+        "reranking": 1459.55,
+        "generation": 2150.63,
+        "total": 3648.36
+      }
+    },
+    {
+      "id": "Q015",
+      "category": "policy",
+      "answerable": true,
+      "has_llm": true,
+      "model_used": null,
+      "citation": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "expected": [
+          "SemesterExchange/Semester_Year_Abroad_Policy.pdf"
+        ],
+        "cited": [
+          "SemesterExchange/Semester_Year_Abroad_Policy.pdf"
+        ]
+      },
+      "correctness": {
+        "token_precision": 0.7143,
+        "token_recall": 0.9524,
+        "token_f1": 0.8163,
+        "numerical_fact_recall": 1.0,
+        "false_abstention": false
+      },
+      "latency_ms": {
+        "retrieval": 32.81,
+        "reranking": 680.88,
+        "generation": 7208.12,
+        "total": 7921.81
+      }
+    },
+    {
+      "id": "Q016",
+      "category": "policy",
+      "answerable": true,
+      "has_llm": true,
+      "model_used": null,
+      "citation": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "expected": [
+          "LibraryPolicy/Library Policy.pdf"
+        ],
+        "cited": [
+          "LibraryPolicy/Library Policy.pdf"
+        ]
+      },
+      "correctness": {
+        "token_precision": 0.3235,
+        "token_recall": 1.0,
+        "token_f1": 0.4889,
+        "numerical_fact_recall": 1.0,
+        "false_abstention": false
+      },
+      "latency_ms": {
+        "retrieval": 32.67,
+        "reranking": 593.02,
+        "generation": 5145.92,
+        "total": 5771.61
+      }
+    },
+    {
+      "id": "Q017",
+      "category": "academic",
+      "answerable": true,
+      "has_llm": false,
+      "model_used": null,
+      "citation": {
+        "precision": 0.5,
+        "recall": 1.0,
+        "f1": 0.6667,
+        "expected": [
+          "EDU REV/Academic Benefits.pdf"
+        ],
+        "cited": [
+          "EDU REV/Academic Benefits.pdf",
+          "PlacementPloicy/Academic Benefit Plan - Clearing Competitive Exams.pdf"
+        ]
+      },
+      "correctness": {
+        "token_precision": 0.1179,
+        "token_recall": 0.8621,
+        "token_f1": 0.2075,
+        "numerical_fact_recall": 1.0,
+        "false_abstention": false
+      },
+      "latency_ms": {
+        "retrieval": 35.82,
+        "reranking": 898.88,
+        "generation": 1778.63,
+        "total": 2713.33
+      }
+    },
+    {
+      "id": "Q018",
+      "category": "academic",
+      "answerable": true,
+      "has_llm": true,
+      "model_used": null,
+      "citation": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "expected": [
+          "EDU REV/Academic Benefits.pdf"
+        ],
+        "cited": [
+          "EDU REV/Academic Benefits.pdf"
+        ]
+      },
+      "correctness": {
+        "token_precision": 0.42,
+        "token_recall": 0.875,
+        "token_f1": 0.5676,
+        "numerical_fact_recall": 1.0,
+        "false_abstention": false
+      },
+      "latency_ms": {
+        "retrieval": 40.13,
+        "reranking": 628.53,
+        "generation": 6690.68,
+        "total": 7359.34
+      }
+    },
+    {
+      "id": "Q019",
+      "category": "academic",
+      "answerable": true,
+      "has_llm": false,
+      "model_used": null,
+      "citation": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "expected": [
+          "EDU REV/Academic Benefits.pdf"
+        ],
+        "cited": [
+          "EDU REV/Academic Benefits.pdf"
+        ]
+      },
+      "correctness": {
+        "token_precision": 0.0805,
+        "token_recall": 0.9231,
+        "token_f1": 0.1481,
+        "numerical_fact_recall": 1.0,
+        "false_abstention": false
+      },
+      "latency_ms": {
+        "retrieval": 34.9,
+        "reranking": 488.96,
+        "generation": 1903.87,
+        "total": 2427.73
+      }
+    },
+    {
+      "id": "Q020",
+      "category": "academic",
+      "answerable": true,
+      "has_llm": false,
+      "model_used": null,
+      "citation": {
+        "precision": 0.5,
+        "recall": 1.0,
+        "f1": 0.6667,
+        "expected": [
+          "EDU REV/Academic Benefits.pdf"
+        ],
+        "cited": [
+          "EDU REV/Academic Benefits.pdf",
+          "PlacementPloicy/Academic Benefit Plan - Clearing Competitive Exams.pdf"
+        ]
+      },
+      "correctness": {
+        "token_precision": 0.0886,
+        "token_recall": 0.96,
+        "token_f1": 0.1622,
+        "numerical_fact_recall": 1.0,
+        "false_abstention": false
+      },
+      "latency_ms": {
+        "retrieval": 37.83,
+        "reranking": 528.33,
+        "generation": 2271.67,
+        "total": 2837.83
+      }
+    },
+    {
+      "id": "Q021",
+      "category": "academic",
+      "answerable": true,
+      "has_llm": true,
+      "model_used": null,
+      "citation": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "expected": [
+          "EDU REV/Academic Benefits.pdf"
+        ],
+        "cited": [
+          "EDU REV/Academic Benefits.pdf"
+        ]
+      },
+      "correctness": {
+        "token_precision": 0.3,
+        "token_recall": 0.75,
+        "token_f1": 0.4286,
+        "numerical_fact_recall": 1.0,
+        "false_abstention": false
+      },
+      "latency_ms": {
+        "retrieval": 34.09,
+        "reranking": 500.25,
+        "generation": 4805.98,
+        "total": 5340.32
+      }
+    },
+    {
+      "id": "Q022",
+      "category": "academic",
+      "answerable": true,
+      "has_llm": false,
+      "model_used": null,
+      "citation": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "expected": [
+          "EDU REV/Academic Benefits.pdf"
+        ],
+        "cited": [
+          "EDU REV/Academic Benefits.pdf"
+        ]
+      },
+      "correctness": {
+        "token_precision": 0.0738,
+        "token_recall": 0.6429,
+        "token_f1": 0.1324,
+        "numerical_fact_recall": 1.0,
+        "false_abstention": false
+      },
+      "latency_ms": {
+        "retrieval": 37.16,
+        "reranking": 445.97,
+        "generation": 1868.09,
+        "total": 2351.22
+      }
+    },
+    {
+      "id": "Q023",
+      "category": "academic",
+      "answerable": true,
+      "has_llm": false,
+      "model_used": null,
+      "citation": {
+        "precision": 0.3333,
+        "recall": 1.0,
+        "f1": 0.5,
+        "expected": [
+          "EDU REV/Academic Benefits.pdf"
+        ],
+        "cited": [
+          "EDU REV/Academic Benefits.pdf",
+          "PlacementPloicy/Academic Benefit Plan - Clearing Competitive Exams.pdf",
+          "PlacementPloicy/OJT Internship policy 2019-2020 onwards (10 Aug 2019).pdf"
+        ]
+      },
+      "correctness": {
+        "token_precision": 0.0504,
+        "token_recall": 0.75,
+        "token_f1": 0.0944,
+        "numerical_fact_recall": 1.0,
+        "false_abstention": false
+      },
+      "latency_ms": {
+        "retrieval": 35.37,
+        "reranking": 987.51,
+        "generation": 2290.3,
+        "total": 3313.18
+      }
+    },
+    {
+      "id": "Q024",
+      "category": "placement",
+      "answerable": true,
+      "has_llm": false,
+      "model_used": null,
+      "citation": {
+        "precision": 0.5,
+        "recall": 1.0,
+        "f1": 0.6667,
+        "expected": [
+          "PlacementPloicy/2023 Career Services Policy.pdf"
+        ],
+        "cited": [
+          "EDU REV/Academic Benefits.pdf",
+          "PlacementPloicy/2023 Career Services Policy.pdf"
+        ]
+      },
+      "correctness": {
+        "token_precision": 0.0779,
+        "token_recall": 0.9048,
+        "token_f1": 0.1434,
+        "numerical_fact_recall": 1.0,
+        "false_abstention": false
+      },
+      "latency_ms": {
+        "retrieval": 21.1,
+        "reranking": 1824.14,
+        "generation": 2042.29,
+        "total": 3887.53
+      }
+    },
+    {
+      "id": "Q025",
+      "category": "placement",
+      "answerable": true,
+      "has_llm": false,
+      "model_used": null,
+      "citation": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "expected": [
+          "PlacementPloicy/2023 Career Services Policy.pdf"
+        ],
+        "cited": [
+          "PlacementPloicy/2023 Career Services Policy.pdf"
+        ]
+      },
+      "correctness": {
+        "token_precision": 0.0923,
+        "token_recall": 0.4286,
+        "token_f1": 0.1519,
+        "numerical_fact_recall": 0.0,
+        "false_abstention": false
+      },
+      "latency_ms": {
+        "retrieval": 35.02,
+        "reranking": 572.22,
+        "generation": 1957.77,
+        "total": 2565.01
+      }
+    },
+    {
+      "id": "Q026",
+      "category": "placement",
+      "answerable": true,
+      "has_llm": false,
+      "model_used": null,
+      "citation": {
+        "precision": 0.5,
+        "recall": 1.0,
+        "f1": 0.6667,
+        "expected": [
+          "PlacementPloicy/2023 Career Services Policy.pdf"
+        ],
+        "cited": [
+          "NSSPolicy/LPUNSSPOLICY.pdf",
+          "PlacementPloicy/2023 Career Services Policy.pdf"
+        ]
+      },
+      "correctness": {
+        "token_precision": 0.0542,
+        "token_recall": 0.9375,
+        "token_f1": 0.1024,
+        "numerical_fact_recall": 1.0,
+        "false_abstention": false
+      },
+      "latency_ms": {
+        "retrieval": 34.49,
+        "reranking": 444.19,
+        "generation": 1807.07,
+        "total": 2285.75
+      }
+    },
+    {
+      "id": "Q027",
+      "category": "placement",
+      "answerable": true,
+      "has_llm": false,
+      "model_used": null,
+      "citation": {
+        "precision": 0.5,
+        "recall": 1.0,
+        "f1": 0.6667,
+        "expected": [
+          "PlacementPloicy/Academic Benefit Plan - Placement and Internship - 2023 and 2024 Batch.pdf"
+        ],
+        "cited": [
+          "PlacementPloicy/Academic Benefit Plan - Placement and Internship - 2023 and 2024 Batch.pdf",
+          "PlacementPloicy/Academic Benefit Plan - Clearing Competitive Exams.pdf"
+        ]
+      },
+      "correctness": {
+        "token_precision": 0.0853,
+        "token_recall": 0.9474,
+        "token_f1": 0.1565,
+        "numerical_fact_recall": 1.0,
+        "false_abstention": false
+      },
+      "latency_ms": {
+        "retrieval": 35.22,
+        "reranking": 526.62,
+        "generation": 2339.09,
+        "total": 2900.93
+      }
+    },
+    {
+      "id": "Q028",
+      "category": "placement",
+      "answerable": true,
+      "has_llm": false,
+      "model_used": null,
+      "citation": {
+        "precision": 0.5,
+        "recall": 1.0,
+        "f1": 0.6667,
+        "expected": [
+          "PlacementPloicy/OJT Internship policy 2019-2020 onwards (10 Aug 2019).pdf"
+        ],
+        "cited": [
+          "EDU REV/Academic Benefits.pdf",
+          "PlacementPloicy/OJT Internship policy 2019-2020 onwards (10 Aug 2019).pdf"
+        ]
+      },
+      "correctness": {
+        "token_precision": 0.084,
+        "token_recall": 0.6774,
+        "token_f1": 0.1495,
+        "numerical_fact_recall": 1.0,
+        "false_abstention": false
+      },
+      "latency_ms": {
+        "retrieval": 34.92,
+        "reranking": 454.56,
+        "generation": 1802.16,
+        "total": 2291.64
+      }
+    },
+    {
+      "id": "Q029",
+      "category": "placement",
+      "answerable": true,
+      "has_llm": false,
+      "model_used": null,
+      "citation": {
+        "precision": 0.5,
+        "recall": 1.0,
+        "f1": 0.6667,
+        "expected": [
+          "PlacementPloicy/2023 Career Services Policy.pdf"
+        ],
+        "cited": [
+          "PlacementPloicy/OJT Internship policy 2019-2020 onwards (10 Aug 2019).pdf",
+          "PlacementPloicy/2023 Career Services Policy.pdf"
+        ]
+      },
+      "correctness": {
+        "token_precision": 0.0551,
+        "token_recall": 0.6842,
+        "token_f1": 0.102,
+        "numerical_fact_recall": 0.0,
+        "false_abstention": false
+      },
+      "latency_ms": {
+        "retrieval": 35.2,
+        "reranking": 492.51,
+        "generation": 1749.8,
+        "total": 2277.51
+      }
+    },
+    {
+      "id": "Q030",
+      "category": "placement",
+      "answerable": true,
+      "has_llm": false,
+      "model_used": null,
+      "citation": {
+        "precision": 0.5,
+        "recall": 1.0,
+        "f1": 0.6667,
+        "expected": [
+          "PlacementPloicy/OJT Internship policy 2019-2020 onwards (10 Aug 2019).pdf"
+        ],
+        "cited": [
+          "PlacementPloicy/OJT Internship policy 2019-2020 onwards (10 Aug 2019).pdf",
+          "PlacementPloicy/2023 Career Services Policy.pdf"
+        ]
+      },
+      "correctness": {
+        "token_precision": 0.112,
+        "token_recall": 0.7073,
+        "token_f1": 0.1933,
+        "numerical_fact_recall": 1.0,
+        "false_abstention": false
+      },
+      "latency_ms": {
+        "retrieval": 36.05,
+        "reranking": 514.07,
+        "generation": 1750.36,
+        "total": 2300.48
+      }
+    },
+    {
+      "id": "Q031",
+      "category": "table_based",
+      "answerable": true,
+      "has_llm": false,
+      "model_used": null,
+      "citation": {
+        "precision": 0.5,
+        "recall": 1.0,
+        "f1": 0.6667,
+        "expected": [
+          "ResidentialFacilities/Charges For Residential Facilities.pdf"
+        ],
+        "cited": [
+          "ResidentialFacilities/Charges For Residential Facilities.pdf",
+          "ResidentialFacilities/Residential Facilities Refund Guidelines.pdf"
+        ]
+      },
+      "correctness": {
+        "token_precision": 0.0386,
+        "token_recall": 0.5625,
+        "token_f1": 0.0723,
+        "numerical_fact_recall": 0.3333,
+        "false_abstention": false
+      },
+      "latency_ms": {
+        "retrieval": 35.04,
+        "reranking": 578.25,
+        "generation": 2004.08,
+        "total": 2617.37
+      }
+    },
+    {
+      "id": "Q032",
+      "category": "table_based",
+      "answerable": true,
+      "has_llm": false,
+      "model_used": null,
+      "citation": {
+        "precision": 0.5,
+        "recall": 1.0,
+        "f1": 0.6667,
+        "expected": [
+          "PlacementPloicy/Academic Benefit Plan - Clearing Competitive Exams.pdf"
+        ],
+        "cited": [
+          "EDU REV/Academic Benefits.pdf",
+          "PlacementPloicy/Academic Benefit Plan - Clearing Competitive Exams.pdf"
+        ]
+      },
+      "correctness": {
+        "token_precision": 0.0497,
+        "token_recall": 0.7895,
+        "token_f1": 0.0935,
+        "numerical_fact_recall": 1.0,
+        "false_abstention": false
+      },
+      "latency_ms": {
+        "retrieval": 35.56,
+        "reranking": 476.2,
+        "generation": 1844.92,
+        "total": 2356.68
+      }
+    },
+    {
+      "id": "Q033",
+      "category": "table_based",
+      "answerable": true,
+      "has_llm": false,
+      "model_used": null,
+      "citation": {
+        "precision": 0.5,
+        "recall": 1.0,
+        "f1": 0.6667,
+        "expected": [
+          "PlacementPloicy/Academic Benefit Plan - Placement and Internship - 2023 and 2024 Batch.pdf"
+        ],
+        "cited": [
+          "PlacementPloicy/Academic Benefit Plan - Placement and Internship - 2023 and 2024 Batch.pdf",
+          "EDU REV/Academic Benefits.pdf"
+        ]
+      },
+      "correctness": {
+        "token_precision": 0.0833,
+        "token_recall": 0.8095,
+        "token_f1": 0.1511,
+        "numerical_fact_recall": 0.6,
+        "false_abstention": false
+      },
+      "latency_ms": {
+        "retrieval": 32.58,
+        "reranking": 854.24,
+        "generation": 1763.91,
+        "total": 2650.73
+      }
+    },
+    {
+      "id": "Q034",
+      "category": "table_based",
+      "answerable": true,
+      "has_llm": false,
+      "model_used": null,
+      "citation": {
+        "precision": 0.5,
+        "recall": 1.0,
+        "f1": 0.6667,
+        "expected": [
+          "ResidentialFacilities/Charges For Residential Facilities.pdf"
+        ],
+        "cited": [
+          "ResidentialFacilities/Charges For Residential Facilities.pdf",
+          "ResidentialFacilities/Residential Facilities Refund Guidelines.pdf"
+        ]
+      },
+      "correctness": {
+        "token_precision": 0.0152,
+        "token_recall": 0.2667,
+        "token_f1": 0.0288,
+        "numerical_fact_recall": 0.0,
+        "false_abstention": false
+      },
+      "latency_ms": {
+        "retrieval": 42.47,
+        "reranking": 480.63,
+        "generation": 2031.72,
+        "total": 2554.82
+      }
+    },
+    {
+      "id": "Q035",
+      "category": "table_based",
+      "answerable": true,
+      "has_llm": false,
+      "model_used": null,
+      "citation": {
+        "precision": 0.5,
+        "recall": 1.0,
+        "f1": 0.6667,
+        "expected": [
+          "PlacementPloicy/Academic Benefit Plan - Placement and Internship - 2023 and 2024 Batch.pdf"
+        ],
+        "cited": [
+          "PlacementPloicy/Academic Benefit Plan - Placement and Internship - 2023 and 2024 Batch.pdf",
+          "EDU REV/Academic Benefits.pdf"
+        ]
+      },
+      "correctness": {
+        "token_precision": 0.049,
+        "token_recall": 0.5556,
+        "token_f1": 0.0901,
+        "numerical_fact_recall": 0.3333,
+        "false_abstention": false
+      },
+      "latency_ms": {
+        "retrieval": 20.25,
+        "reranking": 424.95,
+        "generation": 1822.39,
+        "total": 2267.59
+      }
+    },
+    {
+      "id": "Q036",
+      "category": "table_based",
+      "answerable": true,
+      "has_llm": false,
+      "model_used": null,
+      "citation": {
+        "precision": 0.5,
+        "recall": 1.0,
+        "f1": 0.6667,
+        "expected": [
+          "PlacementPloicy/Academic Benefit Plan - Clearing Competitive Exams.pdf"
+        ],
+        "cited": [
+          "EDU REV/Academic Benefits.pdf",
+          "PlacementPloicy/Academic Benefit Plan - Clearing Competitive Exams.pdf"
+        ]
+      },
+      "correctness": {
+        "token_precision": 0.0212,
+        "token_recall": 0.6,
+        "token_f1": 0.041,
+        "numerical_fact_recall": 0.0,
+        "false_abstention": false
+      },
+      "latency_ms": {
+        "retrieval": 22.34,
+        "reranking": 565.47,
+        "generation": 2225.8,
+        "total": 2813.61
+      }
+    },
+    {
+      "id": "Q037",
+      "category": "table_based",
+      "answerable": true,
+      "has_llm": false,
+      "model_used": null,
+      "citation": {
+        "precision": 0.5,
+        "recall": 1.0,
+        "f1": 0.6667,
+        "expected": [
+          "ResidentialFacilities/Charges For Residential Facilities.pdf"
+        ],
+        "cited": [
+          "ResidentialFacilities/Charges For Residential Facilities.pdf",
+          "ResidentialFacilities/Residential Facilities Refund Guidelines.pdf"
+        ]
+      },
+      "correctness": {
+        "token_precision": 0.0307,
+        "token_recall": 0.6154,
+        "token_f1": 0.0584,
+        "numerical_fact_recall": 0.5,
+        "false_abstention": false
+      },
+      "latency_ms": {
+        "retrieval": 35.64,
+        "reranking": 622.45,
+        "generation": 1684.8,
+        "total": 2342.89
+      }
+    },
+    {
+      "id": "Q038",
+      "category": "multi_condition",
+      "answerable": true,
+      "has_llm": false,
+      "model_used": null,
+      "citation": {
+        "precision": 0.5,
+        "recall": 1.0,
+        "f1": 0.6667,
+        "expected": [
+          "EDU REV/Academic Benefits.pdf"
+        ],
+        "cited": [
+          "EDU REV/Academic Benefits.pdf",
+          "PlacementPloicy/Academic Benefit Plan - Clearing Competitive Exams.pdf"
+        ]
+      },
+      "correctness": {
+        "token_precision": 0.075,
+        "token_recall": 0.5455,
+        "token_f1": 0.1319,
+        "numerical_fact_recall": 0.75,
+        "false_abstention": false
+      },
+      "latency_ms": {
+        "retrieval": 36.49,
+        "reranking": 550.59,
+        "generation": 2227.27,
+        "total": 2814.35
+      }
+    },
+    {
+      "id": "Q039",
+      "category": "multi_condition",
+      "answerable": true,
+      "has_llm": false,
+      "model_used": null,
+      "citation": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "expected": [
+          "SemesterExchange/Semester_Year_Abroad_Policy.pdf"
+        ],
+        "cited": [
+          "SemesterExchange/Semester_Year_Abroad_Policy.pdf"
+        ]
+      },
+      "correctness": {
+        "token_precision": 0.1655,
+        "token_recall": 0.5476,
+        "token_f1": 0.2541,
+        "numerical_fact_recall": 0.3333,
+        "false_abstention": false
+      },
+      "latency_ms": {
+        "retrieval": 43.28,
+        "reranking": 558.09,
+        "generation": 1882.71,
+        "total": 2484.08
+      }
+    },
+    {
+      "id": "Q040",
+      "category": "multi_condition",
+      "answerable": true,
+      "has_llm": false,
+      "model_used": null,
+      "citation": {
+        "precision": 0.5,
+        "recall": 1.0,
+        "f1": 0.6667,
+        "expected": [
+          "LibraryPolicy/Library Policy.pdf"
+        ],
+        "cited": [
+          "EDU REV/Academic Benefits.pdf",
+          "LibraryPolicy/Library Policy.pdf"
+        ]
+      },
+      "correctness": {
+        "token_precision": 0.0407,
+        "token_recall": 0.7143,
+        "token_f1": 0.0769,
+        "numerical_fact_recall": 0.0,
+        "false_abstention": false
+      },
+      "latency_ms": {
+        "retrieval": 32.69,
+        "reranking": 469.41,
+        "generation": 2211.96,
+        "total": 2714.06
+      }
+    },
+    {
+      "id": "Q041",
+      "category": "multi_condition",
+      "answerable": true,
+      "has_llm": false,
+      "model_used": null,
+      "citation": {
+        "precision": 0.3333,
+        "recall": 1.0,
+        "f1": 0.5,
+        "expected": [
+          "PlacementPloicy/Academic Benefit Plan - Placement and Internship - 2023 and 2024 Batch.pdf"
+        ],
+        "cited": [
+          "PlacementPloicy/Academic Benefit Plan - Placement and Internship - 2023 and 2024 Batch.pdf",
+          "EDU REV/Academic Benefits.pdf",
+          "PlacementPloicy/Academic Benefit Plan - Clearing Competitive Exams.pdf"
+        ]
+      },
+      "correctness": {
+        "token_precision": 0.017,
+        "token_recall": 0.5455,
+        "token_f1": 0.0331,
+        "numerical_fact_recall": 1.0,
+        "false_abstention": false
+      },
+      "latency_ms": {
+        "retrieval": 37.39,
+        "reranking": 493.33,
+        "generation": 1874.53,
+        "total": 2405.25
+      }
+    },
+    {
+      "id": "Q042",
+      "category": "multi_condition",
+      "answerable": true,
+      "has_llm": false,
+      "model_used": null,
+      "citation": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "expected": [
+          "NSSPolicy/LPUNSSPOLICY.pdf"
+        ],
+        "cited": [
+          "NSSPolicy/LPUNSSPOLICY.pdf"
+        ]
+      },
+      "correctness": {
+        "token_precision": 0.0407,
+        "token_recall": 0.1786,
+        "token_f1": 0.0662,
+        "numerical_fact_recall": 0.25,
+        "false_abstention": false
+      },
+      "latency_ms": {
+        "retrieval": 33.59,
+        "reranking": 556.91,
+        "generation": 2086.53,
+        "total": 2677.03
+      }
+    },
+    {
+      "id": "Q043",
+      "category": "multi_condition",
+      "answerable": true,
+      "has_llm": false,
+      "model_used": null,
+      "citation": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "expected": [
+          "SemesterExchange/Semester_Year_Abroad_Policy.pdf"
+        ],
+        "cited": [
+          "SemesterExchange/Semester_Year_Abroad_Policy.pdf"
+        ]
+      },
+      "correctness": {
+        "token_precision": 0.2055,
+        "token_recall": 0.8824,
+        "token_f1": 0.3333,
+        "numerical_fact_recall": 1.0,
+        "false_abstention": false
+      },
+      "latency_ms": {
+        "retrieval": 21.91,
+        "reranking": 505.53,
+        "generation": 1783.92,
+        "total": 2311.36
+      }
+    },
+    {
+      "id": "Q044",
+      "category": "conversational",
+      "answerable": true,
+      "has_llm": false,
+      "model_used": null,
+      "citation": {
+        "precision": 0.5,
+        "recall": 1.0,
+        "f1": 0.6667,
+        "expected": [
+          "LibraryPolicy/Library Policy.pdf"
+        ],
+        "cited": [
+          "UNImap/UNIMAP_Campus_Guide.txt",
+          "LibraryPolicy/Library Policy.pdf"
+        ]
+      },
+      "correctness": {
+        "token_precision": 0.0927,
+        "token_recall": 1.0,
+        "token_f1": 0.1696,
+        "numerical_fact_recall": 1.0,
+        "false_abstention": false
+      },
+      "latency_ms": {
+        "retrieval": 17.72,
+        "reranking": 1005.46,
+        "generation": 1998.08,
+        "total": 3021.26
+      }
+    },
+    {
+      "id": "Q045",
+      "category": "conversational",
+      "answerable": true,
+      "has_llm": false,
+      "model_used": null,
+      "citation": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "expected": [
+          "PlacementPloicy/2023 Career Services Policy.pdf"
+        ],
+        "cited": [
+          "PlacementPloicy/2023 Career Services Policy.pdf"
+        ]
+      },
+      "correctness": {
+        "token_precision": 0.1154,
+        "token_recall": 0.5,
+        "token_f1": 0.1875,
+        "numerical_fact_recall": 0.0,
+        "false_abstention": false
+      },
+      "latency_ms": {
+        "retrieval": 35.18,
+        "reranking": 527.7,
+        "generation": 1858.24,
+        "total": 2421.12
+      }
+    },
+    {
+      "id": "Q046",
+      "category": "conversational",
+      "answerable": true,
+      "has_llm": false,
+      "model_used": null,
+      "citation": {
+        "precision": 0.3333,
+        "recall": 1.0,
+        "f1": 0.5,
+        "expected": [
+          "PlacementPloicy/OJT Internship policy 2019-2020 onwards (10 Aug 2019).pdf"
+        ],
+        "cited": [
+          "PlacementPloicy/Academic Benefit Plan - Clearing Competitive Exams.pdf",
+          "SemesterExchange/Semester_Year_Abroad_Policy.pdf",
+          "PlacementPloicy/OJT Internship policy 2019-2020 onwards (10 Aug 2019).pdf"
+        ]
+      },
+      "correctness": {
+        "token_precision": 0.0197,
+        "token_recall": 1.0,
+        "token_f1": 0.0385,
+        "numerical_fact_recall": 1.0,
+        "false_abstention": false
+      },
+      "latency_ms": {
+        "retrieval": 17.77,
+        "reranking": 469.45,
+        "generation": 1787.69,
+        "total": 2274.91
+      }
+    },
+    {
+      "id": "Q047",
+      "category": "conversational",
+      "answerable": true,
+      "has_llm": false,
+      "model_used": null,
+      "citation": {
+        "precision": 0.5,
+        "recall": 1.0,
+        "f1": 0.6667,
+        "expected": [
+          "SemesterExchange/Semester_Year_Abroad_Policy.pdf"
+        ],
+        "cited": [
+          "EDU REV/Academic Benefits.pdf",
+          "SemesterExchange/Semester_Year_Abroad_Policy.pdf"
+        ]
+      },
+      "correctness": {
+        "token_precision": 0.0388,
+        "token_recall": 0.6923,
+        "token_f1": 0.0735,
+        "numerical_fact_recall": 1.0,
+        "false_abstention": false
+      },
+      "latency_ms": {
+        "retrieval": 19.8,
+        "reranking": 862.77,
+        "generation": 2301.2,
+        "total": 3183.77
+      }
+    },
+    {
+      "id": "Q048",
+      "category": "conversational",
+      "answerable": true,
+      "has_llm": false,
+      "model_used": null,
+      "citation": {
+        "precision": 0.5,
+        "recall": 1.0,
+        "f1": 0.6667,
+        "expected": [
+          "EDU REV/Academic Benefits.pdf"
+        ],
+        "cited": [
+          "EDU REV/Academic Benefits.pdf",
+          "PlacementPloicy/OJT Internship policy 2019-2020 onwards (10 Aug 2019).pdf"
+        ]
+      },
+      "correctness": {
+        "token_precision": 0.0488,
+        "token_recall": 0.9231,
+        "token_f1": 0.0927,
+        "numerical_fact_recall": 1.0,
+        "false_abstention": false
+      },
+      "latency_ms": {
+        "retrieval": 31.88,
+        "reranking": 671.7,
+        "generation": 1820.65,
+        "total": 2524.23
+      }
+    },
+    {
+      "id": "Q049",
+      "category": "conversational",
+      "answerable": true,
+      "has_llm": false,
+      "model_used": null,
+      "citation": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "expected": [
+          "UNImap/UNIMAP_Campus_Guide.txt"
+        ],
+        "cited": [
+          "SemesterExchange/Semester_Year_Abroad_Policy.pdf",
+          "PlacementPloicy/OJT Internship policy 2019-2020 onwards (10 Aug 2019).pdf",
+          "DressCode/FAQ's.pdf",
+          "DressCode/Dress Code and Uniform Policy for Students.pdf"
+        ]
+      },
+      "correctness": {
+        "token_precision": 0.0119,
+        "token_recall": 0.6667,
+        "token_f1": 0.0233,
+        "numerical_fact_recall": 0.0,
+        "false_abstention": false
+      },
+      "latency_ms": {
+        "retrieval": 16.55,
+        "reranking": 765.61,
+        "generation": 1848.83,
+        "total": 2630.99
+      }
+    },
+    {
+      "id": "Q050",
+      "category": "exact_terminology",
+      "answerable": true,
+      "has_llm": false,
+      "model_used": null,
+      "citation": {
+        "precision": 0.5,
+        "recall": 1.0,
+        "f1": 0.6667,
+        "expected": [
+          "PlacementPloicy/2023 Career Services Policy.pdf"
+        ],
+        "cited": [
+          "PlacementPloicy/OJT Internship policy 2019-2020 onwards (10 Aug 2019).pdf",
+          "PlacementPloicy/2023 Career Services Policy.pdf"
+        ]
+      },
+      "correctness": {
+        "token_precision": 0.0178,
+        "token_recall": 0.8333,
+        "token_f1": 0.0348,
+        "numerical_fact_recall": 1.0,
+        "false_abstention": false
+      },
+      "latency_ms": {
+        "retrieval": 34.04,
+        "reranking": 540.74,
+        "generation": 1795.95,
+        "total": 2370.73
+      }
+    },
+    {
+      "id": "Q051",
+      "category": "exact_terminology",
+      "answerable": true,
+      "has_llm": false,
+      "model_used": null,
+      "citation": {
+        "precision": 0.5,
+        "recall": 1.0,
+        "f1": 0.6667,
+        "expected": [
+          "PlacementPloicy/2023 Career Services Policy.pdf"
+        ],
+        "cited": [
+          "PlacementPloicy/Academic Benefit Plan - Placement and Internship - 2023 and 2024 Batch.pdf",
+          "PlacementPloicy/2023 Career Services Policy.pdf"
+        ]
+      },
+      "correctness": {
+        "token_precision": 0.0195,
+        "token_recall": 0.8333,
+        "token_f1": 0.0382,
+        "numerical_fact_recall": 1.0,
+        "false_abstention": false
+      },
+      "latency_ms": {
+        "retrieval": 18.96,
+        "reranking": 692.02,
+        "generation": 1999.48,
+        "total": 2710.46
+      }
+    },
+    {
+      "id": "Q052",
+      "category": "exact_terminology",
+      "answerable": true,
+      "has_llm": false,
+      "model_used": null,
+      "citation": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "expected": [
+          "PlacementPloicy/2023 Career Services Policy.pdf"
+        ],
+        "cited": [
+          "PlacementPloicy/2023 Career Services Policy.pdf"
+        ]
+      },
+      "correctness": {
+        "token_precision": 0.0495,
+        "token_recall": 0.8333,
+        "token_f1": 0.0935,
+        "numerical_fact_recall": 1.0,
+        "false_abstention": false
+      },
+      "latency_ms": {
+        "retrieval": 19.52,
+        "reranking": 638.52,
+        "generation": 1735.47,
+        "total": 2393.51
+      }
+    },
+    {
+      "id": "Q053",
+      "category": "exact_terminology",
+      "answerable": true,
+      "has_llm": false,
+      "model_used": null,
+      "citation": {
+        "precision": 0.5,
+        "recall": 1.0,
+        "f1": 0.6667,
+        "expected": [
+          "PlacementPloicy/Academic Benefit Plan - Clearing Competitive Exams.pdf"
+        ],
+        "cited": [
+          "EDU REV/Academic Benefits.pdf",
+          "PlacementPloicy/Academic Benefit Plan - Clearing Competitive Exams.pdf"
+        ]
+      },
+      "correctness": {
+        "token_precision": 0.0232,
+        "token_recall": 0.7778,
+        "token_f1": 0.045,
+        "numerical_fact_recall": 1.0,
+        "false_abstention": false
+      },
+      "latency_ms": {
+        "retrieval": 37.09,
+        "reranking": 820.09,
+        "generation": 2268.99,
+        "total": 3126.17
+      }
+    },
+    {
+      "id": "Q054",
+      "category": "exact_terminology",
+      "answerable": true,
+      "has_llm": false,
+      "model_used": null,
+      "citation": {
+        "precision": 0.5,
+        "recall": 1.0,
+        "f1": 0.6667,
+        "expected": [
+          "PlacementPloicy/2023 Career Services Policy.pdf"
+        ],
+        "cited": [
+          "PlacementPloicy/Academic Benefit Plan - Placement and Internship - 2023 and 2024 Batch.pdf",
+          "PlacementPloicy/2023 Career Services Policy.pdf"
+        ]
+      },
+      "correctness": {
+        "token_precision": 0.0195,
+        "token_recall": 0.8333,
+        "token_f1": 0.0382,
+        "numerical_fact_recall": 1.0,
+        "false_abstention": false
+      },
+      "latency_ms": {
+        "retrieval": 21.04,
+        "reranking": 795.37,
+        "generation": 1852.09,
+        "total": 2668.5
+      }
+    },
+    {
+      "id": "Q055",
+      "category": "exact_terminology",
+      "answerable": true,
+      "has_llm": false,
+      "model_used": null,
+      "citation": {
+        "precision": 0.3333,
+        "recall": 1.0,
+        "f1": 0.5,
+        "expected": [
+          "PlacementPloicy/Academic Benefit Plan - 3rd Party Industry Tests - 2023 Batch.docx"
+        ],
+        "cited": [
+          "EDU REV/Academic Benefits.pdf",
+          "PlacementPloicy/Academic Benefit Plan - Clearing Competitive Exams.pdf",
+          "PlacementPloicy/Academic Benefit Plan - 3rd Party Industry Tests - 2023 Batch.docx"
+        ]
+      },
+      "correctness": {
+        "token_precision": 0.0212,
+        "token_recall": 0.8,
+        "token_f1": 0.0412,
+        "numerical_fact_recall": 1.0,
+        "false_abstention": false
+      },
+      "latency_ms": {
+        "retrieval": 33.69,
+        "reranking": 942.07,
+        "generation": 2101.0,
+        "total": 3076.76
+      }
+    },
+    {
+      "id": "Q056",
+      "category": "unanswerable",
+      "answerable": false,
+      "has_llm": false,
+      "model_used": null,
+      "unanswerable": {
+        "correct_abstention": false,
+        "hallucinated": true
+      },
+      "latency_ms": {
+        "retrieval": 32.49,
+        "reranking": 852.27,
+        "generation": 1852.8,
+        "total": 2737.56
+      }
+    },
+    {
+      "id": "Q057",
+      "category": "unanswerable",
+      "answerable": false,
+      "has_llm": false,
+      "model_used": null,
+      "unanswerable": {
+        "correct_abstention": true,
+        "hallucinated": false
+      },
+      "latency_ms": {
+        "retrieval": 36.5,
+        "reranking": 587.92,
+        "generation": 1861.27,
+        "total": 2485.69
+      }
+    },
+    {
+      "id": "Q058",
+      "category": "unanswerable",
+      "answerable": false,
+      "has_llm": false,
+      "model_used": null,
+      "unanswerable": {
+        "correct_abstention": true,
+        "hallucinated": false
+      },
+      "latency_ms": {
+        "retrieval": 19.85,
+        "reranking": 587.82,
+        "generation": 2036.38,
+        "total": 2644.05
+      }
+    },
+    {
+      "id": "Q059",
+      "category": "unanswerable",
+      "answerable": false,
+      "has_llm": false,
+      "model_used": null,
+      "unanswerable": {
+        "correct_abstention": false,
+        "hallucinated": true
+      },
+      "latency_ms": {
+        "retrieval": 34.11,
+        "reranking": 597.38,
+        "generation": 1869.59,
+        "total": 2501.08
+      }
+    },
+    {
+      "id": "Q060",
+      "category": "unanswerable",
+      "answerable": false,
+      "has_llm": false,
+      "model_used": null,
+      "unanswerable": {
+        "correct_abstention": false,
+        "hallucinated": true
+      },
+      "latency_ms": {
+        "retrieval": 32.66,
+        "reranking": 478.16,
+        "generation": 2116.69,
+        "total": 2627.51
+      }
+    },
+    {
+      "id": "Q061",
+      "category": "unanswerable",
+      "answerable": false,
+      "has_llm": false,
+      "model_used": null,
+      "unanswerable": {
+        "correct_abstention": false,
+        "hallucinated": true
+      },
+      "latency_ms": {
+        "retrieval": 34.05,
+        "reranking": 512.42,
+        "generation": 1739.47,
+        "total": 2285.94
+      }
+    },
+    {
+      "id": "Q062",
+      "category": "exact_terminology",
+      "answerable": true,
+      "has_llm": false,
+      "model_used": null,
+      "citation": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "expected": [
+          "SemesterExchange/Semester_Year_Abroad_Policy.pdf"
+        ],
+        "cited": [
+          "SemesterExchange/Semester_Year_Abroad_Policy.pdf"
+        ]
+      },
+      "correctness": {
+        "token_precision": 0.0573,
+        "token_recall": 0.5625,
+        "token_f1": 0.104,
+        "numerical_fact_recall": 1.0,
+        "false_abstention": false
+      },
+      "latency_ms": {
+        "retrieval": 34.93,
+        "reranking": 535.78,
+        "generation": 1987.32,
+        "total": 2558.03
+      }
+    },
+    {
+      "id": "Q063",
+      "category": "policy",
+      "answerable": true,
+      "has_llm": false,
+      "model_used": null,
+      "citation": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "expected": [
+          "NSSPolicy/LPUNSSPOLICY.pdf"
+        ],
+        "cited": [
+          "NSSPolicy/LPUNSSPOLICY.pdf"
+        ]
+      },
+      "correctness": {
+        "token_precision": 0.1019,
+        "token_recall": 0.9412,
+        "token_f1": 0.1839,
+        "numerical_fact_recall": 1.0,
+        "false_abstention": false
+      },
+      "latency_ms": {
+        "retrieval": 18.48,
+        "reranking": 449.44,
+        "generation": 1799.76,
+        "total": 2267.68
+      }
+    }
+  ]
+}
