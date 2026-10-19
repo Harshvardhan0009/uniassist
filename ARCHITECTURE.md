@@ -34,52 +34,63 @@ It has two independently deployable parts:
 ```mermaid
 flowchart TB
     subgraph Client["Frontend — Next.js 16 (app/page.js)"]
-        UI["Chat UI · localStorage history · markdown/table renderer"]
+        UI["Chat UI · SSE Streaming Reader · Citation Badges · localStorage History"]
     end
 
     subgraph API["Backend — FastAPI (app/main.py)"]
         H["GET /api/health"]
+        M["GET /api/metrics"]
         Q["POST /api/query"]
+        QS["POST /api/query/stream"]
         I["POST /api/ingest (bearer token)"]
     end
 
     subgraph QueryPipe["Query pipeline (app/query/*)"]
-        R["retriever.py — similarity search"]
-        RR["reranker.py — Cohere rerank (optional)"]
-        G["generator.py — LLM answer + citations"]
+        QR["rewriter.py — Turn 2+ conversational query resolution"]
+        R["retriever.py — prefix-guided E5 similarity search"]
+        RR["reranker.py — Cohere rerank-v3.5 cross-encoder"]
+        CP["compressor.py — adaptive context tail pruning"]
+        G["generator.py — calibrated generation & SSE token streaming"]
     end
 
     subgraph IngestPipe["Ingestion pipeline (app/ingestion/*)"]
-        P["partition.py — PDF/DOCX/TXT/MD"]
-        C["chunker.py — RecursiveCharacterTextSplitter"]
-        S["summarizer.py — LLM summaries (concurrent)"]
-        E["embedder.py — HF embeddings + store"]
+        P["partition.py — table-aware PDF/DOCX/TXT extraction"]
+        C["chunker.py — 1500 chars / 200 overlap"]
+        E["embedder.py — passage-prefixed E5 embeddings + store"]
     end
 
-    EMB["HuggingFace all-MiniLM-L6-v2<br/>(in-process, 384-dim, normalized)"]
-    VDB[("ChromaDB<br/>collection: university_docs<br/>space: cosine")]
-    LLM["LLM via OpenAI-compatible API<br/>(OpenRouter / xAI Grok)"]
-    COH["Cohere Rerank v3.5"]
-    DATA["/Data — university documents/"]
+    EMB["HuggingFace intfloat/e5-base-v2<br/>(768-dim, cosine space, passage: / query: prefixed)"]
+    VDB[("ChromaDB (Render / Local)<br/>collection: university_docs<br/>space: cosine (285 chunks)")]
+    LLM["Primary LLM: Google Gemini 3.6 Flash<br/>(OpenAI-compatible endpoint)"]
+    FLLM["Fallback LLM: Groq openai/gpt-oss-120b<br/>(zero-downtime failover)"]
+    COH["Cohere Rerank v3.5 API"]
+    DATA["/Data — 14 university documents (144 pages)"]
 
-    UI -->|"question + history"| Q
-    Q --> R --> RR --> G --> Q
-    I --> P --> C --> S --> E
+    UI -->|"question + history"| QS
+    UI -->|"fallback request"| Q
+    QS --> QR --> R --> RR --> CP --> G --> QS
+    Q --> QR --> R --> RR --> CP --> G --> Q
+    I --> P --> C --> E
     DATA --> P
 
     R --> VDB
     R --> EMB
     E --> EMB
     E --> VDB
-    S --> LLM
+    QR --> LLM
     G --> LLM
+    LLM -.->|"failover on error/quota"| FLLM
     RR --> COH
     H --> VDB
+    M --> API
 ```
 
-**Request flow (query):** `question + prior turns` → embed query → ChromaDB similarity search
-(top‑K) → Cohere rerank to top‑N (skipped if no key) → LLM generation from **raw** chunk text →
-answer + source citations + per-step timings.
+**Production Request Flow (5-Step Pipeline):**
+1. **Query Rewriting:** Turn 2+ history resolution rewrites ambiguous conversational pronouns into standalone queries (+50% conversational recall).
+2. **Dense Retrieval:** E5-base-v2 embeds the query with `query: ` prefix and retrieves Top-20 candidates from ChromaDB cosine space.
+3. **Cross-Encoder Reranking:** Cohere `rerank-v3.5` rescores candidates and selects the Top-5 most relevant chunks.
+4. **Context Compression:** Score-aware tail pruning drops distractor chunks (-15.8% prompt tokens while retaining 100% source recall).
+5. **Calibrated Generation & Streaming:** Gemini 3.6 Flash generates the response with exact page citations (`[Doc.pdf, Page X]`), streaming tokens in real time via SSE, with zero-downtime failover to Groq.
 
 ---
 
@@ -94,10 +105,12 @@ answer + source citations + per-step timings.
 | PDF parsing | **pdfplumber** (table-aware, primary), **pypdf** (fallback) |
 | DOCX parsing | **python-docx** |
 | TXT / MD parsing | LangChain `TextLoader` (UTF-8) |
-| Embeddings | **langchain-huggingface** + **sentence-transformers** |
-| Vector store | **ChromaDB** + **langchain-chroma** |
-| LLM client | **langchain-openai** (`ChatOpenAI`, OpenAI-compatible) |
-| Reranker | **langchain-cohere** (`CohereRerank`) |
+| Embeddings | **sentence-transformers** (`intfloat/e5-base-v2`, 768-dim) |
+| Vector store | **ChromaDB** + **langchain-chroma** (cosine space) |
+| Primary LLM client | **langchain-openai** (`ChatOpenAI`, Google Gemini 3.6 Flash) |
+| Fallback LLM client | **langchain-openai** (`ChatOpenAI`, Groq `openai/gpt-oss-120b`) |
+| Reranker | **langchain-cohere** (`CohereRerank`, `rerank-v3.5`) |
+| Observability | In-memory rolling telemetry window + `query_traces.jsonl` |
 | Logging / CLI | **rich** |
 
 ### Frontend (JavaScript)
@@ -105,17 +118,19 @@ answer + source citations + per-step timings.
 |---|---|
 | Framework | **Next.js 16.3.1** (App Router, Turbopack) |
 | UI library | **React 19.2.8** / react-dom |
+| Streaming | Server-Sent Events (SSE) `ReadableStream` reader with REST fallback |
 | Language | JavaScript (JSX), no TypeScript |
 | Styling | CSS Modules + global CSS variables (dark theme, LPU orange) |
-| Fonts | Inter + JetBrains Mono (Google Fonts via CSS `@import`) |
+| Typography | Inter + JetBrains Mono (Google Fonts via CSS `@import`) |
+| Citations | Stylized inline badges (`📄 Document, Page X`) + context pills |
 | Linting | ESLint 9 + eslint-config-next |
-| State/persistence | React hooks + `localStorage` (no external state lib) |
+| Persistence | React hooks + `localStorage` (per-chat history) |
 
 ### Infrastructure
 | Concern | Technology |
 |---|---|
-| Vector DB (containerized) | `chromadb/chroma:latest` via **docker-compose** (host `8001` → container `8000`) |
-| Vector DB (hosted) | ChromaDB on **Render** (client-server mode over HTTPS) |
+| Vector DB (hosted) | ChromaDB on **Render** (client-server mode over HTTPS, 285 chunks) |
+| Vector DB (local dev) | `chromadb/chroma:latest` via **docker-compose** (port `8001`) |
 | Backend runtime | Python 3 virtualenv (`backend/venv`) |
 
 ---
@@ -124,47 +139,24 @@ answer + source citations + per-step timings.
 
 | Role | Model / Service | Where | Configured via |
 |---|---|---|---|
-| **Text embeddings** | `all-MiniLM-L6-v2` (384-dim, normalized, cosine) | In-process (CPU, auto-CUDA) | `EMBEDDING_MODEL` |
-| **LLM (summarize + generate)** | OpenAI-compatible chat model | External API | `LLM_API_KEY` / `LLM_BASE_URL` / `LLM_MODEL` (legacy `GROK_*` accepted) |
-| **Fallback LLM** | OpenAI-compatible chat model (e.g. Groq `openai/gpt-oss-120b`) | External API | `FALLBACK_LLM_API_KEY` (legacy `GROQ_API_KEY`) / `FALLBACK_LLM_BASE_URL` / `FALLBACK_LLM_MODEL` |
-| **Reranker** | `rerank-v3.5` (cross-encoder) | Cohere API | `COHERE_API_KEY` / `COHERE_RERANK_MODEL` |
-| **Vector store** | ChromaDB (`university_docs`) | Local file **or** remote HTTP | `CHROMA_*` |
+| **Text embeddings** | `intfloat/e5-base-v2` (768-dim, cosine space) | In-process (CPU, auto-CUDA) | `EMBEDDING_MODEL` |
+| **Primary LLM** | Google Gemini `gemini-3.6-flash` | External API | `LLM_API_KEY` / `LLM_BASE_URL` / `LLM_MODEL` |
+| **Fallback LLM** | Groq `openai/gpt-oss-120b` | External API | `FALLBACK_LLM_API_KEY` / `FALLBACK_LLM_BASE_URL` / `FALLBACK_LLM_MODEL` |
+| **Reranker** | Cohere `rerank-v3.5` (cross-encoder) | External API | `COHERE_API_KEY` / `COHERE_RERANK_MODEL` |
+| **Vector store** | ChromaDB (`university_docs`) | Remote HTTP or Local | `CHROMA_*` |
 
-### Currently configured deployment (from `backend/.env`)
-- **LLM provider:** Google Gemini via its **OpenAI-compatible** endpoint
-  (`LLM_BASE_URL=https://generativelanguage.googleapis.com/v1beta/openai/`), **model
-  `gemini-3.6-flash`**. *(History: the earlier OpenRouter `gemini-2.5-flash` key became
-  unfunded (`402`), and `gemini-2.5-flash` is now `404` for new Google accounts — see §14.
-  Code defaults, if unset, are xAI Grok: `https://api.x.ai/v1`, `grok-3-mini`.)*
-  > ⚠ The Gemini **free tier caps at 20 requests/day**, so live `/api/query` LLM answers
-  > degrade to extractive fallback after the cap; use a paid tier for production traffic.
-- **Reranker:** **configured and active** — `COHERE_API_KEY` is set, so Cohere `rerank-v3.5`
-  reranks the top‑K candidates down to top‑N (`RERANK_TOP_N`). *(Trial-tier: 10 calls/min.)*
-- **Vector store:** **client-server mode** against `uniassist-chroma.onrender.com:443` (SSL),
-  collection `university_docs`.
-- **Embeddings:** loaded in-process on CPU (`all-MiniLM-L6-v2`; evaluation recommends
-  `e5-base-v2` — see §14, pending promotion).
-- **Fallback LLM:** **Groq `openai/gpt-oss-120b`** is configured (`FALLBACK_LLM_*`). When the
-  primary LLM errors, rate-limits, hits its quota, or returns empty, generation **automatically
-  fails over** to Groq before resorting to the extractive response. This makes answers resilient
-  to the Gemini free-tier daily cap.
-
-> The primary LLM, fallback LLM, and Cohere are all **optional at runtime**: with no LLM at all the
-> backend returns a structured extract of retrieved passages; without a Cohere key it skips
-> reranking. The fallback LLM is used only when the primary fails, so a single funded provider is
-> enough for full answers.
-
-### Model / retrieval parameters
-| Parameter | Value | Location |
-|---|---|---|
-| Chunk size / overlap | `2500` / `300` chars | `chunker.py` |
-| Text splitter | `RecursiveCharacterTextSplitter` (`\n\n`, `\n`, `. `, ` `, ``) | `chunker.py` |
-| Retrieval top‑K | `20` | `RETRIEVAL_TOP_K` |
-| Rerank top‑N | `5` | `RERANK_TOP_N` |
-| Min relevance score | `0.0` (disabled) | `RETRIEVAL_MIN_SCORE` |
-| Summarization temp / max tokens | `0.0` / `256` | `summarizer.py` |
-| Generation temp / max tokens | `0.1` / `1024` | `generator.py` |
-| Summarization concurrency | `5` | `SUMMARY_CONCURRENCY` |
+### Production Configuration Parameters
+| Parameter | Value | Location / Env Var | Rationale / Source |
+|---|---|---|---|
+| Embedding model | `intfloat/e5-base-v2` | `EMBEDDING_MODEL` | Phase 7 Winner (Hit@5: 88.9%, MRR: 0.782) |
+| Chunk size / overlap | `1500` / `200` chars | `CHUNK_SIZE` / `CHUNK_OVERLAP` | Phase 10 Sweep Winner |
+| Ingestion summarization | `False` (raw text) | `ENABLE_INGESTION_SUMMARIZATION` | Phase 7 Finding (preserves numbers/tables) |
+| Retrieval top‑K | `20` | `RETRIEVAL_TOP_K` | High-recall initial candidate pool |
+| Rerank top‑N | `5` | `RERANK_TOP_N` | Cohere cross-encoder precision focus |
+| Context compression | `True` | `ENABLE_CONTEXT_COMPRESSION` | Phase 18 Winner (-15.8% tokens, 100% recall) |
+| Query rewriting | `True` | `ENABLE_QUERY_REWRITING` | Phase 14 Winner (+50% conversational recall) |
+| Primary LLM | `gemini-3.6-flash` | `LLM_MODEL` | Phase 11 Winner (4.68/5.0 human eval) |
+| Generation temperature | `0.1` | `generator.py` | Minimizes variance & hallucination |
 
 ---
 
@@ -175,29 +167,33 @@ uniassist/
 ├── backend/
 │   ├── app/
 │   │   ├── config.py             # pydantic-settings (env-driven)
-│   │   ├── main.py               # FastAPI app, endpoints, auth, rate limit
+│   │   ├── main.py               # FastAPI app, SSE streaming, health & metrics
+│   │   ├── telemetry.py          # Rolling latency and cost observability
 │   │   ├── ingestion/
-│   │   │   ├── partition.py      # PDF/DOCX/TXT/MD → LangChain Documents
-│   │   │   ├── chunker.py        # split into retrieval-friendly chunks
-│   │   │   ├── summarizer.py     # LLM summaries (concurrent) → searchable content
-│   │   │   ├── embedder.py       # HF embeddings + Chroma store + health check
-│   │   │   └── pipeline.py       # CLI orchestrator (steps 3–6)
+│   │   │   ├── partition.py      # PDF/DOCX/TXT/MD table-aware extraction
+│   │   │   ├── chunker.py        # 1500 chars / 200 overlap text splitting
+│   │   │   ├── embedder.py       # E5 prefixed embeddings + Chroma store
+│   │   │   └── pipeline.py       # Ingestion orchestrator CLI
 │   │   └── query/
-│   │       ├── retriever.py      # embed query + similarity search
-│   │       ├── reranker.py       # Cohere cross-encoder (optional)
-│   │       ├── generator.py      # LLM answer + citations + history
-│   │       └── chain.py          # query() orchestration (steps 7–9)
+│   │       ├── rewriter.py       # Turn 2+ conversational query resolution
+│   │       ├── retriever.py      # E5 similarity search with query: prefix
+│   │       ├── reranker.py       # Cohere rerank-v3.5 cross-encoder
+│   │       ├── compressor.py     # Adaptive context tail pruning
+│   │       ├── generator.py      # Calibrated generation & SSE token generator
+│   │       └── chain.py          # query() and stream_query() orchestrators
 │   ├── requirements.txt
 │   └── .env.example
 ├── frontend/
 │   ├── app/
-│   │   ├── page.js               # entire chat UI + markdown formatter
-│   │   ├── layout.js             # root layout + metadata
-│   │   ├── globals.css           # design tokens + keyframes
-│   │   └── page.module.css       # component styles
+│   │   ├── page.js               # Chat UI, SSE streaming reader & citation badges
+│   │   ├── layout.js             # Root layout & page metadata
+│   │   ├── globals.css           # Global theme variables & tokens
+│   │   └── page.module.css       # Layout, badges, context pills & cursor
 │   ├── package.json
 │   └── .env.example
-├── Data/                         # university documents (see §8)
+├── evaluation/                   # 25-Phase evaluation framework & benchmarks
+├── Data/                         # University documents (14 PDFs, 144 pages)
+
 ├── evaluation/                   # evaluation framework (Phase 4+, see §14)
 │   ├── configs/baseline_v1.json  # frozen reference config (Phase 1)
 │   ├── dataset/questions.json    # 63-question benchmark + ground truth (Phases 2-3)

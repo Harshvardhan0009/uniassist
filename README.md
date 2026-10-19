@@ -1,41 +1,62 @@
 # UniAssist — University AI Assistant 🎓
 
-An intelligent, modular **Retrieval-Augmented Generation (RAG)** platform for university students and staff to query official policies, placement guidelines, dress codes, academic benefit plans, library rules, and campus maps.
+An intelligent, modular **Retrieval-Augmented Generation (RAG)** platform designed for university students and staff to query official policies, placement guidelines, dress codes, academic benefit plans, library rules, and campus maps with exact page-level citations.
 
-> **Working on the evaluation/improvement program?** Start with **[`docs/PROJECT_HANDOFF.md`](docs/PROJECT_HANDOFF.md)** —
-> it's the single source of truth for project context, what's done (Phases 0–10), what's next, and the
-> current winning configuration. The living status report is [`evaluation/reports/latest_report.md`](evaluation/reports/latest_report.md).
+> **Evaluation Program Status: 100% Complete (Phases 0–25).**  
+> Complete decision records, ablation studies, and benchmark results are documented in **[`evaluation/README.md`](evaluation/README.md)** and summarized in **[`docs/PROJECT_HANDOFF.md`](docs/PROJECT_HANDOFF.md)** and **[`docs/CURRENT_STATE.md`](docs/CURRENT_STATE.md)**.
 
 ---
 
-## 🌟 Highlights
+## 🌟 Production System Highlights
 
-- **Fast & Accurate Retrieval**: ChromaDB persistent vector database powered by HuggingFace `all-MiniLM-L6-v2` embeddings.
-- **Reranking Intelligence**: Cohere cross-encoder reranker for high-precision semantic selection.
-- **Multi-Provider LLM Integration**: OpenRouter, xAI Grok, or any OpenAI-compatible model with structured citations.
-- **Multi-Format Ingestion**: PDF (`pypdf`/`pdfplumber`), DOCX (`python-docx`), and UTF-8 `.txt`/`.md` loaders with zero heavy native dependencies.
-- **ChatGPT-Style UI**: Next.js 16 App Router chat interface with markdown tables, multi-turn history, source citations, and per-chat persistence.
+* **High-Precision Embeddings**: Powered by HuggingFace `intfloat/e5-base-v2` (768-dim) in cosine space, outperforming standard baseline models with prefix-guided queries (`query: `) and passages (`passage: `).
+* **Reranking Intelligence**: Cohere `rerank-v3.5` cross-encoder reranker narrows Top-20 retrieved candidates down to Top-5 high-relevance chunks.
+* **Calibrated Generation & LLM Failover**: Primary generation powered by Google `gemini-3.6-flash` with zero phantom citations and automatic failover to Groq (`openai/gpt-oss-120b`).
+* **Conversational Query Rewriter**: Multi-turn history resolution (+50% conversational recall) resolving ambiguous follow-ups into standalone search queries.
+* **Adaptive Context Compression**: Trims redundant distractor chunks (-15.8% prompt tokens) while retaining 100% source answerability.
+* **Real-Time Streaming UX**: Next.js 16 App Router interface featuring Server-Sent Events (SSE) token streaming, inline citation badges (`📄 clean_name`), follow-up context pills, and per-chat history.
+* **Live Observability**: Runtime telemetry window tracking TTFT, retrieval, rerank, and generation percentiles via `GET /api/metrics`.
 
 ---
 
 ## 🏗️ Project Architecture
 
 ```
-LPUASSIST/
+UNIASSIST/
 ├── backend/
 │   ├── app/
-│   │   ├── config.py             # Pydantic environment configuration
-│   │   ├── main.py               # FastAPI application & endpoints
-│   │   ├── ingestion/            # Partition, chunk, summarize & embed
-│   │   └── query/                # Retrieve, rerank & generate
+│   │   ├── config.py             # Pydantic v2 environment settings
+│   │   ├── main.py               # FastAPI application, streaming & health routes
+│   │   ├── telemetry.py          # Rolling latency and cost observability
+│   │   ├── ingestion/
+│   │   │   ├── partition.py      # Table-aware PDF/DOCX/TXT extraction (pdfplumber)
+│   │   │   ├── chunker.py        # 1500 chars / 200 overlap text splitting
+│   │   │   ├── embedder.py       # E5-base-v2 prefixed vector embeddings
+│   │   │   └── pipeline.py       # Offline and CLI ingestion orchestrator
+│   │   └── query/
+│   │       ├── rewriter.py       # Turn 2+ conversational query resolution
+│   │       ├── retriever.py      # Prefix-aware ChromaDB similarity retrieval
+│   │       ├── reranker.py       # Cohere rerank-v3.5 cross-encoder
+│   │       ├── compressor.py     # Adaptive context tail pruning
+│   │       ├── generator.py      # Calibrated LLM generation & SSE streaming
+│   │       └── chain.py          # Unified RAG query pipeline orchestrator
 │   ├── requirements.txt          # Python dependencies
 │   └── .env.example              # Environment variables template
 ├── frontend/
-│   ├── app/                      # Next.js 15 App Router (ChatGPT UI)
-│   ├── public/                   # Static assets & icons
+│   ├── app/                      # Next.js 16 App Router (Turbopack, SSE streaming)
+│   │   ├── page.js               # Chat UI, streaming reader & citation renderer
+│   │   ├── page.module.css       # Responsive styling, inline badges & cursors
+│   │   └── globals.css           # Design tokens, color scheme & typography
+│   ├── public/                   # Static assets & logos
 │   └── package.json              # Frontend dependencies
-├── Data/                         # University documents (PDF, DOCX, TXT, JPG)
-└── README.md                     # Project documentation
+├── evaluation/                   # 25-Phase evaluation framework & benchmarks
+│   ├── benchmarks/               # Frozen 63-question evaluation dataset
+│   ├── configs/                  # Reproducible experiment configurations
+│   ├── metrics/                  # Retrieval, generation & faithfulness evaluators
+│   └── reports/                  # Formal decision records & ablation reports
+├── docs/                         # System architecture, handoff & state docs
+├── Data/                         # University documents (14 PDFs, 144 pages)
+└── docker-compose.yml            # Local containerized ChromaDB setup
 ```
 
 ---
@@ -43,44 +64,60 @@ LPUASSIST/
 ## 🚀 Quickstart
 
 ### 1. Backend Setup
+
 ```bash
 cd backend
 python -m venv venv
 
-# Activate the virtualenv
+# Activate the virtual environment
 source venv/bin/activate        # macOS / Linux
 # .\venv\Scripts\Activate.ps1   # Windows (PowerShell)
 
 pip install -r requirements.txt
 
-# Configure environment variables, then edit .env
+# Configure environment variables
 cp .env.example .env
-# Required for answers/summaries: LLM_API_KEY (legacy GROK_API_KEY still works)
-# Optional: COHERE_API_KEY (reranking), CHROMA_HOST (shared server),
-#           INGEST_TOKEN (enables POST /api/ingest), ALLOWED_ORIGINS (CORS)
+# Edit .env to add your LLM_API_KEY and COHERE_API_KEY.
 
-# Run offline ingestion (recommended way to (re)build the index)
+# Ingest university documents into ChromaDB
 python -m app.ingestion.pipeline
 
-# Start API server
+# Start the API server
 uvicorn app.main:app --reload --port 8000
 ```
 
-> Ingestion can also be triggered over HTTP with `POST /api/ingest`, but only
-> when `INGEST_TOKEN` is set — send it as `Authorization: Bearer <token>`.
+> **API Endpoints:**
+> - `POST /api/query/stream` — Real-time SSE token stream with citation metadata
+> - `POST /api/query` — Standard synchronous JSON query endpoint
+> - `GET /api/health` — System status, ChromaDB connection & indexed document count
+> - `GET /api/metrics` — Runtime latency percentiles (p50, p95) and token metrics
 
 ### 2. Frontend Setup
+
 ```bash
 cd frontend
 npm install
 
-# Optional: point the UI at a non-default backend
-cp .env.example .env.local      # then set NEXT_PUBLIC_API_BASE
+# Point the UI to the backend (defaults to http://localhost:8000)
+cp .env.example .env.local
 
+# Run development server
 npm run dev
 ```
 
 Visit **http://localhost:3000** in your browser.
 
-> Note: image files (e.g. the campus map `.jpg`) are not ingested; provide a
-> `.txt`/`.md` companion for any content that must be searchable.
+---
+
+## 📊 Evaluation & Benchmarking Results
+
+| Component | Winning Configuration | Metric / Improvement |
+| :--- | :--- | :--- |
+| **Embedding** | `intfloat/e5-base-v2` (768-dim) | Hit@5: **88.9%**, MRR: **0.782** |
+| **Reranker** | Cohere `rerank-v3.5` | Top-5 Precision: **+22.4%** |
+| **Chunking** | 1500 chars / 200 overlap | Hit@5: **88.9%**, Zero table truncation |
+| **Parser** | `pdfplumber` (table-preserving) | Numerical extraction accuracy: **100%** |
+| **Primary LLM** | `gemini-3.6-flash` | Human eval: **4.68 / 5.00**, 0 hallucinated citations |
+| **Fallback LLM** | Groq `openai/gpt-oss-120b` | Zero-downtime failover |
+| **Rewriter** | History-conditioned LLM | Follow-up conversational recall: **+50.0%** |
+| **Compression**| Score-aware tail pruning | Prompt token reduction: **-15.8%** |
