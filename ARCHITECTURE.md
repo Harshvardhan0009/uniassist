@@ -150,7 +150,7 @@ flowchart TB
 |---|---|---|---|
 | Embedding model | `intfloat/e5-base-v2` | `EMBEDDING_MODEL` | Phase 7 Winner (Hit@5: 88.9%, MRR: 0.782) |
 | Chunk size / overlap | `1500` / `200` chars | `CHUNK_SIZE` / `CHUNK_OVERLAP` | Phase 10 Sweep Winner |
-| Ingestion summarization | `False` (raw text) | `ENABLE_INGESTION_SUMMARIZATION` | Phase 7 Finding (preserves numbers/tables) |
+| Ingestion summarization | `False` (raw text) | `ENABLE_INGESTION_SUMMARIZATION` | Evaluation circumstance (raw text indexed; summary A/B untested, future work) |
 | Retrieval top‑K | `20` | `RETRIEVAL_TOP_K` | High-recall initial candidate pool |
 | Rerank top‑N | `5` | `RERANK_TOP_N` | Cohere cross-encoder precision focus |
 | Context compression | `True` | `ENABLE_CONTEXT_COMPRESSION` | Phase 19 Winner (-15.8% tokens, 100% recall) |
@@ -227,9 +227,12 @@ flowchart LR
    `RecursiveCharacterTextSplitter(chunk_size=1500, chunk_overlap=200)` (winning sweep from Phase 10).
    Metadata is enriched (`source_file`, `chunk_index`, `chunk_type` = `table`/`text_only`, `page_number`).
    Total document corpus produces exactly **285 chunks** across the 14 university documents.
-3. **Summarization disabled** (`ENABLE_INGESTION_SUMMARIZATION=False`) — Phase 7 and Phase 10 findings
-   demonstrated that indexing raw extracted text directly preserves exact numeric boundaries, salary slabs,
-   and course codes without LLM summarization latency, hallucination risk, or API key dependencies.
+3. **Summarization disabled** (`ENABLE_INGESTION_SUMMARIZATION=False`) — Raw text was indexed
+   directly throughout the evaluation program as a circumstance of the original frozen benchmark snapshot
+   (LLM summaries were unavailable when the snapshot was established, and raw text was kept consistent across
+   all subsequent phases to isolate component variables). Summary-indexing was **not** tested as a single-variable
+   A/B comparison against raw text, and is listed as future work. In production, indexing raw text avoids LLM
+   summarization latency, provider cost, and hallucination risk during corpus ingestion.
 4. **Embed & store** (`embedder.py`) — prepends the mandatory `passage: ` prefix required by
    `intfloat/e5-base-v2` (768-dimensional embeddings), sanitizes metadata to Chroma-safe primitives,
    **deletes any existing vectors for the same sources** (idempotent re-ingest, no orphans), then
@@ -399,7 +402,7 @@ its `.txt` companion for searchable content.
 | `EMBEDDING_MODEL` | `intfloat/e5-base-v2` | Sentence-transformer embedding model (768-dim) |
 | `CHUNK_SIZE` | `1500` | Target chunk size in characters (Phase 10 sweep winner) |
 | `CHUNK_OVERLAP` | `200` | Character overlap between chunks |
-| `ENABLE_INGESTION_SUMMARIZATION` | `false` | When false, indexes raw text directly (preserves exact tables) |
+| `ENABLE_INGESTION_SUMMARIZATION` | `false` | When false, indexes raw text directly (default; summary A/B untested) |
 | `SUMMARY_CONCURRENCY` | `5` | Max concurrent summarization calls (if enabled) |
 | `LLM_API_KEY` | `""` | Primary LLM API key (Google Gemini / OpenAI compatible) |
 | `LLM_BASE_URL` | `https://generativelanguage.googleapis.com/v1beta/openai/` | Primary LLM base URL |
@@ -479,9 +482,9 @@ The original design describes an aspirational roadmap. What is **actually built 
 | Streaming responses | ✅ Implemented (`POST /api/query/stream` SSE) |
 | Observability / metrics | ✅ Implemented (`GET /api/metrics` + rolling telemetry + query traces) |
 
-**Not yet implemented (roadmap):** file upload + auth, async ingestion queue, image/OCR ingestion.
-An **evaluation/benchmarking framework is now complete** (Phases 0–25, see §14); all winning
-parameters were promoted to production in Phase 22.
+**Not yet implemented (roadmap):** file upload + auth, async ingestion queue, image/OCR ingestion,
+summary-vs-raw indexing A/B evaluation. An **evaluation/benchmarking framework is now complete**
+(Phases 0–25, see §14); all winning parameters were promoted to production in Phase 22.
 
 ---
 
