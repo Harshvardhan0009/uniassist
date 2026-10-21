@@ -86,7 +86,7 @@ flowchart TB
 ```
 
 **Production Request Flow (5-Step Pipeline):**
-1. **Query Rewriting:** Turn 2+ history resolution rewrites ambiguous conversational pronouns into standalone queries (+50% conversational recall).
+1. **Query Rewriting:** Turn 2+ history resolution rewrites ambiguous conversational pronouns into standalone queries (conversational source Recall@1: 4/6 → 6/6, +50%, page Recall@1: 3/6 → 6/6, +100%; small sample of 6 questions).
 2. **Dense Retrieval:** E5-base-v2 embeds the query with `query: ` prefix and retrieves Top-20 candidates from ChromaDB cosine space.
 3. **Cross-Encoder Reranking:** Cohere `rerank-v3.5` rescores candidates and selects the Top-5 most relevant chunks.
 4. **Context Compression:** Score-aware tail pruning drops distractor chunks (-15.8% prompt tokens while retaining 100% source recall).
@@ -154,7 +154,7 @@ flowchart TB
 | Retrieval top‑K | `20` | `RETRIEVAL_TOP_K` | High-recall initial candidate pool |
 | Rerank top‑N | `5` | `RERANK_TOP_N` | Cohere cross-encoder precision focus |
 | Context compression | `True` | `ENABLE_CONTEXT_COMPRESSION` | Phase 19 Winner (-15.8% tokens, 100% recall) |
-| Query rewriting | `True` | `ENABLE_QUERY_REWRITING` | Phase 15 Winner (+50% conversational recall) |
+| Query rewriting | `True` | `ENABLE_QUERY_REWRITING` | Phase 15 Winner (conversational source R@1: 4/6 → 6/6, +50%, small sample) |
 | Primary LLM | `gemini-3.6-flash` | `LLM_MODEL` | Phase 12 Winner (matched 18Q: +29.8% token recall, 3.1× speed; [`LLM_MATCHED_SUBSET_ANALYSIS.md`](./evaluation/reports/LLM_MATCHED_SUBSET_ANALYSIS.md)) |
 | Generation temperature | `0.1` | `generator.py` | Minimizes variance & hallucination |
 
@@ -252,7 +252,7 @@ flowchart LR
 
 1. **Query Rewriting** (`rewriter.py`) — for multi-turn conversations (Turn 2+), uses conversational
    history to resolve ambiguous pronouns and context into standalone search queries via LLM
-   (Phase 15 winner, +50% recall on conversational follow-ups). First turns pass through untouched.
+   (Phase 15 winner: conversational source Recall@1 4/6 → 6/6, +50%, page Recall@1 3/6 → 6/6, +100%; benchmark dense source R@1 53/57 → 55/57, +2 Qs; small sample of 6 conversational questions). First turns pass through untouched.
 2. **Retrieve** (`retriever.py`) — prepends the mandatory `query: ` prefix for `intfloat/e5-base-v2`
    and executes `similarity_search_with_relevance_scores` (cosine) to fetch a broad candidate pool
    of Top-20 chunks (`RETRIEVAL_TOP_K=20`); candidates below `RETRIEVAL_MIN_SCORE` (0.0) are dropped.
@@ -544,7 +544,7 @@ flowchart LR
 - **Phases 7–8 (Embedding Selection):** `intfloat/e5-base-v2` won across all retrieval metrics (source Recall@5 1.000 / MRR 0.927 vs MiniLM 0.965 / 0.912).
 - **Phase 12 (LLM Evaluation):** Gemini 3.6 Flash achieved +29.8% token recall, +8.7% numerical recall, and 3.1× faster generation latency over Groq on the matched 18-question answerable subset (Q001–Q018). See [`LLM_MATCHED_SUBSET_ANALYSIS.md`](./evaluation/reports/LLM_MATCHED_SUBSET_ANALYSIS.md).
 - **Phase 14 (Human Evaluation):** Whole-system human evaluation on a 30-question stratified sample achieved 4.68/5.00 overall score.
-- **Phase 15 (Query Rewriting):** Multi-turn conversational query resolution improved conversational source Recall@1 from 0.667 to 1.000 (4/6 to 6/6 questions, +50%).
+- **Phase 15 (Query Rewriting):** Multi-turn conversational query resolution improved conversational source Recall@1 from 0.667 to 1.000 (4/6 to 6/6 questions, +50%) and page Recall@1 from 0.500 to 1.000 (3/6 to 6/6 questions, +100%; small sample of 6 questions); benchmark dense source Recall@1 improved from 0.930 to 0.965 (53/57 → 55/57, +2 Qs) and page Recall@1 from 0.789 to 0.842 (45/57 → 48/57, +3 Qs).
 - **Phases 16–17 (Rejected Paradigms):** Metadata filtering (Phase 16) and Hybrid BM25+Dense search (Phase 17) were evaluated and rejected based on benchmark data.
 - **Phase 19 (Context Compression):** Adaptive context tail pruning reduced context tokens by 15.8% while preserving 100% ground-truth retrieval.
 - **Phase 20 (Faithfulness & Hallucination Audit):** Headline audit reported numerical hallucinations dropping from 28 to 9 (Groq) and 2 (Gemini), but compared unmatched sample sizes (63 vs 63 vs 18 questions). On the identical 18-question matched subset, Baseline had 8 errors, while Groq and Gemini tied at 2 errors each. See [`LLM_MATCHED_SUBSET_ANALYSIS.md`](./evaluation/reports/LLM_MATCHED_SUBSET_ANALYSIS.md).

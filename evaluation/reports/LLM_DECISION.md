@@ -42,6 +42,8 @@
 | **Numerical Fact Recall** | **0.926** | 0.852 | **Gemini (+8.7%)** |
 | **False Abstentions** | 0/18 | 0/18 | Tie |
 
+> *Note on sample size: While token recall gains are broadly distributed (Gemini leads on 12/18 questions), the +8.7% numerical fact recall difference corresponds to exactly 2 questions (Q003, Q014 out of 18). Head-to-head testing on all 63 questions is recommended when API quotas permit.*
+
 ### 2a. Per-Question Breakdown (18 Answerable Questions)
 
 | QID | Gemini Token Recall | Groq Token Recall | Gemini Num Recall | Groq Num Recall |

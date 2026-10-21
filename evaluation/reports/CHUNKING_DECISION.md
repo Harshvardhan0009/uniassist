@@ -15,18 +15,20 @@ Full tables: [`CHUNKING_COMPARISON.md`](./CHUNKING_COMPARISON.md). Raw: `experim
 
 ## Findings
 
-- **1500/200 is the best chunk size**, improving the current 2500/300 on source R@1 (0.877 → 0.930),
-  source MRR (0.927 → 0.952), and most of all **page-level** precision (R@1 **0.649 → 0.789**, MRR
+- **1500/200 is the best chunk size**, improving the current 2500/300 on source R@1 (0.877 → 0.930, 50/57 → 53/57, +3 Qs),
+  source MRR (0.927 → 0.952), and most of all **page-level** precision (R@1 **0.649 → 0.789**, 37/57 → 45/57, +8 Qs; MRR
   0.743 → 0.819). Page-level matters directly for citation accuracy (Phase 20).
 - **Larger is worse.** 2500/300 and 3500/400 are the weakest. E5-base has a **512-token limit
   (~2000 chars)**, so 2500–3500-char chunks are **truncated** — their tail text never gets embedded —
   and a larger chunk dilutes which page a hit points to. This is the mechanism behind the page-level drop.
 - **By category (source level):** table / policy / multi-condition / direct-factual / academic are
   already perfect (1.000) at both 2500 and 1500, so 1500/200 **holds** them while lifting the weaker
-  categories: exact_terminology 0.714 → 0.857, placement 0.714 → 0.857, conversational 0.500 → 0.667.
+  categories: exact_terminology 0.714 → 0.857 (5/7 → 6/7), placement 0.714 → 0.857 (5/7 → 6/7), conversational 0.500 → 0.667 (3/6 → 4/6).
   No category regresses.
 - **1000/150** is also better than baseline but slightly below 1500/200 (more, smaller chunks →
   marginally lower source R@1 and page R@1); 1500/200 is the sweet spot of completeness vs granularity.
+
+> *Note on sample size: Source Recall@1 gains represent a 3-question shift (50/57 → 53/57), and category-level improvements reflect 1-question deltas on small subsets (n=6–7); the most robust driver is the 8-question improvement in page-level Recall@1 (37/57 → 45/57).*
 
 ## Recommendation
 

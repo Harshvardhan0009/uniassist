@@ -254,15 +254,15 @@ Full human evaluation report: [`HUMAN_EVALUATION.md`](./HUMAN_EVALUATION.md).
 
 Evaluated conversational query rewriting across the benchmark using LLM reformulation on turn 2+ queries holding `e5-base-v2` and `1500/200` chunking constant.
 
-**Conversational subset (n = 6):**
-- **Source Recall@1:** 0.667 → **1.000 (+50.0%)**
-- **Page Recall@1:** 0.500 → **1.000 (+100.0%)**
+**Conversational subset (n = 6, small sample):**
+- **Source Recall@1:** 0.667 (4/6) → **1.000 (6/6, +50.0%)**
+- **Page Recall@1:** 0.500 (3/6) → **1.000 (6/6, +100.0%)**
 - **Source MRR:** 0.742 → **1.000 (+34.8%)**
 - **Page MRR:** 0.689 → **1.000 (+45.1%)**
 
 **Entire 57-Question Benchmark:**
-- **Source Recall@1:** 0.930 → **0.965 (+3.5 pts)**
-- **Page Recall@1:** 0.789 → **0.842 (+5.3 pts)**
+- **Source Recall@1:** 0.930 → **0.965 (+3.5 pts; 53/57 → 55/57, +2 Qs)**
+- **Page Recall@1:** 0.789 → **0.842 (+5.3 pts; 45/57 → 48/57, +3 Qs)**
 - **Source MRR:** 0.952 → **0.980 (+2.8 pts)**
 - **Page MRR:** 0.819 → **0.866 (+4.7 pts)**
 

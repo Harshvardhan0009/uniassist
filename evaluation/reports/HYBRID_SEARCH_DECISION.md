@@ -21,6 +21,8 @@
 | **Avg Retrieval Latency** | **17.6 ms** | 12.2 ms | 51.0 ms | **17.6 ms** (+285 ms rerank) |
 | **Architecture Complexity** | Low (Single VectorDB) | Low (In-memory) | High (Dual Index + RRF) | Moderate |
 
+> *Note on sample size: The page Recall@1 delta between Dense E5 and Hybrid represents a single question (48/57 vs 47/57); the rejection decision is fundamentally justified by zero source recall gain (57/57 tie) alongside 2.9× retrieval latency and dual-index maintenance.*
+
 ### **Official Decision: REJECT Hybrid Search as Default Production Retriever; Retain Dense E5 + Cohere Reranker**
 
 1. **Zero Net Recall Gain**: Pure Dense E5 with multi-turn query rewriting already captures **100% Source Recall@5** (57/57). Fusing BM25 via Reciprocal Rank Fusion (RRF, $k=60$) yields the exact same 100% Source Recall@5.

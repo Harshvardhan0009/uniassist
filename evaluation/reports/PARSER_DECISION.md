@@ -10,14 +10,16 @@ Full metrics breakdown: [`PARSER_COMPARISON.md`](./PARSER_COMPARISON.md).
 
 | Metric | Current (`pdfplumber`) | Unstructured (`fast`) | Delta | Winner |
 |---|---|---|---|:---:|
-| **Source Recall@1 (dense)** | **0.930** | 0.895 | -0.035 | **Current** |
+| **Source Recall@1 (dense)** | **0.930 (53/57)** | 0.895 (51/57) | -0.035 (-2 Qs) | **Current** |
 | **Source MRR (dense)** | **0.952** | 0.932 | -0.020 | **Current** |
-| **Page Recall@1 (dense)** | **0.789** | 0.737 | -0.052 | **Current** |
+| **Page Recall@1 (dense)** | **0.789 (45/57)** | 0.737 (42/57) | -0.052 (-3 Qs) | **Current** |
 | **Page MRR (dense)** | **0.819** | 0.792 | -0.027 | **Current** |
-| **Page Recall@1 (reranked)** | 0.877 | 0.877 | 0.000 | *Tie* |
-| **Page Recall@5 (reranked)** | 0.965 | 0.965 | 0.000 | *Tie* |
+| **Page Recall@1 (reranked)** | 0.877 (50/57) | 0.877 (50/57) | 0.000 | *Tie* |
+| **Page Recall@5 (reranked)** | 0.965 (55/57) | 0.965 (55/57) | 0.000 | *Tie* |
 | **Ingestion Time** | **10.79s** | 21.27s | +10.48s (2x) | **Current** |
 | **Heavy Dependencies** | **None (lightweight)** | Torch, OpenCV, ONNX, Timm | +500MB+ | **Current** |
+
+> *Note on sample size: Metric deltas between parsers represent shifts of 2–3 questions (out of 57 answerable) on the dense retrieval stage; decision is further reinforced by ingestion speed (2× faster) and avoiding heavy PyTorch/OCR dependencies.*
 
 ---
 

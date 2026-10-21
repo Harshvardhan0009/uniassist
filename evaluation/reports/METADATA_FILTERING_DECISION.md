@@ -33,6 +33,8 @@ We evaluated three retrieval paradigms over the identical frozen corpus (`chunk_
 | **Oracle Filtered (Ideal Router)** | 100.0% | **0.965** | **1.000** | **0.842** | **0.895** | **±0.000 (No gain)** |
 | **Automated Filtered (Real-World LLM Router)** | 96.5% | 0.947 | 0.982 | 0.825 | 0.877 | **-0.018 (Degraded)** |
 
+> *Note on sample size: The automated filtering degradation represents exactly 1 misclassified query out of 57 (55/57 → 54/57); rejection is grounded in the fact that the theoretical oracle upper bound yields zero net gain (0/57) across the benchmark.*
+
 ---
 
 ## 3. Why Oracle Filtering Provides Zero Gain
