@@ -153,9 +153,9 @@ flowchart TB
 | Ingestion summarization | `False` (raw text) | `ENABLE_INGESTION_SUMMARIZATION` | Phase 7 Finding (preserves numbers/tables) |
 | Retrieval top‑K | `20` | `RETRIEVAL_TOP_K` | High-recall initial candidate pool |
 | Rerank top‑N | `5` | `RERANK_TOP_N` | Cohere cross-encoder precision focus |
-| Context compression | `True` | `ENABLE_CONTEXT_COMPRESSION` | Phase 18 Winner (-15.8% tokens, 100% recall) |
-| Query rewriting | `True` | `ENABLE_QUERY_REWRITING` | Phase 14 Winner (+50% conversational recall) |
-| Primary LLM | `gemini-3.6-flash` | `LLM_MODEL` | Phase 11 Winner (4.68/5.0 human eval) |
+| Context compression | `True` | `ENABLE_CONTEXT_COMPRESSION` | Phase 19 Winner (-15.8% tokens, 100% recall) |
+| Query rewriting | `True` | `ENABLE_QUERY_REWRITING` | Phase 15 Winner (+50% conversational recall) |
+| Primary LLM | `gemini-3.6-flash` | `LLM_MODEL` | Phase 12 Winner (matched 18Q: +29.8% token recall, 3.1× speed; [`LLM_MATCHED_SUBSET_ANALYSIS.md`](./evaluation/reports/LLM_MATCHED_SUBSET_ANALYSIS.md)) |
 | Generation temperature | `0.1` | `generator.py` | Minimizes variance & hallucination |
 
 ---
@@ -539,11 +539,12 @@ flowchart LR
 **Key Milestone Results Across Phases:**
 - **Phases 4–6 (Dense Baseline & Cohere Reranker):** MiniLM baseline achieved source Recall@5 0.965 / MRR 0.912. Adding Cohere `rerank-v3.5` lifted page Recall@1 from 0.63 to 0.90 and source Recall@5 to 0.982.
 - **Phases 7–8 (Embedding Selection):** `intfloat/e5-base-v2` won across all retrieval metrics (source Recall@5 1.000 / MRR 0.927 vs MiniLM 0.965 / 0.912).
-- **Phase 10 (Chunking Optimization):** 1500 chars / 200 overlap swept over 2500/300, achieving 0.789 page Recall@1 (vs 0.649) across 285 chunks.
-- **Phase 11 (LLM Evaluation):** Gemini 3.6 Flash achieved 4.68/5.0 human evaluation score and 1.83s average generation latency.
-- **Phases 14–16 (Query Enhancement & Paradigms):** Query rewriting won for multi-turn conversations (+50% recall). Hybrid search and metadata filtering were evaluated and rejected due to degraded recall and latency overhead.
-- **Phase 18 (Context Compression):** Adaptive context tail pruning reduced context tokens by 15.8% while preserving 100% ground-truth retrieval.
-- **Phase 20 (Faithfulness & Hallucination Audit):** Numerical hallucinations dropped from 28 to 2 in system-level comparisons against baseline.
+- **Phase 12 (LLM Evaluation):** Gemini 3.6 Flash achieved +29.8% token recall, +8.7% numerical recall, and 3.1× faster generation latency over Groq on the matched 18-question answerable subset (Q001–Q018). See [`LLM_MATCHED_SUBSET_ANALYSIS.md`](./evaluation/reports/LLM_MATCHED_SUBSET_ANALYSIS.md).
+- **Phase 14 (Human Evaluation):** Whole-system human evaluation on a 30-question stratified sample achieved 4.68/5.00 overall score.
+- **Phase 15 (Query Rewriting):** Multi-turn conversational query resolution improved conversational source Recall@1 from 0.667 to 1.000 (4/6 to 6/6 questions, +50%).
+- **Phases 16–17 (Rejected Paradigms):** Metadata filtering (Phase 16) and Hybrid BM25+Dense search (Phase 17) were evaluated and rejected based on benchmark data.
+- **Phase 19 (Context Compression):** Adaptive context tail pruning reduced context tokens by 15.8% while preserving 100% ground-truth retrieval.
+- **Phase 20 (Faithfulness & Hallucination Audit):** Headline audit reported numerical hallucinations dropping from 28 to 9 (Groq) and 2 (Gemini), but compared unmatched sample sizes (63 vs 63 vs 18 questions). On the identical 18-question matched subset, Baseline had 8 errors, while Groq and Gemini tied at 2 errors each. See [`LLM_MATCHED_SUBSET_ANALYSIS.md`](./evaluation/reports/LLM_MATCHED_SUBSET_ANALYSIS.md).
 - **Phase 22 (Production Promotion):** Winning pipeline parameters promoted to `backend/app/` with 285-chunk re-indexing.
 
 **Operational notes & constraints:**

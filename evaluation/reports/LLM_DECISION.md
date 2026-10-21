@@ -5,6 +5,11 @@
 > Gemini wins on answer quality (token recall, numerical recall, latency) while matching
 > Groq on citation accuracy and safety. The existing primary+fallback architecture is the
 > correct design.
+>
+> **Matched-subset re-analysis:** For a dedicated analysis on the identical 18-question matched subset
+> ($n=18$, Q001–Q018) and resolution of the Phase 20 unmatched hallucination sample sizes (63 vs 63 vs 18),
+> see [`LLM_MATCHED_SUBSET_ANALYSIS.md`](./LLM_MATCHED_SUBSET_ANALYSIS.md). Note that $n=18$ covers answerable
+> queries only; out-of-domain abstention was evaluated on the 6 unanswerables in Phase 18.
 
 ---
 
