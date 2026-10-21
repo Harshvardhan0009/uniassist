@@ -1,0 +1,53 @@
+name: Backend CI
+
+on:
+  push:
+    branches:
+      - main
+      - laukik-uniassist-branch
+    paths:
+      - "backend/**"
+      - ".github/workflows/ci.yml"
+  pull_request:
+    branches:
+      - main
+      - laukik-uniassist-branch
+    paths:
+      - "backend/**"
+      - ".github/workflows/ci.yml"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Backend Smoke Tests (Offline)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+          cache-dependency-path: "backend/requirements.txt"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          # Pre-install CPU-only PyTorch to avoid heavy multi-GB CUDA binaries on CI runner
+          pip install --extra-index-url https://download.pytorch.org/whl/cpu torch
+          pip install -r backend/requirements.txt
+
+      - name: Run offline pytest smoke suite
+        env:
+          # Ensure tests run fully offline without any live API keys or remote Chroma instances
+          CHROMA_HOST: ""
+          RATE_LIMIT_PER_MINUTE: "0"
+          INGEST_TOKEN: ""
+        run: |
+          pytest backend/tests -v
