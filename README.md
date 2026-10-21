@@ -107,6 +107,21 @@ npm run dev
 
 Visit **http://localhost:3000** in your browser.
 
+### 3. Running Smoke Tests
+
+A minimal offline pytest test suite runs without external API dependencies:
+
+```bash
+# From project root
+pytest backend/tests
+
+# Or run directly inside the backend venv
+cd backend
+python -m pytest tests
+```
+
+Tests cover health and telemetry responses, query length validation (3–1000 characters), token-based ingestion bearer authorization, chunk splitting size and overlap boundaries, and score-aware adaptive context compression.
+
 ---
 
 ## 📊 Evaluation & Benchmarking Results
