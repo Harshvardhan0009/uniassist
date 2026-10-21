@@ -21,6 +21,17 @@ os.environ["RATE_LIMIT_PER_MINUTE"] = "0"
 os.environ["INGEST_TOKEN"] = ""
 
 
+@pytest.fixture(autouse=True)
+def mock_embedding_function():
+    """Prevent any test from initializing the real HuggingFace/E5 model or downloading weights."""
+    from unittest.mock import MagicMock
+    mock_emb = MagicMock()
+    mock_emb.embed_documents.return_value = [[0.0] * 768]
+    mock_emb.embed_query.return_value = [0.0] * 768
+    with patch("app.ingestion.embedder.get_embedding_function", return_value=mock_emb) as mock_fn:
+        yield mock_fn
+
+
 @pytest.fixture
 def mock_chroma_healthy():
     """Mock embedder.check_chroma to simulate a connected local ChromaDB."""
