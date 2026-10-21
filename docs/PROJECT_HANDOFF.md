@@ -5,7 +5,7 @@
 > so far, the current configuration, important gotchas, and what's next. When starting a new session,
 > just say *"read `docs/PROJECT_HANDOFF.md`"* and you'll have full context.
 >
-> **Last updated:** 2026-09-05 · **Branch:** `laukik-uniassist-branch` · **HEAD:** `4697de7`
+> **Last updated:** 2026-10-21 · **Branch:** `laukik-uniassist-branch` · **HEAD:** `b64f3b4`
 > · **Remote:** `github.com/Harshvardhan0009/uniassist`
 
 ---
@@ -53,7 +53,11 @@ modify production** until the full winning configuration is chosen (that's Phase
 
 ---
 
-## 3. Current production configuration (frozen "Baseline V1")
+## 3. Frozen Baseline V1 (historical)
+
+> **Historical Reference Note:** This section records the original frozen Baseline V1 reference configuration
+> established in Phase 1 for benchmark comparisons. The **current live production configuration** promoted
+> in Phase 22 is detailed in [Section 7](#7-production-architecture-promoted-in-phase-22) below.
 
 | Component | Value |
 |---|---|
@@ -185,32 +189,58 @@ The production codebase in `backend/app/` is now running the fully converged, ev
 
 ---
 
-## 8. How to resume in a new chat
+## 8. Current Next Steps & Maintenance
 
-1. Say: *"read `docs/PROJECT_HANDOFF.md`"* (this file) and *"read `evaluation/reports/latest_report.md`"*
-   for the freshest numbers.
-2. Confirm git state: `git log --oneline -5`, `git status`.
-3. Pick the next phase (default: **Phase 11 parser**, or **Phases 12–14 answer quality**).
-4. Follow the golden rules (§2): one variable, same dataset/corpus, record latency, don't touch
-   production, commit + push curated artifacts (scan for secrets first), update the docs
-   (`latest_report.md`, `README.md`, `ARCHITECTURE.md`, and this handoff).
-5. **Keep this file current** at the end of each phase (update "Last updated", HEAD, the progress
-   tables, and the winning config).
+The 25-phase evaluation program is complete and the winning architecture is in production. Immediate next steps for project sustainability:
+
+1. **Minimal Pytest Smoke Suite (`backend/tests/`):**
+   - Offline unit tests for `/api/health`, `/api/metrics`, request parameter validation (`/api/query`), constant-time token bearer auth (`/api/ingest`), chunker splitting boundaries, and context compressor score pruning.
+2. **Continuous Integration (`.github/workflows/ci.yml`):**
+   - Run the offline test suite on every PR and push without requiring external API keys.
+3. **Production Observability & Monitoring:**
+   - Monitor `GET /api/metrics` for p50/p95 latency shifts and LLM failover frequency.
+   - Configure secrets securely in the production deployment environment.
 
 ---
 
 ## 9. Commit history (evaluation program)
 
 ```
-4697de7 Phases 9-10 - keep reranker; select 1500/200 chunking
-f1c4c6e Phase 8 embedding selection - e5-base-v2 (reranked-confirmed)
-e627dcc Groq fallback LLM (primary -> fallback -> extractive)
-af2ce01 Phase 7 embedding comparison - e5-base-v2 wins
-a387d8d Phase 6 baseline - Cohere-reranked metrics + Gemini answers (partial)
-e224c52 Phase 5 retrieval metrics + dense baseline
-c98434f Phase 4 evaluation pipeline framework
-c23678e Phase 3 ground truth
-d68a9c1 Phase 2 benchmark dataset
-4583efe Phase 1 freeze Baseline V1
-77fc1f6 Phase 0 codebase audit
+b64f3b4 docs: reconcile ARCHITECTURE.md with promoted production system
+fcfe1a8 docs: synchronize README, ARCHITECTURE, and backend/.env.example with production RAG pipeline
+c67d5b9 fix(frontend): support apostrophes in citation regex and ignore backend logs
+df3fcda feat(rag): complete 25-phase optimization, promote winning pipeline, reindex vector store, and add real-time streaming UX
+3b579fb docs: add PROJECT_HANDOFF.md (project context + phase progress + next steps)
+4697de7 feat(eval): Phases 9-10 - keep reranker; select 1500/200 chunking
+f1c4c6e docs(eval): Phase 8 embedding selection - e5-base-v2 (reranked-confirmed)
+e627dcc feat(llm): add automatic Groq fallback LLM (primary -> fallback -> extractive)
+af2ce01 feat(eval): Phase 7 embedding comparison - e5-base-v2 wins (MiniLM/BGE/E5)
+a387d8d feat(eval): Phase 6 baseline - Cohere-reranked metrics + Gemini answers (partial)
+e224c52 feat(eval): retrieval metrics + dense baseline scored (Phase 5)
+c98434f feat(eval): add evaluation pipeline framework (Phase 4)
+c23678e feat(eval): attach ground truth to uniassist_eval_v1 (Phase 3)
+d68a9c1 feat(eval): add benchmark dataset uniassist_eval_v1 (Phase 2)
+4583efe chore(eval): freeze Baseline V1 (Phase 1)
+77fc1f6 docs: add Phase 0 codebase audit (CURRENT_STATE.md)
 ```
+
+---
+
+## 10. Known limitations & evaluation caveats
+
+1. **Phase 6 Answer Coverage vs Later Phases:**
+   - In Phase 6 (`baseline_v1.json`), only **16/63** answers were captured with a real LLM due to the Gemini free-tier daily cap (20 requests/day).
+   - In subsequent phases, full 63-question answer coverage was achieved by Groq in Phase 12/13 (`rag_e5_1500_groq_gptoss_full_rag_scored.json`, 63/63) and in the Phase 20 audit (`faithfulness_audit_scored.json`, 63/63). The Phase 12/13 Gemini run evaluated 18 questions (`rag_e5_1500_gemini_full_rag_scored.json`) before hitting the daily quota.
+2. **Statistical Ties on 57 Answerable Questions:**
+   - The benchmark dataset contains 57 answerable questions. A 1-question difference equals $1/57 \approx 1.75\%$.
+   - A delta such as 0.965 (55/57) vs 0.947 (54/57) in Recall@1 represents exactly **one question**. Such small deltas represent statistical ties rather than significant margins. Decisions were made considering latency, operational simplicity, and cross-encoder synergy rather than single-question retrieval deltas alone.
+3. **Abstention Sample Size:**
+   - Out-of-corpus refusal calibration (Phase 18) was evaluated on **6 unanswerable questions** (`Q056`–`Q061`). While achieving 6/6 (100%) clean abstention on both models confirms prompt refusal capabilities, 6 queries is a small sample. Expanding to a 20+ query adversarial set is recommended for future audits.
+4. **Human Evaluation Scorer:**
+   - The 30-question stratified human evaluation in Phase 14 (`human_eval_30q_scored.json`) produced an overall score of 4.68/5.00. Scorer identity: `TODO: verify` (to be filled in by the author).
+5. **Numerical Hallucination Comparison:**
+   - The reported reduction in numerical hallucinations (from 28 down to 2) compares the Baseline V1 system (MiniLM, 2500/300, extractive fallbacks, uncalibrated prompt) against the promoted Gemini configuration (E5, 1500/200, context compression, calibrated slab-aware prompt). This is a **system-level comparison**, not a single-variable ablation.
+6. **Operational Limits & Cold Starts:**
+   - **Google Gemini free-tier:** Capped at 20 requests/day. The live demo depends heavily on automatic failover to the Groq `openai/gpt-oss-120b` fallback when quota is reached.
+   - **Cohere Trial Key:** Limited to 10 calls/minute, requiring an eval-only throttle (`EVAL_COHERE_MIN_INTERVAL_MS=7000`) during batch runs.
+   - **Hosted Render ChromaDB:** Free/starter container instances spin down after inactivity; initial requests can experience a 30–50+ second cold start while the remote container wakes up.

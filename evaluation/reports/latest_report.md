@@ -378,14 +378,31 @@ All 25 phases of the UniAssist RAG Evaluation and Optimization Program are **100
 
 ---
 
-## Environment blockers — status
+## Limitations of this evaluation
 
-| Blocker | Status | Notes |
-|---|---|---|
-| Cohere Trial `429` (10/min) | ✅ **worked around** | eval harness throttle (`EVAL_COHERE_MIN_INTERVAL_MS`) + 429-retry → 63/63 reranked, no fallback |
-| OpenRouter LLM `402` | ⛔ still unfunded | account never purchased credits; abandoned in favour of the Google key |
-| `gemini-2.5-flash` 404 | ⛔ unavailable | deprecated for new accounts → substituted `gemini-3.6-flash` |
-| `gemini-3.6-flash` free tier | ✅ **mitigated** | 20 req/day cap; a **Groq `openai/gpt-oss-120b` fallback** auto-fails-over in `generator.py`. |
+To preserve scientific rigor and maintain transparency regarding experimental constraints:
+
+1. **Answer Sample Coverage Across LLM Runs:**
+   - In **Phase 6** (`baseline_v1.json`), only **16/63** answers were captured with a real LLM (`gemini-3.6-flash`) due to Google's free-tier daily cap (20 requests/day); the remaining 47 questions fell back to deterministic extractive snippets (`has_llm=false`).
+   - In **Phase 12 / 13**, full **63/63** answer coverage (57 answerable, 6 unanswerable) was achieved with Groq (`rag_e5_1500_groq_gptoss_full_rag_scored.json`), while the Gemini run evaluated **18/63** answers (`rag_e5_1500_gemini_full_rag_scored.json`) before exhausting daily quota.
+   - In **Phase 18**, both models were evaluated on the 6 unanswerable questions (`abstention_experiment_raw.json`).
+   - In **Phase 20**, the audit (`faithfulness_audit_scored.json`) audited **63/63** questions on Groq, **63/63** on Baseline V1, and an **18-question** sample on Gemini.
+2. **Statistical Ties on 57 Answerable Questions:**
+   - With $N = 57$ answerable questions, a single question constitutes $\frac{1}{57} \approx 1.75\%$ (0.0175).
+   - A metric difference between **0.965** ($55/57$) and **0.947** ($54/57$) in Recall@1 represents **exactly one question**.
+   - Such deltas represent statistical ties rather than significant margins. Wherever decision documents or comparison tables refer to these deltas, they must be recognized as ties; component selections were justified by latency, maintenance simplicity, and cross-encoder synergy rather than isolated 1-question retrieval margins.
+3. **Abstention Sample Size:**
+   - Abstention accuracy in Phase 18 and Phase 20 is reported as 6/6 (100.0%) on the unanswerable set (`Q056`–`Q061`). While achieving zero hallucinations across both Gemini and Groq confirms prompt grounding, **6 questions is a small sample**. Expanding to 20+ out-of-domain queries is recommended for future benchmark revisions.
+4. **Human Evaluation Scorer:**
+   - The 30-question stratified human evaluation in Phase 14 (`human_eval_30q_scored.json`) evaluated Faithfulness (4.80), Correctness (4.53), Citations (4.67), and Clarity (4.73).
+   - Scored by: `TODO: verify` (to be filled in by the author; not automated).
+5. **Numerical Hallucination Reduction (28 → 2):**
+   - The reported decrease in numerical hallucinations from 28 errors to 2 errors in Phase 20 compares the Baseline V1 system (MiniLM, 2500/300, partial extractive fallbacks, uncalibrated prompt) against the optimized Gemini configuration (E5, 1500/200, context compression, calibrated slab-aware prompt).
+   - This metric is a **system-level comparison** between baseline and production stacks, not an isolated single-variable ablation.
+6. **Operational Limits & Live Deployment Constraints:**
+   - **Gemini Free Tier:** 20 requests/day. The live application depends directly on the automatic failover to Groq (`openai/gpt-oss-120b`) in `generator.py` once quota is reached.
+   - **Cohere Trial Key:** 10 requests/minute. Batch evaluation requires the harness throttle (`EVAL_COHERE_MIN_INTERVAL_MS=7000`) and retry handling.
+   - **Render ChromaDB Cold Starts:** Free/starter hosted instances spin down on idle. Initial requests after dormancy can experience 30–50+ seconds of cold start latency before the vector store responds.
 
 ---
 
