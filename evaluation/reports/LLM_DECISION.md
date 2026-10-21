@@ -5,6 +5,11 @@
 > Gemini wins on answer quality (token recall, numerical recall, latency) while matching
 > Groq on citation accuracy and safety. The existing primary+fallback architecture is the
 > correct design.
+>
+> **Matched-subset re-analysis:** For a dedicated analysis on the identical 18-question matched subset
+> ($n=18$, Q001–Q018) and resolution of the Phase 20 unmatched hallucination sample sizes (63 vs 63 vs 18),
+> see [`LLM_MATCHED_SUBSET_ANALYSIS.md`](./LLM_MATCHED_SUBSET_ANALYSIS.md). Note that $n=18$ covers answerable
+> queries only; out-of-domain abstention was evaluated on the 6 unanswerables in Phase 18.
 
 ---
 
@@ -36,6 +41,8 @@
 | **Token F1 vs GT** | **0.574** | 0.488 | **Gemini (+17.6%)** |
 | **Numerical Fact Recall** | **0.926** | 0.852 | **Gemini (+8.7%)** |
 | **False Abstentions** | 0/18 | 0/18 | Tie |
+
+> *Note on sample size: While token recall gains are broadly distributed (Gemini leads on 12/18 questions), the +8.7% numerical fact recall difference corresponds to exactly 2 questions (Q003, Q014 out of 18). Head-to-head testing on all 63 questions is recommended when API quotas permit.*
 
 ### 2a. Per-Question Breakdown (18 Answerable Questions)
 

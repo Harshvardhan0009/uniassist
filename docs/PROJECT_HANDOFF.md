@@ -5,7 +5,7 @@
 > so far, the current configuration, important gotchas, and what's next. When starting a new session,
 > just say *"read `docs/PROJECT_HANDOFF.md`"* and you'll have full context.
 >
-> **Last updated:** 2026-09-05 · **Branch:** `laukik-uniassist-branch` · **HEAD:** `4697de7`
+> **Last updated:** 2026-10-21 · **Branch:** `laukik-uniassist-branch` · **HEAD at last doc edit:** `b9de3c2`
 > · **Remote:** `github.com/Harshvardhan0009/uniassist`
 
 ---
@@ -18,12 +18,14 @@ residential facilities, semester exchange, NSS, campus map), grounded strictly i
 documents.
 
 **Two deployable parts:**
-- **Backend** — FastAPI (`backend/app/`). Offline **ingestion** (documents → chunks → summaries →
-  embeddings → ChromaDB) + online **query** (retrieve → rerank → generate).
+- **Backend** — FastAPI (`backend/app/`). Offline **ingestion** (table-aware partition → 1500/200
+  chunking → passage-prefixed E5 embeddings → ChromaDB) + online **query** (5-step pipeline: rewriter →
+  E5 dense retrieval → Cohere reranker → context compressor → calibrated LLM generator).
 - **Frontend** — Next.js 16 / React 19 single-page chat UI (`frontend/app/page.js`).
 
-**Live pipeline:** `question → embed → ChromaDB similarity (top-20) → Cohere rerank (top-5) →
-LLM answer + citations`.
+**Live pipeline:** `question → Turn 2+ conversational rewriter → query-prefixed E5 retrieval (top-20) →
+Cohere rerank-v3.5 (top-5) → adaptive context compressor → Gemini 3.6 Flash generation & SSE streaming
+(Groq GPT-OSS-120B fallback)`.
 
 **Key docs:**
 - `ARCHITECTURE.md` — full current architecture (kept up to date).
@@ -53,7 +55,11 @@ modify production** until the full winning configuration is chosen (that's Phase
 
 ---
 
-## 3. Current production configuration (frozen "Baseline V1")
+## 3. Frozen Baseline V1 (historical)
+
+> **Historical Reference Note:** This section records the original frozen Baseline V1 reference configuration
+> established in Phase 1 for benchmark comparisons. The **current live production configuration** promoted
+> in Phase 22 is detailed in [Section 7](#7-production-architecture-promoted-in-phase-22) below.
 
 | Component | Value |
 |---|---|
@@ -63,8 +69,7 @@ modify production** until the full winning configuration is chosen (that's Phase
 | Vector store | ChromaDB, collection `university_docs` (remote Render, client-server) |
 | Retrieval | top-K = **20** |
 | Reranker | Cohere **rerank-v3.5**, top-N = **5** |
-| LLM (primary) | **`gemini-3.6-flash`** via Google's OpenAI-compatible endpoint |
-| LLM (fallback) | **Groq `openai/gpt-oss-120b`** (auto-failover) |
+| LLM (baseline reference) | OpenRouter **google/gemini-2.5-flash** (substituted during evaluation runs by **`gemini-3.6-flash`** / Groq failover due to OpenRouter 404/quota) |
 
 **Corpus:** 14 ingestible files (12 PDF + 1 DOCX + 1 TXT) → 144 pages → **184 chunks** at 2500/300.
 
@@ -89,10 +94,7 @@ modify production** until the full winning configuration is chosen (that's Phase
   63-question reranked run takes ~15 min because of this.
 - **Reasoning models return empty at tiny `max_tokens`** (Gemini 3.x, gpt-oss "think" first). Use a
   realistic budget (≥256).
-- **E5/BGE need instruction prefixes.** E5 **requires** `query:` / `passage:`; BGE uses a query
-  instruction. Wired into the eval harness via `_PrefixedEmbeddings` (config `embedding.query_prefix`
-  / `passage_prefix`). **Production `embedder.py`/`retriever.py` do NOT apply prefixes yet** — that's
-  part of the Phase 22 E5 promotion.
+- **E5/BGE instruction prefixes:** E5 **requires** `query: ` / `passage: ` prefixes. As part of Phase 22 promotion, production `embedder.py` (`_PrefixedEmbeddings` with `passage: `) and `retriever.py` (with `query: `) apply these prefixes automatically.
 - **Config gotcha (fixed):** experiment configs must put `snapshot`/`collection` under the
   **`"evaluation"`** block, not `"experiment"` (`load_config` reads `evaluation`). A chunk run once
   silently reused the wrong snapshot because of this.
@@ -151,15 +153,15 @@ level** (right page — matters for citations). 57 of 63 questions are answerabl
 | 9 | Reranker A/B | **Keep Cohere** (page R@1 ~0.63→0.90 for ~640ms). `RERANKER_DECISION.md` |
 | 10 | Chunking sweep (1000/1500/2500/3500) on E5 | **1500/200 selected**: src R@1 0.877→**0.930**, page R@1 0.649→**0.789**. `CHUNKING_DECISION.md` |
 | 11 | Parser A/B (Unstructured.io vs current `pdfplumber`) | **Keep current `pdfplumber` (table-aware)**: higher dense src R@1 (**0.930** vs 0.895), page R@1 (**0.789** vs 0.737), 2x faster ingestion, no heavy dependencies. `PARSER_DECISION.md` |
-| 12 | LLM comparison (Gemini 3.6 Flash vs Groq GPT-OSS-120B) | **Retain Gemini 3.6 Flash primary, Groq GPT-OSS-120B fallback**: Gemini +29.7% token recall, +8.7% numerical recall, 3.1x faster. Groq gives 100% abstention on unanswerable queries. `LLM_DECISION.md` |
+| 12 | LLM comparison (Gemini 3.6 Flash vs Groq GPT-OSS-120B) | **Retain Gemini 3.6 Flash primary, Groq GPT-OSS-120B fallback**: on matched 18Q answerable subset (Q001–Q018), Gemini +29.8% token recall, +8.7% numerical recall, 3.1× faster. Groq evaluated on full 63Q with 6/6 unanswerable abstention. See [`LLM_DECISION.md`](../evaluation/reports/LLM_DECISION.md) and [`LLM_MATCHED_SUBSET_ANALYSIS.md`](../evaluation/reports/LLM_MATCHED_SUBSET_ANALYSIS.md) |
 | 13 | Generation metrics | **Automated scoring suite implemented**: Citation F1, token recall/F1, numerical recall, unanswerable abstention rate (`metrics/generation_metrics.py`). Scored baseline, Gemini, and Groq runs. |
 | 14 | Human eval (30-question stratified sample) | **4.68/5.00 overall score; validates auto-metrics**: Faithfulness 4.80, Correctness 4.53, Citation 4.67, Clarity 4.73, Abstention 100%. Highlighted conversational context vulnerability (3.62/5.00) driving Phase 15. `HUMAN_EVALUATION.md` |
-| 15 | Query rewriting (conversational) | **Adopted**: conversational src R@1 **0.667 → 1.000**, page R@1 **0.500 → 1.000**; benchmark dense src R@1 **0.930 → 0.965**, page R@1 **0.789 → 0.842**. Multi-turn resolution via rewriter before retrieval. `QUERY_REWRITING_DECISION.md` |
-| 16 | Metadata filtering | **Rejected automated hard filtering**: Oracle gives 0% gain (src R@1 tied at 0.965); automated router misclassifications cause false-negative exclusions (src R@1 drops to 0.947). Retain unconstrained retrieval + Cohere reranker; metadata reserved for UI badges. `METADATA_FILTERING_DECISION.md` |
-| 17 | Hybrid search (Dense + BM25 RRF) | **Rejected hybrid as default**: identical 1.000 src R@5 (57/57) and 0.965 src R@1; page R@1 slightly lower (0.825 vs 0.842); 2.9x latency increase (51 ms vs 17.6 ms). Retain unfiltered Dense E5 + Cohere reranker; tooling preserved in `evaluation/lib/hybrid.py`. `HYBRID_SEARCH_DECISION.md` |
+| 15 | Query rewriting (conversational) | **Adopted**: conversational src R@1 **0.667 → 1.000** (4/6 → 6/6, +50%), page R@1 **0.500 → 1.000** (3/6 → 6/6, +100%; small sample of 6 questions); benchmark dense src R@1 **0.930 → 0.965** (53/57 → 55/57, +2 Qs), page R@1 **0.789 → 0.842** (45/57 → 48/57, +3 Qs). Multi-turn resolution via rewriter before retrieval. `QUERY_REWRITING_DECISION.md` |
+| 16 | Metadata filtering | **Rejected automated hard filtering**: Oracle gives 0% gain (src R@1 tied at 0.965, 55/57); automated router misclassifications cause false-negative exclusions (src R@1 drops to 0.947, 54/57, -1 Q). Retain unconstrained retrieval + Cohere reranker; metadata reserved for UI badges. `METADATA_FILTERING_DECISION.md` |
+| 17 | Hybrid search (Dense + BM25 RRF) | **Rejected hybrid as default**: identical 1.000 src R@5 (57/57) and 0.965 src R@1 (55/57); page R@1 slightly lower (0.825 vs 0.842, 47/57 vs 48/57, -1 Q); 2.9x latency increase (51 ms vs 17.6 ms). Retain unfiltered Dense E5 + Cohere reranker; tooling preserved in `evaluation/lib/hybrid.py`. `HYBRID_SEARCH_DECISION.md` |
 | 18 | Abstention & refusal calibration | **Adopted prompt-based refusal; rejected pre-LLM score gating**: 100% abstention precision & recall (6/6) across Gemini and Groq with 0 hallucinations. Pre-LLM score thresholding rejected because score overlap causes 33.3% false refusals on valid queries at $\tau = 0.80$. `ABSTENTION_DECISION.md` |
 | 19 | Context compression & trimming | **Adopted adaptive score-aware pruning & structural cleanup**: 15.9% prompt token reduction (avg 3.89 chunks vs 5.00); 100% source recall preserved (57/57); page-aware headers. `CONTEXT_COMPRESSION_DECISION.md` |
-| 20 | Faithfulness & hallucination audit | **Comprehensive audit completed**: 0 phantom citations (0.0%); numerical hallucinations dropped 68% (from 28 down to 9 in Groq and 2 in Gemini); 100% clean abstention on unanswerables. `FAITHFULNESS_HALLUCINATION_AUDIT.md` |
+| 20 | Faithfulness & hallucination audit | **Comprehensive audit completed**: 0 phantom citations (0.0%). Original audit reported numerical hallucinations dropping from 28 to 9 (Groq) and 2 (Gemini), but compared unmatched samples (63 vs 63 vs 18 Qs). On the matched 18Q subset, Baseline=8, Groq=2, Gemini=2 (tied). See [`FAITHFULNESS_HALLUCINATION_AUDIT.md`](../evaluation/reports/FAITHFULNESS_HALLUCINATION_AUDIT.md) and [`LLM_MATCHED_SUBSET_ANALYSIS.md`](../evaluation/reports/LLM_MATCHED_SUBSET_ANALYSIS.md) |
 | 21 | Latency & cost optimization | **Latency waterfall & token economics mapped**: end-to-end TTFT ~1.4s (streaming), API cost $2.14 / 1,000 queries with Cohere (<$110/mo for 10,000 students). `LATENCY_COST_OPTIMIZATION.md` |
 | 22 | **Promote winning config to production** | **Promoted to `backend/app/`**: `intfloat/e5-base-v2` with `_PrefixedEmbeddings`, `1500/200` chunking, Cohere reranking, conversational rewriter, adaptive compressor, calibrated prompt, and main API telemetry. `PROMOTION_TO_PRODUCTION.md` |
 | 23 | Observability / tracing | **Structured telemetry implemented**: `backend/app/telemetry.py` + `GET /api/metrics` endpoint. `OBSERVABILITY_TRACING.md` |
@@ -185,32 +187,66 @@ The production codebase in `backend/app/` is now running the fully converged, ev
 
 ---
 
-## 8. How to resume in a new chat
+## 8. Current Next Steps & Maintenance
 
-1. Say: *"read `docs/PROJECT_HANDOFF.md`"* (this file) and *"read `evaluation/reports/latest_report.md`"*
-   for the freshest numbers.
-2. Confirm git state: `git log --oneline -5`, `git status`.
-3. Pick the next phase (default: **Phase 11 parser**, or **Phases 12–14 answer quality**).
-4. Follow the golden rules (§2): one variable, same dataset/corpus, record latency, don't touch
-   production, commit + push curated artifacts (scan for secrets first), update the docs
-   (`latest_report.md`, `README.md`, `ARCHITECTURE.md`, and this handoff).
-5. **Keep this file current** at the end of each phase (update "Last updated", HEAD, the progress
-   tables, and the winning config).
+The 25-phase evaluation program is complete and the winning architecture is in production. Key remaining roadmap and maintenance items:
+
+1. **Matched-Subset LLM Analysis (Task A Analysis):**
+   - Recomputed generation metrics on the identical 18-question answerable subset (`evaluation/reports/LLM_MATCHED_SUBSET_ANALYSIS.md`). Confirmed Gemini maintains strong recall and latency leads (+29.8% token recall, 3.1× faster), while Gemini and Groq tied at 2 numerical errors each on the identical subset. Full 63-question evaluation across all categories recommended when Gemini quota allows.
+2. **Summary-vs-Raw Ingestion A/B Testing:**
+   - Raw text was indexed across all evaluation phases as an experimental circumstance (unfunded OpenRouter key at snapshot freeze). Single-variable A/B testing comparing raw text against LLM-generated chunk summaries remains open as future work.
+3. **Expand Unanswerable Adversarial Benchmark (Target: 20+ Questions):**
+   - Out-of-corpus refusal calibration (Phase 18) was evaluated on 6 questions (`Q056`–`Q061`) with 100% precision and recall. Expanding the unanswerable set to 20+ adversarial and edge-case questions will provide higher statistical confidence.
+4. **Frontend CI Workflow (`.github/workflows/ci.yml`):**
+   - Extend GitHub Actions CI to include frontend lint and production build checks (`npm ci`, `npm run lint`, `npm run build`) triggered on `frontend/**` path changes.
+5. **Verify Live Vector Store Chunk Count:**
+   - Verify that live remote ChromaDB reports exactly 285 chunks matching the 1500/200 re-indexing (`TODO: verify against live /api/health`).
+6. **Record Human Evaluation Scorer Identity:**
+   - Annotate scorer identity for the Phase 14 30-question stratified human evaluation (`human_eval_30q_scored.json`, `TODO: verify`).
 
 ---
 
 ## 9. Commit history (evaluation program)
 
 ```
-4697de7 Phases 9-10 - keep reranker; select 1500/200 chunking
-f1c4c6e Phase 8 embedding selection - e5-base-v2 (reranked-confirmed)
-e627dcc Groq fallback LLM (primary -> fallback -> extractive)
-af2ce01 Phase 7 embedding comparison - e5-base-v2 wins
-a387d8d Phase 6 baseline - Cohere-reranked metrics + Gemini answers (partial)
-e224c52 Phase 5 retrieval metrics + dense baseline
-c98434f Phase 4 evaluation pipeline framework
-c23678e Phase 3 ground truth
-d68a9c1 Phase 2 benchmark dataset
-4583efe Phase 1 freeze Baseline V1
-77fc1f6 Phase 0 codebase audit
+57db9e3 ci: add GitHub Actions workflow for backend offline smoke tests
+42c3558 test(backend): add minimal offline pytest smoke suite
+dc6a045 docs: reconcile PROJECT_HANDOFF.md and document evaluation limitations in latest_report.md
+b64f3b4 docs: reconcile ARCHITECTURE.md with promoted production system
+fcfe1a8 docs: synchronize README, ARCHITECTURE, and backend/.env.example with production RAG pipeline
+c67d5b9 fix(frontend): support apostrophes in citation regex and ignore backend logs
+df3fcda feat(rag): complete 25-phase optimization, promote winning pipeline, reindex vector store, and add real-time streaming UX
+3b579fb docs: add PROJECT_HANDOFF.md (project context + phase progress + next steps)
+4697de7 feat(eval): Phases 9-10 - keep reranker; select 1500/200 chunking
+f1c4c6e docs(eval): Phase 8 embedding selection - e5-base-v2 (reranked-confirmed)
+e627dcc feat(llm): add automatic Groq fallback LLM (primary -> fallback -> extractive)
+af2ce01 feat(eval): Phase 7 embedding comparison - e5-base-v2 wins (MiniLM/BGE/E5)
+a387d8d feat(eval): Phase 6 baseline - Cohere-reranked metrics + Gemini answers (partial)
+e224c52 feat(eval): retrieval metrics + dense baseline scored (Phase 5)
+c98434f feat(eval): add evaluation pipeline framework (Phase 4)
+c23678e feat(eval): attach ground truth to uniassist_eval_v1 (Phase 3)
+d68a9c1 feat(eval): add benchmark dataset uniassist_eval_v1 (Phase 2)
+4583efe chore(eval): freeze Baseline V1 (Phase 1)
+77fc1f6 docs: add Phase 0 codebase audit (CURRENT_STATE.md)
 ```
+
+---
+
+## 10. Known limitations & evaluation caveats
+
+1. **Phase 6 Answer Coverage vs Later Phases:**
+   - In Phase 6 (`baseline_v1.json`), only **16/63** answers were captured with a real LLM due to the Gemini free-tier daily cap (20 requests/day).
+   - In subsequent phases, full 63-question answer coverage was achieved by Groq in Phase 12/13 (`rag_e5_1500_groq_gptoss_full_rag_scored.json`, 63/63) and in the Phase 20 audit (`faithfulness_audit_scored.json`, 63/63). The Phase 12/13 Gemini run evaluated 18 questions (`rag_e5_1500_gemini_full_rag_scored.json`) before hitting the daily quota.
+2. **Statistical Ties on 57 Answerable Questions:**
+   - The benchmark dataset contains 57 answerable questions. A 1-question difference equals $1/57 \approx 1.75\%$.
+   - A delta such as 0.965 (55/57) vs 0.947 (54/57) in Recall@1 represents exactly **one question**. Such small deltas represent statistical ties rather than significant margins. Architectural decisions were made considering verified operational factors documented in decision records (e.g., ingestion latency and dependency footprint in `PARSER_DECISION.md`, or retrieval latency and dual-index maintenance overhead in `HYBRID_SEARCH_DECISION.md`) rather than single-question retrieval deltas alone.
+3. **Abstention Sample Size:**
+   - Out-of-corpus refusal calibration (Phase 18) was evaluated on **6 unanswerable questions** (`Q056`–`Q061`). While achieving 6/6 (100%) clean abstention on both models confirms prompt refusal capabilities, 6 queries is a small sample. Expanding to a 20+ query adversarial set is recommended for future audits.
+4. **Human Evaluation Scorer:**
+   - The 30-question stratified human evaluation in Phase 14 (`human_eval_30q_scored.json`) produced an overall score of 4.68/5.00. Scorer identity: `TODO: verify` (to be filled in by the author).
+5. **Numerical Hallucination Comparison:**
+   - The reported reduction in numerical hallucinations (from 28 down to 2) compares the Baseline V1 system (MiniLM, 2500/300, extractive fallbacks, uncalibrated prompt) against the promoted Gemini configuration (E5, 1500/200, context compression, calibrated slab-aware prompt). This is a **system-level comparison**, not a single-variable ablation.
+6. **Operational Limits & Cold Starts:**
+   - **Google Gemini free-tier:** Capped at 20 requests/day. The live demo depends heavily on automatic failover to the Groq `openai/gpt-oss-120b` fallback when quota is reached.
+   - **Cohere Trial Key:** Limited to 10 calls/minute, requiring an eval-only throttle (`EVAL_COHERE_MIN_INTERVAL_MS=7000`) during batch runs.
+   - **Hosted Render ChromaDB:** Free/starter container instances spin down after inactivity; initial requests can experience a 30–50+ second cold start while the remote container wakes up.

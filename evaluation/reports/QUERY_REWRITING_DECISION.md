@@ -4,11 +4,11 @@
 >
 > Query rewriting resolves multi-turn pronoun and contextual ambiguity before vector retrieval.
 > On the conversational benchmark subset (6 questions), it delivers a **+50% lift in Source Recall@1**
-> (0.667 → **1.000**) and a **+100% lift in Page Recall@1** (0.500 → **1.000**), eliminating the single
+> (0.667 → **1.000**, 4/6 → 6/6) and a **+100% lift in Page Recall@1** (0.500 → **1.000**, 3/6 → 6/6; note: small sample of 6 questions), eliminating the single
 > largest quality gap identified during Phase 14 human evaluation.
 >
-> On the entire 57-question benchmark, overall dense Source Recall@1 rises to **0.965** and Page Recall@1
-> rises to **0.842**. Production promotion is deferred to Phase 22.
+> On the entire 57-question benchmark, overall dense Source Recall@1 rises to **0.965** (53/57 → 55/57, +2 Qs) and Page Recall@1
+> rises to **0.842** (45/57 → 48/57, +3 Qs). Production promotion is deferred to Phase 22.
 
 ---
 
@@ -52,6 +52,8 @@ Because query rewriting triggers strictly when conversation history is present, 
 | **Page Recall@1** | 0.789 | **0.842** | **+0.053** |
 | **Page Recall@5** | 0.860 | **0.895** | **+0.035** |
 | **Page MRR** | 0.819 | **0.866** | **+0.047** |
+
+> *Note on sample size: The full benchmark improvement represents a shift of 2 questions on source Recall@1 (53/57 → 55/57) and 3 questions on page Recall@1 (45/57 → 48/57), driven entirely by resolving the 6 conversational follow-up questions.*
 
 ---
 

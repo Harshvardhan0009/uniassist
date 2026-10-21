@@ -8,9 +8,11 @@ Full tables: [`EMBEDDING_COMPARISON.md`](./EMBEDDING_COMPARISON.md). Raw: `exper
 
 | Model | dim | src Recall@1 | src Recall@5 | src MRR | page Recall@1 | page MRR | build (s) | index (MB) | query (ms) |
 |---|--:|--:|--:|--:|--:|--:|--:|--:|--:|
-| all-MiniLM-L6-v2 (baseline) | 384 | 0.877 | 0.965 | 0.912 | 0.632 | 0.708 | ~6 | 4.6 | 20 |
-| BAAI/bge-base-en-v1.5 | 768 | 0.877 | 0.983 | 0.915 | 0.614 | 0.713 | 55 | 5.0 | 66 |
-| **intfloat/e5-base-v2** | 768 | 0.877 | **1.000** | **0.927** | **0.649** | **0.743** | 57 | 5.1 | 62 |
+| all-MiniLM-L6-v2 (baseline) | 384 | 0.877 (50/57) | 0.965 (55/57) | 0.912 | 0.632 (36/57) | 0.708 | ~6 | 4.6 | 20 |
+| BAAI/bge-base-en-v1.5 | 768 | 0.877 (50/57) | 0.983 (56/57) | 0.915 | 0.614 (35/57) | 0.713 | 55 | 5.0 | 66 |
+| **intfloat/e5-base-v2** | 768 | 0.877 (50/57) | **1.000 (57/57)** | **0.927** | **0.649 (37/57)** | **0.743** | 57 | 5.1 | 62 |
+
+> *Note on sample size: Differences between models on dense retrieval represent 1–2 questions (source Recall@5 55/57 for MiniLM vs 57/57 for E5; page Recall@1 36/57 vs 37/57); the selection is primarily justified by perfect top-5 source retention across all 57 queries and consistency under reranking.*
 
 ## Findings
 
