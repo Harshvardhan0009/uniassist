@@ -5,7 +5,7 @@
 > so far, the current configuration, important gotchas, and what's next. When starting a new session,
 > just say *"read `docs/PROJECT_HANDOFF.md`"* and you'll have full context.
 >
-> **Last updated:** 2026-10-21 · **Branch:** `laukik-uniassist-branch` · **HEAD:** `b64f3b4`
+> **Last updated:** 2026-10-21 · **Branch:** `laukik-uniassist-branch` · **HEAD:** `57db9e3`
 > · **Remote:** `github.com/Harshvardhan0009/uniassist`
 
 ---
@@ -206,6 +206,9 @@ The 25-phase evaluation program is complete and the winning architecture is in p
 ## 9. Commit history (evaluation program)
 
 ```
+57db9e3 ci: add GitHub Actions workflow for backend offline smoke tests
+42c3558 test(backend): add minimal offline pytest smoke suite
+dc6a045 docs: reconcile PROJECT_HANDOFF.md and document evaluation limitations in latest_report.md
 b64f3b4 docs: reconcile ARCHITECTURE.md with promoted production system
 fcfe1a8 docs: synchronize README, ARCHITECTURE, and backend/.env.example with production RAG pipeline
 c67d5b9 fix(frontend): support apostrophes in citation regex and ignore backend logs
