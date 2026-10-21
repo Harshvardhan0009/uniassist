@@ -249,7 +249,7 @@ flowchart LR
 
 1. **Query Rewriting** (`rewriter.py`) — for multi-turn conversations (Turn 2+), uses conversational
    history to resolve ambiguous pronouns and context into standalone search queries via LLM
-   (Phase 14 winner, +50% recall on conversational follow-ups). First turns pass through untouched.
+   (Phase 15 winner, +50% recall on conversational follow-ups). First turns pass through untouched.
 2. **Retrieve** (`retriever.py`) — prepends the mandatory `query: ` prefix for `intfloat/e5-base-v2`
    and executes `similarity_search_with_relevance_scores` (cosine) to fetch a broad candidate pool
    of Top-20 chunks (`RETRIEVAL_TOP_K=20`); candidates below `RETRIEVAL_MIN_SCORE` (0.0) are dropped.
@@ -257,7 +257,7 @@ flowchart LR
    the rewritten search query and narrows to Top-5 chunks (`RERANK_TOP_N=5`). If Cohere is unconfigured
    or errors, gracefully falls back to dense retrieval ordering.
 4. **Context Compression** (`compressor.py`) — adaptive score-drop tail pruning (`ENABLE_CONTEXT_COMPRESSION=True`,
-   relative drop ratio 0.35, min score 0.20, minimum 2 chunks kept; Phase 18 winner) removes distractor
+   relative drop ratio 0.35, min score 0.20, minimum 2 chunks kept; Phase 19 winner) removes distractor
    chunks from the prompt, reducing token consumption by ~15.8% with 100% ground-truth retention.
 5. **Generate** (`generator.py`) — injects compressed context with explicit header tags
    `[Source {i}: {source_file}, Page {page_number}]`, up to `MAX_HISTORY_MESSAGES` (6) prior turns,
@@ -418,7 +418,7 @@ its `.txt` companion for searchable content.
 | `RERANK_TOP_N` | `5` | Candidate set retained after cross-encoder reranking |
 | `RETRIEVAL_MIN_SCORE` | `0.0` | Drop candidates below this cosine score |
 | `ENABLE_QUERY_REWRITING` | `true` | Turn 2+ history resolution for conversational follow-ups |
-| `ENABLE_CONTEXT_COMPRESSION` | `true` | Adaptive context tail pruning (Phase 18 winner) |
+| `ENABLE_CONTEXT_COMPRESSION` | `true` | Adaptive context tail pruning (Phase 19 winner) |
 | `COMPRESSION_MIN_SCORE` | `0.20` | Minimum cross-encoder score threshold for compression |
 | `COMPRESSION_REL_RATIO` | `0.35` | Maximum score drop relative to top chunk |
 | `COMPRESSION_MIN_CHUNKS` | `2` | Minimum number of context chunks preserved |
@@ -471,10 +471,10 @@ The original design describes an aspirational roadmap. What is **actually built 
 | BGE-M3 embeddings (microservice) | ➖ `intfloat/e5-base-v2` (768-dim), in-process (Phase 7 winner) |
 | Grok for summarize/generate | ✅ Primary Google Gemini `gemini-3.6-flash` with Groq `openai/gpt-oss-120b` failover |
 | ChromaDB vector store | ✅ Implemented (local or Render client-server, 285 chunks) |
-| Cohere Rerank v3.5 | ✅ Implemented **and active** (Phase 8 winner) |
+| Cohere Rerank v3.5 | ✅ Implemented **and active** (Phase 9 winner) |
 | LangChain orchestration | ✅ Implemented |
 | LangGraph adaptive routing | ➖ Query rewriter (`rewriter.py`) implemented for Turn 2+ conversational queries |
-| Hybrid search / metadata filtering | ❌ Evaluated in Phases 15 & 16 and **rejected** based on benchmark data |
+| Hybrid search / metadata filtering | ❌ Evaluated in Phases 16 & 17 and **rejected** based on benchmark data |
 | Multi-turn conversation | ✅ Implemented (Turn 2+ LLM rewriting + conversation history context) |
 | Streaming responses | ✅ Implemented (`POST /api/query/stream` SSE) |
 | Observability / metrics | ✅ Implemented (`GET /api/metrics` + rolling telemetry + query traces) |
