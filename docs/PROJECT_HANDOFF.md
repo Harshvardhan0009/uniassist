@@ -5,7 +5,7 @@
 > so far, the current configuration, important gotchas, and what's next. When starting a new session,
 > just say *"read `docs/PROJECT_HANDOFF.md`"* and you'll have full context.
 >
-> **Last updated:** 2026-10-21 · **Branch:** `laukik-uniassist-branch` · **HEAD:** `57db9e3`
+> **Last updated:** 2026-10-21 · **Branch:** `laukik-uniassist-branch` · **HEAD at last doc edit:** `b9de3c2`
 > · **Remote:** `github.com/Harshvardhan0009/uniassist`
 
 ---
@@ -18,12 +18,14 @@ residential facilities, semester exchange, NSS, campus map), grounded strictly i
 documents.
 
 **Two deployable parts:**
-- **Backend** — FastAPI (`backend/app/`). Offline **ingestion** (documents → chunks → summaries →
-  embeddings → ChromaDB) + online **query** (retrieve → rerank → generate).
+- **Backend** — FastAPI (`backend/app/`). Offline **ingestion** (table-aware partition → 1500/200
+  chunking → passage-prefixed E5 embeddings → ChromaDB) + online **query** (5-step pipeline: rewriter →
+  E5 dense retrieval → Cohere reranker → context compressor → calibrated LLM generator).
 - **Frontend** — Next.js 16 / React 19 single-page chat UI (`frontend/app/page.js`).
 
-**Live pipeline:** `question → embed → ChromaDB similarity (top-20) → Cohere rerank (top-5) →
-LLM answer + citations`.
+**Live pipeline:** `question → Turn 2+ conversational rewriter → query-prefixed E5 retrieval (top-20) →
+Cohere rerank-v3.5 (top-5) → adaptive context compressor → Gemini 3.6 Flash generation & SSE streaming
+(Groq GPT-OSS-120B fallback)`.
 
 **Key docs:**
 - `ARCHITECTURE.md` — full current architecture (kept up to date).
@@ -67,8 +69,7 @@ modify production** until the full winning configuration is chosen (that's Phase
 | Vector store | ChromaDB, collection `university_docs` (remote Render, client-server) |
 | Retrieval | top-K = **20** |
 | Reranker | Cohere **rerank-v3.5**, top-N = **5** |
-| LLM (primary) | **`gemini-3.6-flash`** via Google's OpenAI-compatible endpoint |
-| LLM (fallback) | **Groq `openai/gpt-oss-120b`** (auto-failover) |
+| LLM (baseline reference) | OpenRouter **google/gemini-2.5-flash** (substituted during evaluation runs by **`gemini-3.6-flash`** / Groq failover due to OpenRouter 404/quota) |
 
 **Corpus:** 14 ingestible files (12 PDF + 1 DOCX + 1 TXT) → 144 pages → **184 chunks** at 2500/300.
 
@@ -93,10 +94,7 @@ modify production** until the full winning configuration is chosen (that's Phase
   63-question reranked run takes ~15 min because of this.
 - **Reasoning models return empty at tiny `max_tokens`** (Gemini 3.x, gpt-oss "think" first). Use a
   realistic budget (≥256).
-- **E5/BGE need instruction prefixes.** E5 **requires** `query:` / `passage:`; BGE uses a query
-  instruction. Wired into the eval harness via `_PrefixedEmbeddings` (config `embedding.query_prefix`
-  / `passage_prefix`). **Production `embedder.py`/`retriever.py` do NOT apply prefixes yet** — that's
-  part of the Phase 22 E5 promotion.
+- **E5/BGE instruction prefixes:** E5 **requires** `query: ` / `passage: ` prefixes. As part of Phase 22 promotion, production `embedder.py` (`_PrefixedEmbeddings` with `passage: `) and `retriever.py` (with `query: `) apply these prefixes automatically.
 - **Config gotcha (fixed):** experiment configs must put `snapshot`/`collection` under the
   **`"evaluation"`** block, not `"experiment"` (`load_config` reads `evaluation`). A chunk run once
   silently reused the wrong snapshot because of this.
@@ -191,15 +189,20 @@ The production codebase in `backend/app/` is now running the fully converged, ev
 
 ## 8. Current Next Steps & Maintenance
 
-The 25-phase evaluation program is complete and the winning architecture is in production. Immediate next steps for project sustainability:
+The 25-phase evaluation program is complete and the winning architecture is in production. Key remaining roadmap and maintenance items:
 
-1. **Minimal Pytest Smoke Suite (`backend/tests/`):**
-   - Offline unit tests for `/api/health`, `/api/metrics`, request parameter validation (`/api/query`), constant-time token bearer auth (`/api/ingest`), chunker splitting boundaries, and context compressor score pruning.
-2. **Continuous Integration (`.github/workflows/ci.yml`):**
-   - Run the offline test suite on every PR and push without requiring external API keys.
-3. **Production Observability & Monitoring:**
-   - Monitor `GET /api/metrics` for p50/p95 latency shifts and LLM failover frequency.
-   - Configure secrets securely in the production deployment environment.
+1. **Matched-Subset LLM Analysis (Task A Analysis):**
+   - Recomputed generation metrics on the identical 18-question answerable subset (`evaluation/reports/LLM_MATCHED_SUBSET_ANALYSIS.md`). Confirmed Gemini maintains strong recall and latency leads (+29.8% token recall, 3.1× faster), while Gemini and Groq tied at 2 numerical errors each on the identical subset. Full 63-question evaluation across all categories recommended when Gemini quota allows.
+2. **Summary-vs-Raw Ingestion A/B Testing:**
+   - Raw text was indexed across all evaluation phases as an experimental circumstance (unfunded OpenRouter key at snapshot freeze). Single-variable A/B testing comparing raw text against LLM-generated chunk summaries remains open as future work.
+3. **Expand Unanswerable Adversarial Benchmark (Target: 20+ Questions):**
+   - Out-of-corpus refusal calibration (Phase 18) was evaluated on 6 questions (`Q056`–`Q061`) with 100% precision and recall. Expanding the unanswerable set to 20+ adversarial and edge-case questions will provide higher statistical confidence.
+4. **Frontend CI Workflow (`.github/workflows/ci.yml`):**
+   - Extend GitHub Actions CI to include frontend lint and production build checks (`npm ci`, `npm run lint`, `npm run build`) triggered on `frontend/**` path changes.
+5. **Verify Live Vector Store Chunk Count:**
+   - Verify that live remote ChromaDB reports exactly 285 chunks matching the 1500/200 re-indexing (`TODO: verify against live /api/health`).
+6. **Record Human Evaluation Scorer Identity:**
+   - Annotate scorer identity for the Phase 14 30-question stratified human evaluation (`human_eval_30q_scored.json`, `TODO: verify`).
 
 ---
 
@@ -236,7 +239,7 @@ d68a9c1 feat(eval): add benchmark dataset uniassist_eval_v1 (Phase 2)
    - In subsequent phases, full 63-question answer coverage was achieved by Groq in Phase 12/13 (`rag_e5_1500_groq_gptoss_full_rag_scored.json`, 63/63) and in the Phase 20 audit (`faithfulness_audit_scored.json`, 63/63). The Phase 12/13 Gemini run evaluated 18 questions (`rag_e5_1500_gemini_full_rag_scored.json`) before hitting the daily quota.
 2. **Statistical Ties on 57 Answerable Questions:**
    - The benchmark dataset contains 57 answerable questions. A 1-question difference equals $1/57 \approx 1.75\%$.
-   - A delta such as 0.965 (55/57) vs 0.947 (54/57) in Recall@1 represents exactly **one question**. Such small deltas represent statistical ties rather than significant margins. Decisions were made considering latency, operational simplicity, and cross-encoder synergy rather than single-question retrieval deltas alone.
+   - A delta such as 0.965 (55/57) vs 0.947 (54/57) in Recall@1 represents exactly **one question**. Such small deltas represent statistical ties rather than significant margins. Architectural decisions were made considering verified operational factors documented in decision records (e.g., ingestion latency and dependency footprint in `PARSER_DECISION.md`, or retrieval latency and dual-index maintenance overhead in `HYBRID_SEARCH_DECISION.md`) rather than single-question retrieval deltas alone.
 3. **Abstention Sample Size:**
    - Out-of-corpus refusal calibration (Phase 18) was evaluated on **6 unanswerable questions** (`Q056`–`Q061`). While achieving 6/6 (100%) clean abstention on both models confirms prompt refusal capabilities, 6 queries is a small sample. Expanding to a 20+ query adversarial set is recommended for future audits.
 4. **Human Evaluation Scorer:**

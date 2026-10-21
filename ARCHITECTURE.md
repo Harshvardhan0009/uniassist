@@ -22,9 +22,9 @@ and the campus map — grounded strictly in official university documents.
 
 It has two independently deployable parts:
 
-- **Backend** — a FastAPI service that runs an offline **ingestion pipeline** (documents → chunks
-  → summaries → embeddings → vector store) and an online **query pipeline**
-  (retrieve → rerank → generate).
+- **Backend** — a FastAPI service that runs an offline **ingestion pipeline** (table-aware partition →
+  1500/200 chunking → passage-prefixed E5 embedding → ChromaDB) and an online **query pipeline**
+  (5-step pipeline: conversational rewriter → E5 dense retrieval → Cohere reranking → adaptive context compression → calibrated generation with SSE streaming).
 - **Frontend** — a Next.js App Router single-page chat UI (ChatGPT-style).
 
 ---
@@ -148,7 +148,7 @@ flowchart TB
 ### Production Configuration Parameters
 | Parameter | Value | Location / Env Var | Rationale / Source |
 |---|---|---|---|
-| Embedding model | `intfloat/e5-base-v2` | `EMBEDDING_MODEL` | Phase 7 Winner (Hit@5: 88.9%, MRR: 0.782) |
+| Embedding model | `intfloat/e5-base-v2` | `EMBEDDING_MODEL` | Phase 7 Winner (source Recall@5: 1.000 / MRR: 0.927; page Hit@5: 88.9% / MRR: 0.782 on 1500/200) |
 | Chunk size / overlap | `1500` / `200` chars | `CHUNK_SIZE` / `CHUNK_OVERLAP` | Phase 10 Sweep Winner |
 | Ingestion summarization | `False` (raw text) | `ENABLE_INGESTION_SUMMARIZATION` | Evaluation circumstance (raw text indexed; summary A/B untested, future work) |
 | Retrieval top‑K | `20` | `RETRIEVAL_TOP_K` | High-recall initial candidate pool |
@@ -198,7 +198,7 @@ uniassist/
 │   ├── runners/                  # retrieval_eval.py, full_rag_eval.py
 │   ├── metrics/                  # Phase 5 (retrieval) / Phase 13 (generation)
 │   └── experiments/ · reports/   # result artifacts + reports
-├── Data/                         # University documents (14 PDFs, 144 pages)
+├── Data/                         # University documents (12 PDF + 1 DOCX + 1 TXT, 14 ingestible files, 144 pages)
 ├── docker-compose.yml            # ChromaDB container
 ├── README.md                     # quickstart
 ├── uniassist.md                  # original design/roadmap doc
@@ -333,8 +333,9 @@ Interactive docs are available at `/docs` (Swagger) and `/redoc`.
   "documents_indexed": 285
 }
 ```
+*(Note: `documents_indexed` counts indexed text chunks in ChromaDB, not individual document files; 285 chunks expected for the 14 documents at 1500/200 — TODO: verify against live /api/health).*
 
-**`GET /api/metrics` — response**
+**`GET /api/metrics` — response (illustrative values)**
 ```json
 {
   "total_queries": 42,
@@ -542,10 +543,10 @@ flowchart LR
 **Key Milestone Results Across Phases:**
 - **Phases 4–6 (Dense Baseline & Cohere Reranker):** MiniLM baseline achieved source Recall@5 0.965 / MRR 0.912. Adding Cohere `rerank-v3.5` lifted page Recall@1 from 0.63 to 0.90 and source Recall@5 to 0.982.
 - **Phases 7–8 (Embedding Selection):** `intfloat/e5-base-v2` won across all retrieval metrics (source Recall@5 1.000 / MRR 0.927 vs MiniLM 0.965 / 0.912).
-- **Phase 12 (LLM Evaluation):** Gemini 3.6 Flash achieved +29.8% token recall, +8.7% numerical recall, and 3.1× faster generation latency over Groq on the matched 18-question answerable subset (Q001–Q018). See [`LLM_MATCHED_SUBSET_ANALYSIS.md`](./evaluation/reports/LLM_MATCHED_SUBSET_ANALYSIS.md).
-- **Phase 14 (Human Evaluation):** Whole-system human evaluation on a 30-question stratified sample achieved 4.68/5.00 overall score.
+- **Phase 12 (LLM Evaluation):** On the matched 18-question answerable subset (Q001–Q018), Gemini 3.6 Flash achieved +29.8% token recall, +8.7% numerical recall, and completed generation in 3.90s avg (streaming TTFT ~750ms) vs Groq's 12.02s (3.1× faster). See [`LLM_MATCHED_SUBSET_ANALYSIS.md`](./evaluation/reports/LLM_MATCHED_SUBSET_ANALYSIS.md).
+- **Phase 14 (Human Evaluation):** Whole-system human evaluation (measuring the full pipeline: retrieval, reranking, compression, prompt calibration, and LLM) on a 30-question stratified sample achieved 4.68/5.00 overall score (faithfulness 4.80, correctness 4.53, citation 4.67, clarity 4.73, abstention 100%).
 - **Phase 15 (Query Rewriting):** Multi-turn conversational query resolution improved conversational source Recall@1 from 0.667 to 1.000 (4/6 to 6/6 questions, +50%) and page Recall@1 from 0.500 to 1.000 (3/6 to 6/6 questions, +100%; small sample of 6 questions); benchmark dense source Recall@1 improved from 0.930 to 0.965 (53/57 → 55/57, +2 Qs) and page Recall@1 from 0.789 to 0.842 (45/57 → 48/57, +3 Qs).
-- **Phases 16–17 (Rejected Paradigms):** Metadata filtering (Phase 16) and Hybrid BM25+Dense search (Phase 17) were evaluated and rejected based on benchmark data.
+- **Phases 16–17 (Rejected Paradigms):** Metadata filtering (Phase 16) was rejected because oracle filtering gave 0.0% gain (Source Recall@1 tied at 0.965, 55/57) and automated routing misclassifications lowered Source Recall@1 (0.965 → 0.947, 54/57, -1 Q). Hybrid BM25+Dense search (Phase 17) tied pure Dense E5 on source recall (0.965 Source Recall@1, 55/57; 1.000 Source Recall@5, 57/57), was 1 question lower on page Recall@1 (0.825 vs 0.842, 47/57 vs 48/57), and added 2.9× retrieval latency (51.0 ms vs 17.6 ms) plus dual-index complexity. Both were rejected in favor of unfiltered Dense E5 + Cohere reranker.
 - **Phase 19 (Context Compression):** Adaptive context tail pruning reduced context tokens by 15.8% while preserving 100% ground-truth retrieval.
 - **Phase 20 (Faithfulness & Hallucination Audit):** Headline audit reported numerical hallucinations dropping from 28 to 9 (Groq) and 2 (Gemini), but compared unmatched sample sizes (63 vs 63 vs 18 questions). On the identical 18-question matched subset, Baseline had 8 errors, while Groq and Gemini tied at 2 errors each. See [`LLM_MATCHED_SUBSET_ANALYSIS.md`](./evaluation/reports/LLM_MATCHED_SUBSET_ANALYSIS.md).
 - **Phase 22 (Production Promotion):** Winning pipeline parameters promoted to `backend/app/` with 285-chunk re-indexing.
